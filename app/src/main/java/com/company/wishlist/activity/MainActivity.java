@@ -68,7 +68,6 @@ public class MainActivity extends BaseActivity {
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.toggle_open_drawer, R.string.toggle_close_drawer);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
         showUserData = (Button) findViewById(R.id.show_user_data);
         info = (TextView) findViewById(R.id.info);
         profileImgView = (ImageView) findViewById(R.id.profile_img);

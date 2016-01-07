@@ -4,8 +4,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.company.wishlist.R;
 import com.company.wishlist.task.FacebookProfileData;
@@ -18,7 +16,7 @@ import org.json.JSONObject;
 import java.util.concurrent.ExecutionException;
 
 
-public abstract class BaseActivity extends LogActivity {
+public abstract class BaseActivity extends DebugActivity {
 
     private FacebookPreferences facebookPreferences;
     private IntentUtil intentUtil;

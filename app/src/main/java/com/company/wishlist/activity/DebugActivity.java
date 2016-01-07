@@ -7,7 +7,7 @@ import android.util.Log;
 /**
  * Created by vladstarikov on 07.01.16.
  */
-public class LogActivity extends AppCompatActivity{
+public abstract class DebugActivity extends AppCompatActivity{
 
     String LOG_TAG = this.getClass().getSimpleName();
 

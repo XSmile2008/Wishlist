@@ -163,14 +163,6 @@ public class MainActivity extends BaseActivity {
         profileImgView.setImageDrawable(null);
     }
 
-
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d(TAG, "ActivityTwo: onRestart()");
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -178,22 +170,4 @@ public class MainActivity extends BaseActivity {
         refreshUserDataUi();
     }
 
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(TAG, "ActivityTwo: onPause()");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(TAG, "ActivityTwo: onStop()");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "ActivityTwo: onDestroy()");
-    }
 }

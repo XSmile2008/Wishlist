@@ -18,7 +18,7 @@ import org.json.JSONObject;
 import java.util.concurrent.ExecutionException;
 
 
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends LogActivity {
 
     private FacebookPreferences facebookPreferences;
     private IntentUtil intentUtil;

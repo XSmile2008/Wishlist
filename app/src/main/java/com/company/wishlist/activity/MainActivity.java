@@ -34,12 +34,11 @@ import com.facebook.AccessTokenTracker;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends BaseActivity implements AdapterView.OnItemClickListener, View.OnClickListener{
+public class MainActivity extends BaseActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -82,7 +81,7 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigationView);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
         View header = navigationView.getHeaderView(0);
 
         userAvatarView = (ImageView) header.findViewById(R.id.profile_user_avatar_iw);
@@ -199,7 +198,6 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
         };
     }
 
-
     @Override
     protected void onRestart() {
         super.onRestart();
@@ -212,7 +210,6 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
         updateUserData();
         refreshUserDataUi();
     }
-
 
     @Override
     protected void onPause() {

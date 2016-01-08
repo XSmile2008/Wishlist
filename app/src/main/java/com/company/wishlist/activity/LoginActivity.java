@@ -1,14 +1,11 @@
 package com.company.wishlist.activity;
 
 import android.content.Intent;
-import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import com.company.wishlist.R;
-import com.company.wishlist.task.FacebookProfileData;
-import com.company.wishlist.util.DialogUtil;
 import com.company.wishlist.util.FacebookPreferences;
 import com.company.wishlist.util.IntentUtil;
 import com.facebook.CallbackManager;
@@ -18,7 +15,6 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
 import java.util.Arrays;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by v.odahovskiy on 05.01.2016.
@@ -39,7 +35,7 @@ public class LoginActivity extends AppCompatActivity {
         facebookPreferences = new FacebookPreferences(this);
         intentUtil = new IntentUtil(this);
 
-        loginButton = (LoginButton) findViewById(R.id.login_buttonn);
+        loginButton = (LoginButton) findViewById(R.id.login_button);
         loginButton.setReadPermissions(Arrays.asList("public_profile, email, user_birthday, user_friends"));
 
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {

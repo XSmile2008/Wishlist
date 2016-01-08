@@ -17,7 +17,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
 import com.company.wishlist.model.User;
-import com.company.wishlist.task.FacebookProfileData;
 import com.company.wishlist.util.DialogUtil;
 import com.company.wishlist.util.FacebookPreferences;
 import com.company.wishlist.util.IntentUtil;
@@ -26,12 +25,9 @@ import com.facebook.AccessTokenTracker;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
-import com.facebook.Profile;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends BaseActivity {
 

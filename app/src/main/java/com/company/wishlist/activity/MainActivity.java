@@ -82,13 +82,12 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navView);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigationView);
         View header = navigationView.getHeaderView(0);
 
         userAvatarView = (ImageView) header.findViewById(R.id.profile_user_avatar_iw);
         profileUserName = (TextView) header.findViewById(R.id.profile_user_name_tv);
         updateUserProfile = (ImageView) header.findViewById(R.id.update_user_profile);
-
         showUserData = (Button) findViewById(R.id.show_user_data);
 
         updateUserProfile.setOnClickListener(this);

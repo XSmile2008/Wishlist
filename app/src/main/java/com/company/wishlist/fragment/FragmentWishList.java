@@ -31,7 +31,7 @@ public class FragmentWishList extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        WishListAdapter adapter = new WishListAdapter(createTestData());
+        WishListAdapter adapter = new WishListAdapter(getContext(), createTestData());
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);

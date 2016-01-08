@@ -9,36 +9,40 @@
     android:layout_marginTop="@dimen/cardview_vertical_margin"
     android:elevation="@dimen/cardview_default_elevation">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
         android:padding="8dp">
 
         <ImageView
             android:id="@+id/image_view"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/gift_icon"
-            android:layout_marginRight="@dimen/cardview_vertical_margin"/>
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="@dimen/cardview_vertical_margin"
+            android:src="@drawable/gift_icon" />
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/text_view_title"
+            style="@style/MediumText"
+            android:layout_toRightOf="@+id/image_view"
+            android:text="This is title" />
+
+        <TextView
+            android:id="@+id/text_view_comment"
+            style="@style/SmallText"
+            android:layout_toRightOf="@+id/image_view"
+            android:layout_below="@+id/text_view_title"
+            android:text="This is comment to this wish" />
+
+        <ImageButton
+            android:id="@+id/image_button_options"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_alignParentRight="true"
+            android:background="@null"
+            android:src="@drawable/ic_more_vert_black_24dp" />
 
-            <TextView
-                android:id="@+id/text_view_title"
-                style="@style/MediumText"
-                android:text="This is title" />
-
-            <TextView
-                android:id="@+id/text_view_comment"
-                style="@style/SmallText"
-                android:text="This is comment to this wish" />
-
-        </LinearLayout>
-
-    </LinearLayout>
+    </RelativeLayout>
 
 </android.support.v7.widget.CardView>

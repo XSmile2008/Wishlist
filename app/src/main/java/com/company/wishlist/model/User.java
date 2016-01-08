@@ -5,6 +5,9 @@ import com.company.wishlist.task.FacebookProfileData;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by v.odahovskiy on 06.01.2016.
  */
@@ -18,6 +21,8 @@ public class User {
     private String fullName;
     private String birthday;
     private Gender gender;
+
+    private List<User> friends = new ArrayList<>();
 
     public String getId() {
         return id;

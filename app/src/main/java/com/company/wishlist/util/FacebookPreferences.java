@@ -52,6 +52,11 @@ public class FacebookPreferences {
         return String.format(profileImgUrl, getUserId());
     }
 
+    public String getUserAvatarPath(String userId) {
+        String profileImgUrl = "https://graph.facebook.com/%s/picture?type=large";
+        return String.format(profileImgUrl, null == userId ? getUserId() : userId);
+    }
+
     public void saveUserJson(JSONObject object) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(activity);
         SharedPreferences.Editor editor = sp.edit();

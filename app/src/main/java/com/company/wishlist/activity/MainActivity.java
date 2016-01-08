@@ -1,7 +1,9 @@
 package com.company.wishlist.activity;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -10,39 +12,44 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
+import com.company.wishlist.adapter.FriendListAdapter;
+import com.company.wishlist.bean.FriendBean;
 import com.company.wishlist.model.User;
-import com.company.wishlist.task.FacebookProfileData;
+import com.company.wishlist.task.FacebookMyFriendList;
 import com.company.wishlist.util.DialogUtil;
 import com.company.wishlist.util.FacebookPreferences;
 import com.company.wishlist.util.IntentUtil;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
-import com.facebook.Profile;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements AdapterView.OnItemClickListener, View.OnClickListener{
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private TextView info;
-    private ImageView profileImgView;
+    private ImageView userAvatarView;
+    private TextView profileUserName;
     private Button showUserData;
-
     private FacebookPreferences facebookPreferences;
     private IntentUtil intentUtil;
+    private FriendListAdapter friendListAdapter;
+    private ImageView updateUserProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,30 +71,38 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.toggle_open_drawer, R.string.toggle_close_drawer);
+        ListView friendListVIew = (ListView) drawer.findViewById(R.id.friends_list_view);
+        friendListAdapter = new FriendListAdapter(this, new ArrayList<FriendBean>());
+        friendListVIew.setOnItemClickListener(this);
+        friendListVIew.setAdapter(friendListAdapter);
+
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navView);
+        View header = navigationView.getHeaderView(0);
+
+        userAvatarView = (ImageView) header.findViewById(R.id.profile_user_avatar_iw);
+        profileUserName = (TextView) header.findViewById(R.id.profile_user_name_tv);
+        updateUserProfile = (ImageView) header.findViewById(R.id.update_user_profile);
+
         showUserData = (Button) findViewById(R.id.show_user_data);
-        info = (TextView) findViewById(R.id.info);
-        profileImgView = (ImageView) findViewById(R.id.profile_img);
+
+        updateUserProfile.setOnClickListener(this);
 
         //TEST GET USER DATA
         showUserData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    new GraphRequest(
-                            AccessToken.getCurrentAccessToken(),
-                            "/me/friends",
-                            null,
-                            HttpMethod.GET,
-                            new GraphRequest.Callback() {
-                                public void onCompleted(GraphResponse response) {
-                                    Log.d(TAG, response.getJSONObject().toString());
-                                }
-                            }
-                    ).executeAsync();
+                try {
+                    JSONArray friendArr = new FacebookMyFriendList().execute().get();
+                    Log.d(TAG, friendArr.toString());
+                } catch (InterruptedException | ExecutionException e) {
+                    DialogUtil.alertShow(getString(R.string.app_name), e.getMessage(), getApplicationContext());
+                }
 
             }
         });
@@ -123,22 +138,49 @@ public class MainActivity extends BaseActivity {
     private void refreshUserDataUi() {
         User user = null;
         String json = facebookPreferences.getUserJSON();
+        JSONArray friendArr = null;
         if (null != json) {
             try {
                 JSONObject userData = new JSONObject(json);
                 user = User.getFromJSON(userData);
-            } catch (JSONException e) {
+                friendArr = new FacebookMyFriendList().execute().get();
+
+            } catch (JSONException | InterruptedException | ExecutionException e) {
                 DialogUtil.alertShow(getString(R.string.app_name), e.getMessage(), getApplicationContext());
             }
 
-            if (null != user){
-                info.setText(user.getFullName());
+            if (null != user) {
+                profileUserName.setText(user.getFullName());
 
                 Glide.with(MainActivity.this)
                         .load(facebookPreferences.getUserAvatarPath())
-                        .into(profileImgView);
+                        .asBitmap()
+                        .into(userAvatarView);
+
+                if (null != friendArr && friendArr.length() > 0) {
+                    List<FriendBean> friendBeans = getFriendListFromJSON(friendArr);
+                    friendListAdapter.addAll(friendBeans);
+                }
+
             }
         }
+    }
+
+    private List<FriendBean> getFriendListFromJSON(JSONArray friendArr) {
+        List<FriendBean> result = new ArrayList<FriendBean>();
+
+        for (int i = 0; i < friendArr.length(); i++) {
+            try {
+                JSONObject jsonObject = friendArr.getJSONObject(i);
+                FriendBean bean = FriendBean.getFromJSON(jsonObject);
+                bean.setImageUrl(facebookPreferences.getUserAvatarPath(bean.getId()));
+                result.add(bean);
+            } catch (JSONException e) {
+                Log.d(TAG, e.getMessage());
+            }
+        }
+
+        return result;
     }
 
 
@@ -152,16 +194,17 @@ public class MainActivity extends BaseActivity {
                 if (currentAccessToken == null) {
                     //User logged out
                     facebookPreferences.clearUserData();
-                    clearUserArea();
                     intentUtil.showLoginActivity();
                 }
             }
         };
     }
 
-    private void clearUserArea() {
-        info.setText("");
-        profileImgView.setImageDrawable(null);
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d(TAG, "ActivityTwo: onRestart()");
     }
 
     @Override
@@ -169,5 +212,35 @@ public class MainActivity extends BaseActivity {
         super.onStart();
         updateUserData();
         refreshUserDataUi();
+    }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "ActivityTwo: onPause()");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "ActivityTwo: onStop()");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "ActivityTwo: onDestroy()");
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Toast.makeText(this, " Selected friend id is " + id, Toast.LENGTH_LONG).show();
+        Log.d(TAG," Selected friend id is " + id);
+    }
+
+    @Override
+    public void onClick(View v) {
+        Toast.makeText(getApplicationContext(), "Bla bla", Toast.LENGTH_LONG).show();
     }
 }

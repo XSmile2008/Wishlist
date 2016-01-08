@@ -12,12 +12,12 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="8dp">
+        android:padding="@dimen/cardview_padding">
 
         <ImageView
             android:id="@+id/image_view"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="@dimen/circle_icon_size"
+            android:layout_height="@dimen/circle_icon_size"
             android:layout_alignParentLeft="true"
             android:layout_marginRight="@dimen/cardview_vertical_margin"
             android:src="@drawable/gift_icon" />

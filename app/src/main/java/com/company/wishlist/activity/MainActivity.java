@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -48,7 +49,7 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
     private FacebookPreferences facebookPreferences;
     private IntentUtil intentUtil;
     private FriendListAdapter friendListAdapter;
-    private ImageView updateUserProfile;
+    private ImageButton updateUserProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +87,7 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
 
         userAvatarView = (ImageView) header.findViewById(R.id.profile_user_avatar_iw);
         profileUserName = (TextView) header.findViewById(R.id.profile_user_name_tv);
-        updateUserProfile = (ImageView) header.findViewById(R.id.update_user_profile);
+        updateUserProfile = (ImageButton) header.findViewById(R.id.update_user_profile);
         showUserData = (Button) findViewById(R.id.show_user_data);
 
         updateUserProfile.setOnClickListener(this);

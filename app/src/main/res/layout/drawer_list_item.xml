@@ -6,8 +6,8 @@
 
     <ImageView
         android:id="@+id/friend_avatar_iv"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="@dimen/circle_icon_size"
+        android:layout_height="@dimen/circle_icon_size"
         android:layout_marginLeft="5dp" />
 
     <TextView

@@ -7,6 +7,8 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -24,6 +26,7 @@ import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
 import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.bean.FriendBean;
+import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.User;
 import com.company.wishlist.task.FacebookMyFriendList;
 import com.company.wishlist.util.DialogUtil;
@@ -39,7 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends BaseActivity implements AdapterView.OnItemClickListener, View.OnClickListener {
+public class MainActivity extends BaseActivity implements IOnFriendSelectedListener, View.OnClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -74,10 +77,10 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.toggle_open_drawer, R.string.toggle_close_drawer);
-        ListView friendListVIew = (ListView) drawer.findViewById(R.id.friends_list_view);
+        RecyclerView recyclerViewFriends = (RecyclerView) drawer.findViewById(R.id.friends_recycler_view);
         friendListAdapter = new FriendListAdapter(this, new ArrayList<FriendBean>());
-        friendListVIew.setOnItemClickListener(this);
-        friendListVIew.setAdapter(friendListAdapter);
+        recyclerViewFriends.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewFriends.setAdapter(friendListAdapter);
 
         drawer.setDrawerListener(toggle);
         toggle.syncState();
@@ -231,13 +234,13 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(this, " Selected friend id is " + id, Toast.LENGTH_LONG).show();
-        Log.d(TAG," Selected friend id is " + id);
+    public void onClick(View v) {
+        Toast.makeText(getApplicationContext(), "Bla bla", Toast.LENGTH_LONG).show();
     }
 
     @Override
-    public void onClick(View v) {
-        Toast.makeText(getApplicationContext(), "Bla bla", Toast.LENGTH_LONG).show();
+    public void onFriendSelected(long id) {
+        Toast.makeText(this, " Selected friend id is " + id, Toast.LENGTH_LONG).show();
+        Log.d(TAG," Selected friend id is " + id);
     }
 }

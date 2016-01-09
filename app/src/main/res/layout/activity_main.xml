@@ -49,12 +49,11 @@
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/drawer_header" app:menu="@menu/drawer_menu">
 
-        <ListView
+        <android.support.v7.widget.RecyclerView
             android:paddingTop="280dp"
-            android:id="@+id/friends_list_view"
+            android:id="@+id/friends_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
             android:choiceMode="singleChoice"
             android:divider="@color/list_divider"
             android:dividerHeight="1dp" />

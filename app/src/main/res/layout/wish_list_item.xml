@@ -19,7 +19,7 @@
             android:layout_width="@dimen/circle_icon_size"
             android:layout_height="@dimen/circle_icon_size"
             android:layout_alignParentLeft="true"
-            android:layout_marginRight="@dimen/cardview_vertical_margin"
+            android:layout_marginRight="@dimen/cardview_horizontal_margin"
             android:src="@drawable/gift_icon" />
 
         <TextView
@@ -31,8 +31,8 @@
         <TextView
             android:id="@+id/text_view_comment"
             style="@style/SmallText"
-            android:layout_toRightOf="@+id/image_view"
             android:layout_below="@+id/text_view_title"
+            android:layout_toRightOf="@+id/image_view"
             android:text="This is comment to this wish" />
 
         <ImageButton

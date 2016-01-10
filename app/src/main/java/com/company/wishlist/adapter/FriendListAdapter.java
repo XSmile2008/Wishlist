@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
 import com.company.wishlist.bean.FriendBean;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
+import com.company.wishlist.util.CropCircleTransformation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +63,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
     public void onBindViewHolder(Holder holder, int position) {
         Glide.with(context)
                 .load(friends.get(position).getImageUrl())
-                .asBitmap()
+                .bitmapTransform(new CropCircleTransformation(Glide.get(context).getBitmapPool()))
                 .into(holder.imageViewAvatar);
         holder.textViewTitle.setText(friends.get(position).getName());
     }

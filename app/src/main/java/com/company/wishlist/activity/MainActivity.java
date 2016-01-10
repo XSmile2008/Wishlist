@@ -1,8 +1,11 @@
 package com.company.wishlist.activity;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,12 +22,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
+import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.company.wishlist.R;
 import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.bean.FriendBean;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.User;
 import com.company.wishlist.task.FacebookMyFriendList;
+import com.company.wishlist.util.CropCircleTransformation;
 import com.company.wishlist.util.DialogUtil;
 import com.company.wishlist.util.FacebookPreferences;
 import com.company.wishlist.util.IntentUtil;
@@ -151,8 +158,9 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
 
                 Glide.with(MainActivity.this)
                         .load(facebookPreferences.getUserAvatarPath())
-                        .asBitmap()
+                        .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
                         .into(userAvatarView);
+
 
                 if (null != friendArr && friendArr.length() > 0) {
                     List<FriendBean> friendBeans = getFriendListFromJSON(friendArr);

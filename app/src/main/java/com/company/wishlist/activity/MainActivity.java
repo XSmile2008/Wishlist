@@ -25,6 +25,7 @@ import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.User;
 import com.company.wishlist.util.CropCircleTransformation;
 import com.company.wishlist.util.IntentUtil;
+import com.company.wishlist.util.Utilities;
 import com.firebase.client.AuthData;
 import com.firebase.client.FirebaseError;
 
@@ -88,7 +89,9 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
         updateUserProfile.setOnClickListener(this);
 
         if (isAuthenticated()) {
-            refreshUserDataUi();
+            if (Utilities.isConnected(getApplicationContext())) {
+                refreshUserDataUi();
+            }
         }
     }
 
@@ -110,12 +113,6 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(TAG, isAuthenticated() + "");
-    }
-
     private void refreshUserDataUi() {
         User user = getUser();
         if (null != user) {
@@ -133,14 +130,10 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
     @Override
     public void onAuthenticated(AuthData authData) {
         super.onAuthenticated(authData);
-        refreshUserDataUi();
+        if (Utilities.isConnected(getApplicationContext())) {
+            refreshUserDataUi();
+        }
     }
-
-    @Override
-    public void onAuthenticationError(FirebaseError error) {
-        super.onAuthenticationError(error);
-    }
-
 
     @Override
     public void onClick(View v) {

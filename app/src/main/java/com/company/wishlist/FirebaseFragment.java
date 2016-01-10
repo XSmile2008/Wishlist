@@ -69,10 +69,22 @@ public class FirebaseFragment extends Fragment implements Firebase.AuthResultHan
         setRetainInstance(true);
         Firebase.setAndroidContext(getActivity().getApplicationContext());
         mFirebase = new Firebase(getString(R.string.firebase_url));
+        gettingData();
+    }
+
+    public void reloadData(){
+        gettingData();
+    }
+
+    private void gettingData() {
         mAuthdata = mFirebase.getAuth();
 
         if (isAuthenticated()) {
-            saveUserInFirebase(mAuthdata);
+            if (Utilities.isConnected(getContext())) {
+                saveUserInFirebase(mAuthdata);
+            }else {
+                mCallbacks.onMissingConnection();
+            }
         }
     }
 

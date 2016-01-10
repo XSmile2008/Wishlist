@@ -1,6 +1,5 @@
 package com.company.wishlist.activity;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -18,7 +17,7 @@ import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Created by v.odahovskiy on 05.01.2016.
@@ -32,9 +31,6 @@ public class LoginActivity extends AppCompatActivity {
     private CallbackManager callbackManager;
     private LoginButton loginButton;
     private IntentUtil intentUtil;
-
-    /* A dialog that is presented until the Firebase authentication finished. */
-    private ProgressDialog mAuthProgressDialog;
 
     /* A reference to the Firebase */
     private Firebase mFirebaseRef;
@@ -59,7 +55,7 @@ public class LoginActivity extends AppCompatActivity {
         intentUtil = new IntentUtil(this);
 
         loginButton = (LoginButton) findViewById(R.id.login_button);
-        loginButton.setReadPermissions(Arrays.asList("public_profile, email, user_birthday, user_friends"));
+        loginButton.setReadPermissions(Collections.singletonList("public_profile, email, user_birthday, user_friends"));
 
 
         mFacebookCallbackManager = CallbackManager.Factory.create();
@@ -74,30 +70,16 @@ public class LoginActivity extends AppCompatActivity {
         /* Create the Firebase ref that is used for all authentication with Firebase */
         mFirebaseRef = new Firebase(getResources().getString(R.string.firebase_url));
 
-        /* Setup the progress dialog that is displayed later when authenticating with Firebase */
-        mAuthProgressDialog = new ProgressDialog(this);
-        mAuthProgressDialog.setTitle(getString(R.string.app_name));
-        mAuthProgressDialog.setMessage("Authenticating...");
-        mAuthProgressDialog.setCancelable(false);
-
         mAuthStateListener = new Firebase.AuthStateListener() {
             @Override
             public void onAuthStateChanged(AuthData authData) {
-                hideProgressDialog();
                 mAuthData = authData;
-                //setAuthenticatedUser(authData);
                 Log.v(TAG, " BLA BLA");
             }
         };
         /* Check if the user is authenticated with Firebase already. If this is the case we can set the authenticated
          * user and hide hide any login buttons */
         mFirebaseRef.addAuthStateListener(mAuthStateListener);
-    }
-
-    private void hideProgressDialog() {
-        if (mAuthProgressDialog.isShowing()) {
-            mAuthProgressDialog.hide();
-        }
     }
 
     @Override
@@ -157,7 +139,6 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onAuthenticated(AuthData authData) {
-            hideProgressDialog();
             mAuthData = authData;
             intentUtil.showMainActivity();
             finish();
@@ -165,7 +146,6 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onAuthenticationError(FirebaseError firebaseError) {
-            hideProgressDialog();
             showErrorDialog(firebaseError.toString());
         }
 
@@ -173,7 +153,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private void onFacebookAccessTokenChange(AccessToken token) {
         if (token != null) {
-            mAuthProgressDialog.show();
             mFirebaseRef.authWithOAuthToken("facebook", token.getToken(), new AuthResultHandler("facebook"));
         } else {
             if (this.mAuthData != null && this.mAuthData.getProvider().equals("facebook")) {

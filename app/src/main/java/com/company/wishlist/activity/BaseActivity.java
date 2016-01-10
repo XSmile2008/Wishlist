@@ -24,6 +24,9 @@ public abstract class BaseActivity extends DebugActivity  implements FirebaseFra
     private ProgressDialog mAuthProgressDialog;
     private String mAuthToken;
 
+    public static final String RELOAD_DATA = "RELOAD_DATA";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,9 +50,9 @@ public abstract class BaseActivity extends DebugActivity  implements FirebaseFra
     @Override
     protected void onStart() {
         super.onStart();
-        if(!Utilities.isConnected(getApplicationContext())){
+        /*if(!Utilities.isConnected(getApplicationContext())){
             onMissingConnection();
-        }
+        }*/
     }
 
     private void processFacebookLogin() {
@@ -86,6 +89,13 @@ public abstract class BaseActivity extends DebugActivity  implements FirebaseFra
         super.onResume();
         if(!Utilities.isConnected(getApplicationContext())){
             onMissingConnection();
+        }else {
+            if (null != this.getIntent().getExtras()){
+                boolean reloadData = this.getIntent().getExtras().getBoolean(RELOAD_DATA, false);
+                if (reloadData){
+                    getFirebaseFragment().reloadData();
+                }
+            }
         }
     }
 
@@ -107,7 +117,7 @@ public abstract class BaseActivity extends DebugActivity  implements FirebaseFra
 
     @Override
     public void onMissingConnection() {
-        showErrorDialog("No internet connection");
+        intentUtil.showNoIntentConnectionActivity();
     }
 
     private void showErrorDialog(String message) {

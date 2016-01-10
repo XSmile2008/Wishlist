@@ -16,24 +16,20 @@
 
         <ImageView
             android:id="@+id/image_view"
-            android:layout_width="@dimen/circle_icon_size"
-            android:layout_height="@dimen/circle_icon_size"
+            style="@style/AppTheme.CircleImageView"
             android:layout_alignParentLeft="true"
-            android:layout_marginRight="@dimen/cardview_horizontal_margin"
-            android:src="@drawable/gift_icon" />
+            android:layout_marginRight="@dimen/cardview_horizontal_margin" />
 
         <TextView
             android:id="@+id/text_view_title"
             style="@style/MediumText"
-            android:layout_toRightOf="@+id/image_view"
-            android:text="This is title" />
+            android:layout_toRightOf="@+id/image_view"/>
 
         <TextView
             android:id="@+id/text_view_comment"
             style="@style/SmallText"
             android:layout_below="@+id/text_view_title"
-            android:layout_toRightOf="@+id/image_view"
-            android:text="This is comment to this wish" />
+            android:layout_toRightOf="@+id/image_view"/>
 
         <ImageButton
             android:id="@+id/image_button_options"

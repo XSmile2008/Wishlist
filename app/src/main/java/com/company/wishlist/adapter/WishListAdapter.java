@@ -38,6 +38,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
     @Override
     public void onBindViewHolder(Holder holder, int position) {
+        holder.imageView.setImageResource(R.drawable.gift_icon);
         holder.textViewTitle.setText(wishes.get(position).getTitle());
         holder.textViewComment.setText(wishes.get(position).getComment());
     }

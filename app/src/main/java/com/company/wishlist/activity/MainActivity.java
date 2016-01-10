@@ -1,9 +1,7 @@
 package com.company.wishlist.activity;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -14,11 +12,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +34,7 @@ import com.facebook.AccessTokenTracker;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -77,21 +74,19 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.toggle_open_drawer, R.string.toggle_close_drawer);
-        RecyclerView recyclerViewFriends = (RecyclerView) drawer.findViewById(R.id.friends_recycler_view);
-        friendListAdapter = new FriendListAdapter(this, new ArrayList<FriendBean>());
-        recyclerViewFriends.setLayoutManager(new LinearLayoutManager(this));
-        recyclerViewFriends.setAdapter(friendListAdapter);
-
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        View header = navigationView.getHeaderView(0);
+        friendListAdapter = new FriendListAdapter(this, new ArrayList<FriendBean>());
+        RecyclerView recyclerViewFriends = (RecyclerView) drawer.findViewById(R.id.friends_recycler_view);
+        recyclerViewFriends.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewFriends.setAdapter(friendListAdapter);
 
+        View header = findViewById(R.id.drawer_header);
         userAvatarView = (ImageView) header.findViewById(R.id.profile_user_avatar_iw);
         profileUserName = (TextView) header.findViewById(R.id.profile_user_name_tv);
         updateUserProfile = (ImageButton) header.findViewById(R.id.update_user_profile);
-        showUserData = (Button) findViewById(R.id.show_user_data);
+        showUserData = (Button) findViewById(R.id.show_user_data);//TODO: this button is invisible on screen now. Remove?
 
         updateUserProfile.setOnClickListener(this);
 
@@ -203,34 +198,10 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
     }
 
     @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.d(TAG, "ActivityTwo: onRestart()");
-    }
-
-    @Override
     protected void onStart() {
         super.onStart();
         updateUserData();
         refreshUserDataUi();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(TAG, "ActivityTwo: onPause()");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(TAG, "ActivityTwo: onStop()");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "ActivityTwo: onDestroy()");
     }
 
     @Override

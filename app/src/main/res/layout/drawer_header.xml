@@ -59,6 +59,19 @@
             android:layout_weight="1"
             android:drawableLeft="@drawable/ic_settings_white_24dp"
             android:text="Settings" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:padding="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:text="Logout"
+            android:id="@+id/logout_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
     </LinearLayout>
 
 </LinearLayout>

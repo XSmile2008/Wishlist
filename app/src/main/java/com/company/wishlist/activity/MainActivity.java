@@ -1,11 +1,8 @@
 package com.company.wishlist.activity;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,29 +19,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
-import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.company.wishlist.R;
 import com.company.wishlist.adapter.FriendListAdapter;
-import com.company.wishlist.bean.FriendBean;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.User;
-import com.company.wishlist.task.FacebookMyFriendList;
 import com.company.wishlist.util.CropCircleTransformation;
-import com.company.wishlist.util.DialogUtil;
-import com.company.wishlist.util.FacebookPreferences;
 import com.company.wishlist.util.IntentUtil;
-import com.facebook.AccessToken;
-import com.facebook.AccessTokenTracker;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.firebase.client.AuthData;
+import com.firebase.client.FirebaseError;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends BaseActivity implements IOnFriendSelectedListener, View.OnClickListener {
 
@@ -53,17 +37,16 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
     private ImageView userAvatarView;
     private TextView profileUserName;
     private Button showUserData;
-    private FacebookPreferences facebookPreferences;
     private IntentUtil intentUtil;
     private FriendListAdapter friendListAdapter;
     private ImageButton updateUserProfile;
+    private Button logoutButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        facebookPreferences = new FacebookPreferences(this);
         intentUtil = new IntentUtil(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -84,7 +67,7 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        friendListAdapter = new FriendListAdapter(this, new ArrayList<FriendBean>());
+        friendListAdapter = new FriendListAdapter(this, new ArrayList<User>());
         RecyclerView recyclerViewFriends = (RecyclerView) drawer.findViewById(R.id.friends_recycler_view);
         recyclerViewFriends.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewFriends.setAdapter(friendListAdapter);
@@ -93,25 +76,20 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
         userAvatarView = (ImageView) header.findViewById(R.id.profile_user_avatar_iw);
         profileUserName = (TextView) header.findViewById(R.id.profile_user_name_tv);
         updateUserProfile = (ImageButton) header.findViewById(R.id.update_user_profile);
-        showUserData = (Button) findViewById(R.id.show_user_data);//TODO: this button is invisible on screen now. Remove?
+        logoutButton = (Button) header.findViewById(R.id.logout_button);
 
-        updateUserProfile.setOnClickListener(this);
-
-        //TEST GET USER DATA
-        showUserData.setOnClickListener(new View.OnClickListener() {
+        logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    JSONArray friendArr = new FacebookMyFriendList().execute().get();
-                    Log.d(TAG, friendArr.toString());
-                } catch (InterruptedException | ExecutionException e) {
-                    DialogUtil.alertShow(getString(R.string.app_name), e.getMessage(), getApplicationContext());
-                }
-
+                logout();
             }
         });
 
-        updateUserData();
+        updateUserProfile.setOnClickListener(this);
+
+        if (isAuthenticated()) {
+            refreshUserDataUi();
+        }
     }
 
     @Override
@@ -135,82 +113,34 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
     @Override
     public void onResume() {
         super.onResume();
-        deleteAccessToken();
-        refreshUserDataUi();
+        Log.d(TAG, isAuthenticated() + "");
     }
 
     private void refreshUserDataUi() {
-        User user = null;
-        String json = facebookPreferences.getUserJSON();
-        JSONArray friendArr = null;
-        if (null != json) {
-            try {
-                JSONObject userData = new JSONObject(json);
-                user = User.getFromJSON(userData);
-                friendArr = new FacebookMyFriendList().execute().get();
+        User user = getUser();
+        if (null != user) {
+            profileUserName.setText(user.getDisplayName());
 
-            } catch (JSONException | InterruptedException | ExecutionException e) {
-                DialogUtil.alertShow(getString(R.string.app_name), e.getMessage(), getApplicationContext());
-            }
-
-            if (null != user) {
-                profileUserName.setText(user.getFullName());
-
-                Glide.with(MainActivity.this)
-                        .load(facebookPreferences.getUserAvatarPath())
-                        .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
-                        .into(userAvatarView);
-
-
-                if (null != friendArr && friendArr.length() > 0) {
-                    List<FriendBean> friendBeans = getFriendListFromJSON(friendArr);
-                    friendListAdapter.addAll(friendBeans);
-                }
-
-            }
+            Glide.with(MainActivity.this)
+                    .load(user.getAvatarUrl())
+                    .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
+                    .into(userAvatarView);
+            friendListAdapter.addAll(user.getFriends());
         }
     }
 
-    private List<FriendBean> getFriendListFromJSON(JSONArray friendArr) {
-        List<FriendBean> result = new ArrayList<FriendBean>();
 
-        for (int i = 0; i < friendArr.length(); i++) {
-            try {
-                JSONObject jsonObject = friendArr.getJSONObject(i);
-                FriendBean bean = FriendBean.getFromJSON(jsonObject);
-                bean.setImageUrl(facebookPreferences.getUserAvatarPath(bean.getId()));
-                result.add(bean);
-            } catch (JSONException e) {
-                Log.d(TAG, e.getMessage());
-            }
-        }
-
-        return result;
-    }
-
-
-    private void deleteAccessToken() {
-        AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
-            @Override
-            protected void onCurrentAccessTokenChanged(
-                    AccessToken oldAccessToken,
-                    AccessToken currentAccessToken) {
-
-                if (currentAccessToken == null) {
-                    //User logged out
-                    facebookPreferences.clearUserData();
-                    intentUtil.showLoginActivity();
-                }
-            }
-        };
+    @Override
+    public void onAuthenticated(AuthData authData) {
+        super.onAuthenticated(authData);
+        refreshUserDataUi();
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        updateUserData();
-        refreshUserDataUi();
+    public void onAuthenticationError(FirebaseError error) {
+        super.onAuthenticationError(error);
     }
+
 
     @Override
     public void onClick(View v) {
@@ -220,6 +150,6 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
     @Override
     public void onFriendSelected(long id) {
         Toast.makeText(this, " Selected friend id is " + id, Toast.LENGTH_LONG).show();
-        Log.d(TAG," Selected friend id is " + id);
+        Log.d(TAG, " Selected friend id is " + id);
     }
 }

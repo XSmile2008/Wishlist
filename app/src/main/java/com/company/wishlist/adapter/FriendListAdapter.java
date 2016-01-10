@@ -1,19 +1,17 @@
 package com.company.wishlist.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
-import com.company.wishlist.bean.FriendBean;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
+import com.company.wishlist.model.User;
 import com.company.wishlist.util.CropCircleTransformation;
 
 import java.util.ArrayList;
@@ -25,15 +23,15 @@ import java.util.List;
 public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Holder> {
 
     private Context context;
-    private List<FriendBean> friends;
+    private List<User> friends;
 
-    public FriendListAdapter(Context context, List<FriendBean> friends) {
+    public FriendListAdapter(Context context, List<User> friends) {
         this.context = context;
-        this.friends = (null != friends) ? friends : new ArrayList<FriendBean>();
+        this.friends = (null != friends) ? friends : new ArrayList<User>();
     }
 
-    private boolean isUnique(FriendBean friendBean){
-        for (FriendBean friend : friends){
+    private boolean isUnique(User friendBean){
+        for (User friend : friends){
             if (friend.getId().equals(friendBean.getId())){
                 return true;
             }
@@ -41,14 +39,14 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
         return false;
     }
 
-    public void addFriend(FriendBean friend) {
+    public void addFriend(User friend) {
         if (null != friend && isUnique(friend)) {
             friends.add(friend);
             notifyDataSetChanged();
         }
     }
 
-    public void addAll(List<FriendBean> friends) {
+    public void addAll(List<User> friends) {
         this.friends.clear();
         this.friends.addAll(friends);
         notifyDataSetChanged();
@@ -62,10 +60,10 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
     @Override
     public void onBindViewHolder(Holder holder, int position) {
         Glide.with(context)
-                .load(friends.get(position).getImageUrl())
+                .load(friends.get(position).getAvatarUrl())
                 .bitmapTransform(new CropCircleTransformation(Glide.get(context).getBitmapPool()))
                 .into(holder.imageViewAvatar);
-        holder.textViewTitle.setText(friends.get(position).getName());
+        holder.textViewTitle.setText(friends.get(position).getDisplayName());
     }
 
     @Override

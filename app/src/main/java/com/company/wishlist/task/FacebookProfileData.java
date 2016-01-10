@@ -39,7 +39,6 @@ public class FacebookProfileData extends AsyncTask<Void, Void, JSONObject> {
         request.setParameters(parameters);
         request.executeAndWait();
 
-
         return result[0];
     }
 

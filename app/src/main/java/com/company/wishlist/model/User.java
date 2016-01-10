@@ -1,11 +1,13 @@
 package com.company.wishlist.model;
 
 import com.company.wishlist.task.FacebookProfileData;
+import com.company.wishlist.util.Utilities;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -18,11 +20,20 @@ public class User {
     private String id;
     private String firstName;
     private String lastName;
-    private String fullName;
     private String birthday;
     private Gender gender;
 
-    private List<User> friends = new ArrayList<>();
+    private String displayName;
+    private String provider;
+    List<User> friends = new ArrayList<>();
+
+    public User(){}
+
+    public User(String id, String displayName, String provider) {
+        this.id = id;
+        this.displayName = displayName;
+        this.provider = provider;
+    }
 
     public String getId() {
         return id;
@@ -30,14 +41,6 @@ public class User {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
     }
 
     public String getBirthday() {
@@ -79,11 +82,11 @@ public class User {
             user.setId(object.getString(FacebookProfileData.ID));
             user.setFirstName(object.getString(FacebookProfileData.FIRST_NAME));
             user.setLastName(object.getString(FacebookProfileData.LAST_NAME));
-            user.setFullName(object.getString(FacebookProfileData.NAME));
+            user.setDisplayName(object.getString(FacebookProfileData.NAME));
             user.setBirthday(object.getString(FacebookProfileData.BIRTHDAY));
             user.setGender(object.getString(FacebookProfileData.GENDER));
         } catch (JSONException e) {
-            user = null;
+            e.printStackTrace();
         }
 
         return user;
@@ -95,9 +98,40 @@ public class User {
                 "id='" + id + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", fullName='" + fullName + '\'' +
                 ", birthday='" + birthday + '\'' +
                 ", gender='" + gender + '\'' +
                 '}';
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
+
+    public String getAvatarUrl() {
+        return Utilities.getUserAvatarUrl(id);
+    }
+
+    public List<User> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(List<User> friends) {
+        this.friends = friends;
     }
 }

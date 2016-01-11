@@ -83,9 +83,7 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
         updateUserProfile.setOnClickListener(this);
 
         if (isAuthenticated()) {
-            if (isConnected()) {
-                refreshUserDataUi();
-            }
+            refreshUserDataUi();
         }
     }
 

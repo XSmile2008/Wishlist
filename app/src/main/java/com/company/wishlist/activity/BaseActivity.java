@@ -14,7 +14,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 
 
-public abstract class BaseActivity extends InternetActivity  implements FirebaseFragment.Callbacks{
+public abstract class BaseActivity extends InternetActivity implements FirebaseFragment.Callbacks {
 
     private FirebaseFragment mFirebaseFragment;
     private Firebase mFirebase;
@@ -39,7 +39,6 @@ public abstract class BaseActivity extends InternetActivity  implements Firebase
             if (!mFirebaseFragment.isAuthenticated() || isTokenExpired()) {
                 mFirebase.unauth();
                 processFacebookLogin();
-                return;
             }
         }
     }
@@ -77,14 +76,10 @@ public abstract class BaseActivity extends InternetActivity  implements Firebase
     @Override
     public void onResume() {
         super.onResume();
-        if(isConnected()){
-            onMissingConnection();
-        }else {
-            if (null != this.getIntent().getExtras()){
-                boolean reloadData = this.getIntent().getExtras().getBoolean(RELOAD_DATA, false);
-                if (reloadData){
-                    getFirebaseFragment().reloadData();
-                }
+        if (null != this.getIntent().getExtras()) {
+            boolean reloadData = this.getIntent().getExtras().getBoolean(RELOAD_DATA, false);
+            if (reloadData) {
+                getFirebaseFragment().reloadData();
             }
         }
     }

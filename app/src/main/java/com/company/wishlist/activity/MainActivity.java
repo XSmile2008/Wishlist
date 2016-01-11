@@ -24,10 +24,7 @@ import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.User;
 import com.company.wishlist.util.CropCircleTransformation;
-import com.company.wishlist.util.IntentUtil;
-import com.company.wishlist.util.Utilities;
 import com.firebase.client.AuthData;
-import com.firebase.client.FirebaseError;
 
 import java.util.ArrayList;
 
@@ -37,8 +34,6 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
 
     private ImageView userAvatarView;
     private TextView profileUserName;
-    private Button showUserData;
-    private IntentUtil intentUtil;
     private FriendListAdapter friendListAdapter;
     private ImageButton updateUserProfile;
     private Button logoutButton;
@@ -48,7 +43,6 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        intentUtil = new IntentUtil(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -89,7 +83,7 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
         updateUserProfile.setOnClickListener(this);
 
         if (isAuthenticated()) {
-            if (Utilities.isConnected(getApplicationContext())) {
+            if (isConnected()) {
                 refreshUserDataUi();
             }
         }
@@ -97,19 +91,16 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                return false;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -130,9 +121,14 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
     @Override
     public void onAuthenticated(AuthData authData) {
         super.onAuthenticated(authData);
-        if (Utilities.isConnected(getApplicationContext())) {
+        if (isConnected()) {
             refreshUserDataUi();
         }
+    }
+
+    @Override
+    public void onMissingConnection() {
+
     }
 
     @Override

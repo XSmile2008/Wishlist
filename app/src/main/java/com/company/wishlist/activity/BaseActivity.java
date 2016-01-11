@@ -8,16 +8,14 @@ import android.support.v7.app.AlertDialog;
 import com.company.wishlist.FirebaseFragment;
 import com.company.wishlist.R;
 import com.company.wishlist.model.User;
-import com.company.wishlist.util.IntentUtil;
 import com.company.wishlist.util.Utilities;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 
 
-public abstract class BaseActivity extends DebugActivity  implements FirebaseFragment.Callbacks{
+public abstract class BaseActivity extends InternetActivity  implements FirebaseFragment.Callbacks{
 
-    private IntentUtil intentUtil;
     private FirebaseFragment mFirebaseFragment;
     private Firebase mFirebase;
     private User mUser;
@@ -30,7 +28,6 @@ public abstract class BaseActivity extends DebugActivity  implements FirebaseFra
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        intentUtil = new IntentUtil(this);
 
         setupFirebase();
 
@@ -47,16 +44,9 @@ public abstract class BaseActivity extends DebugActivity  implements FirebaseFra
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        /*if(!Utilities.isConnected(getApplicationContext())){
-            onMissingConnection();
-        }*/
-    }
-
     private void processFacebookLogin() {
-        intentUtil.showLoginActivity();
+        Intent i = new Intent(this, LoginActivity.class);
+        this.startActivity(i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
         finish();
     }
 
@@ -87,7 +77,7 @@ public abstract class BaseActivity extends DebugActivity  implements FirebaseFra
     @Override
     public void onResume() {
         super.onResume();
-        if(!Utilities.isConnected(getApplicationContext())){
+        if(isConnected()){
             onMissingConnection();
         }else {
             if (null != this.getIntent().getExtras()){
@@ -113,11 +103,6 @@ public abstract class BaseActivity extends DebugActivity  implements FirebaseFra
         invalidateOptionsMenu();
         mAuthProgressDialog.hide();
         showErrorDialog(error.getMessage());
-    }
-
-    @Override
-    public void onMissingConnection() {
-        intentUtil.showNoIntentConnectionActivity();
     }
 
     private void showErrorDialog(String message) {

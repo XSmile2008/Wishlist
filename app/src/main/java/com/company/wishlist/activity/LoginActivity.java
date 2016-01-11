@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.company.wishlist.R;
-import com.company.wishlist.util.IntentUtil;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -30,7 +29,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private CallbackManager callbackManager;
     private LoginButton loginButton;
-    private IntentUtil intentUtil;
 
     /* A reference to the Firebase */
     private Firebase mFirebaseRef;
@@ -52,7 +50,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         callbackManager = CallbackManager.Factory.create();
-        intentUtil = new IntentUtil(this);
 
         loginButton = (LoginButton) findViewById(R.id.login_button);
         loginButton.setReadPermissions(Collections.singletonList("public_profile, email, user_birthday, user_friends"));
@@ -140,7 +137,9 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void onAuthenticated(AuthData authData) {
             mAuthData = authData;
-            intentUtil.showMainActivity();
+            getApplicationContext()
+                    .startActivity(new Intent(getApplicationContext(), MainActivity.class)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));//TODO: check
             finish();
         }
 

@@ -9,28 +9,17 @@
     tools:context=".activity.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <fragment
+    <android.support.v4.view.ViewPager
+        android:id="@+id/wish_list_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    <!--<fragment
         android:id="@+id/fragment_wish_list"
         android:name="com.company.wishlist.fragment.FragmentWishList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout="@layout/fragment_wish_list" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <Button
-            android:id="@+id/show_user_data"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <com.facebook.login.widget.LoginButton
-            android:id="@+id/login_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true" />
-
-    </RelativeLayout>
+        tools:layout="@layout/fragment_wish_list" />-->
 
 </LinearLayout>

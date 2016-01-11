@@ -1,11 +1,10 @@
 package com.company.wishlist.activity;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,18 +14,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
-import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.company.wishlist.R;
 import com.company.wishlist.adapter.FriendListAdapter;
+import com.company.wishlist.adapter.WishListPageViewAdapter;
 import com.company.wishlist.bean.FriendBean;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.User;
@@ -52,7 +48,6 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
 
     private ImageView userAvatarView;
     private TextView profileUserName;
-    private Button showUserData;
     private FacebookPreferences facebookPreferences;
     private IntentUtil intentUtil;
     private FriendListAdapter friendListAdapter;
@@ -93,25 +88,19 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
         userAvatarView = (ImageView) header.findViewById(R.id.profile_user_avatar_iw);
         profileUserName = (TextView) header.findViewById(R.id.profile_user_name_tv);
         updateUserProfile = (ImageButton) header.findViewById(R.id.update_user_profile);
-        showUserData = (Button) findViewById(R.id.show_user_data);//TODO: this button is invisible on screen now. Remove?
 
         updateUserProfile.setOnClickListener(this);
 
-        //TEST GET USER DATA
-        showUserData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    JSONArray friendArr = new FacebookMyFriendList().execute().get();
-                    Log.d(TAG, friendArr.toString());
-                } catch (InterruptedException | ExecutionException e) {
-                    DialogUtil.alertShow(getString(R.string.app_name), e.getMessage(), getApplicationContext());
-                }
-
-            }
-        });
-
         updateUserData();
+        setUpTabLayout();
+    }
+
+    private void setUpTabLayout() {
+        WishListPageViewAdapter adapter = new WishListPageViewAdapter(getSupportFragmentManager());
+        ViewPager viewPager = (ViewPager) findViewById(R.id.wish_list_view_pager);
+        viewPager.setAdapter(adapter);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.wish_tab_layout);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     @Override
@@ -220,6 +209,6 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
     @Override
     public void onFriendSelected(long id) {
         Toast.makeText(this, " Selected friend id is " + id, Toast.LENGTH_LONG).show();
-        Log.d(TAG," Selected friend id is " + id);
+        Log.d(TAG, " Selected friend id is " + id);
     }
 }

@@ -40,7 +40,7 @@ public class FragmentWishList extends Fragment {
     @java.lang.Deprecated
     private List<Wish> createTestData() {
         List<Wish> list = new ArrayList<>();
-        while (list.size() < 11) {
+        while (list.size() < 25) {
             Wish wish = new Wish();
             wish.setTitle("Title" + list.size());
             wish.setComment("This is comment for wish#" + list.size());

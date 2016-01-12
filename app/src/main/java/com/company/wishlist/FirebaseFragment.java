@@ -103,13 +103,13 @@ public class FirebaseFragment extends Fragment implements Firebase.AuthResultHan
             mUser.setProvider(provider);
             mFirebase.child("users").child(id).child("first_name").setValue(mUser.getFirstName());
             mFirebase.child("users").child(id).child("last_name").setValue(mUser.getLastName());
-            mFirebase.child("users").child(id).child("gender").setValue(mUser.getGender().name());
+            mFirebase.child("users").child(id).child("gender").setValue(mUser.getGender());
             mFirebase.child("users").child(id).child("birthday").setValue(mUser.getBirthday());
         } catch (InterruptedException | ExecutionException e) {
             mUser = new User(id, displayName, provider);
         }
         mUserId = mUser.getId();
-        mUser.setFriends(friends);
+        //mUser.setFriends(friends);
 
 
         mFirebase.child("users").child(id).child("provider").setValue(provider);

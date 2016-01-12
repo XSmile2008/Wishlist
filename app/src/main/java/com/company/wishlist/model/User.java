@@ -15,17 +15,14 @@ import java.util.List;
  */
 public class User {
 
-    public enum Gender{male, female}
-
     private String id;
     private String firstName;
     private String lastName;
     private String birthday;
-    private Gender gender;
+    private String gender;
 
     private String displayName;
     private String provider;
-    List<User> friends = new ArrayList<>();
 
     public User(){}
 
@@ -41,14 +38,6 @@ public class User {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(String birthday) {
-        this.birthday = birthday;
     }
 
     public String getFirstName() {
@@ -67,12 +56,36 @@ public class User {
         this.lastName = lastName;
     }
 
-    public Gender getGender() {
+    public String getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getGender() {
         return gender;
     }
 
     public void setGender(String gender) {
-        this.gender = Gender.valueOf(gender);
+        this.gender = gender;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
     }
 
     public static User getFromJSON(JSONObject object) {
@@ -101,37 +114,5 @@ public class User {
                 ", birthday='" + birthday + '\'' +
                 ", gender='" + gender + '\'' +
                 '}';
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public String getProvider() {
-        return provider;
-    }
-
-    public void setProvider(String provider) {
-        this.provider = provider;
-    }
-
-    public String getAvatarUrl() {
-        return Utilities.getUserAvatarUrl(id);
-    }
-
-    public List<User> getFriends() {
-        return friends;
-    }
-
-    public void setFriends(List<User> friends) {
-        this.friends = friends;
     }
 }

@@ -31,7 +31,7 @@ public abstract class FirebaseActivity extends BaseActivity implements FirebaseU
             processFirebaseLogin();
         } else {
             if (!firebaseUtil.isAuthenticated() || isTokenExpired()) {
-                firebaseUtil.getFirebase().unauth();
+                firebaseUtil.unauth();
                 processFacebookLogin();
             }
         }
@@ -52,14 +52,14 @@ public abstract class FirebaseActivity extends BaseActivity implements FirebaseU
     private void processFirebaseLogin() {
         if (isConnected()) {
             if (!firebaseUtil.isAuthenticated()) {
-                firebaseUtil.authenticate("facebook", authToken);
+                firebaseUtil.auth("facebook", authToken);
             }
         }
     }
 
     public void logout() {
         if (firebaseUtil.isAuthenticated()) {
-            firebaseUtil.getFirebase().unauth();
+            firebaseUtil.unauth();
             processFacebookLogout();
         }
     }

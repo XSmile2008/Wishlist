@@ -5,24 +5,20 @@ import android.content.Context;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.model.User;
-import com.company.wishlist.task.FacebookMyFriendList;
 import com.company.wishlist.task.FacebookProfileData;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
  * Created by v.odahovskiy on 12.01.2016.
  */
 public class FirebaseUtil implements Firebase.AuthResultHandler {
+
+    //DB TABLES
+    public final String USERS = "users";
 
     //interface for interact util with activity for connection
     public interface IFirebaseConnection {
@@ -32,19 +28,23 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
     }
 
     private Context context;//is IFirebaseConnection so you cant cast it
-    private Firebase firebase;
+    private Firebase firebaseRoot;
     private AuthData authData;
     private User user;
 
     public FirebaseUtil(Context context) {
         this.context = context;
         Firebase.setAndroidContext(context);
-        firebase = new Firebase(context.getString(R.string.firebase_url));
+        firebaseRoot = new Firebase(context.getString(R.string.firebase_url));
         refresh();
     }
 
-    public void authenticate(String provider, String token) {
-        firebase.authWithOAuthToken(provider, token, this);
+    public void auth(String provider, String token) {
+        firebaseRoot.authWithOAuthToken(provider, token, this);
+    }
+
+    public void unauth() {
+        firebaseRoot.unauth();
     }
 
     private void saveUserInFirebase(AuthData authData) {
@@ -54,16 +54,10 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
         try {
             user = new FacebookProfileData().execute().get();
             user.setProvider(provider);
-            firebase.child("users").child(id).child("first_name").setValue(user.getFirstName());
-            firebase.child("users").child(id).child("last_name").setValue(user.getLastName());
-            firebase.child("users").child(id).child("gender").setValue(user.getGender());
-            firebase.child("users").child(id).child("birthday").setValue(user.getBirthday());
+            firebaseRoot.child(USERS).child(id).setValue(user);
         } catch (InterruptedException | ExecutionException e) {
-            user = new User(id, displayName, provider);
+            user = new User(id, displayName, provider);//TODO: what it do?
         }
-
-        firebase.child("users").child(id).child("provider").setValue(provider);
-        firebase.child("users").child(id).child("displayName").setValue(displayName);
     }
 
     @Override
@@ -80,7 +74,7 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
 
 
     public void refresh() {
-        authData = firebase.getAuth();
+        authData = firebaseRoot.getAuth();
 
         if (isAuthenticated()) {
             if (((InternetActivity) context).isConnected()) {
@@ -97,10 +91,6 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
 
     public boolean isAuthenticated() {
         return null != authData;
-    }
-
-    public Firebase getFirebase() {
-        return firebase;
     }
 
     public AuthData getAuthdata() {

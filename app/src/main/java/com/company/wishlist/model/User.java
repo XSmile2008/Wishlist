@@ -1,15 +1,6 @@
 package com.company.wishlist.model;
 
-import com.company.wishlist.task.FacebookProfileData;
-import com.company.wishlist.util.Utilities;
 import com.google.gson.annotations.SerializedName;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Created by v.odahovskiy on 06.01.2016.

@@ -27,17 +27,6 @@ public class Utilities {
         return Patterns.WEB_URL.matcher(urlToValidate).matches();
     }
 
-    /*public static FirebaseFragment setupFirebase(FragmentManager fm) {
-        FirebaseFragment ff =
-                (FirebaseFragment) fm.findFragmentByTag(FirebaseFragment.TAG_FIREBASE_FRAGMENT);
-        if (ff == null) {
-            ff = new FirebaseFragment();
-            fm.beginTransaction().add(ff, FirebaseFragment.TAG_FIREBASE_FRAGMENT).commit();
-            fm.executePendingTransactions();
-        }
-        return ff;
-    }*/
-
     public static boolean isNullOrEmpty(String s) {
         return s == null || s.isEmpty();
     }
@@ -46,8 +35,4 @@ public class Utilities {
         return expirationDate <= System.currentTimeMillis() / 1000;
     }
 
-    public static String getUserAvatarUrl(String userId) {
-        String url = "https://graph.facebook.com/%s/picture?type=large";
-        return String.format(url, userId);
-    }
 }

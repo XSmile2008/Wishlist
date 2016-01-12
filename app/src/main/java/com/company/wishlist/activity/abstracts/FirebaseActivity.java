@@ -64,6 +64,7 @@ public abstract class FirebaseActivity extends BaseActivity implements FirebaseU
         }
     }
 
+    //TODO: May be move this method to FirebaseUtil, and delete getAuthdate() ?
     private boolean isTokenExpired() {
         return (firebaseUtil.getAuthdata() == null
                 || Utilities.isExpired(firebaseUtil.getAuthdata().getExpires()));

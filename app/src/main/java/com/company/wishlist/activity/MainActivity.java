@@ -24,12 +24,18 @@ import com.company.wishlist.activity.abstracts.FirebaseActivity;
 import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.User;
-import com.company.wishlist.task.FacebookMyFriendList;
 import com.company.wishlist.util.CropCircleTransformation;
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.firebase.client.AuthData;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONArray;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
+import java.util.List;
 
 public class MainActivity extends FirebaseActivity implements IOnFriendSelectedListener, View.OnClickListener {
 
@@ -114,11 +120,16 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
                     .load(user.getAvatarURL())
                     .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
                     .into(userAvatarView);
-            try {
-                friendListAdapter.setFriends(new FacebookMyFriendList().execute().get());
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
+
+            GraphRequest.newMyFriendsRequest(AccessToken.getCurrentAccessToken(),
+                    new GraphRequest.GraphJSONArrayCallback() {
+                        @Override
+                        public void onCompleted(JSONArray objects, GraphResponse response) {
+                            List<User> friends = new Gson()
+                                    .fromJson(objects.toString(), new TypeToken<List<User>>() {}.getType());
+                            friendListAdapter.setFriends(friends);
+                        }
+                    }).executeAsync();
         }
     }
 

@@ -1,4 +1,4 @@
-package com.company.wishlist.activity;
+package com.company.wishlist.activity.abstracts;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;

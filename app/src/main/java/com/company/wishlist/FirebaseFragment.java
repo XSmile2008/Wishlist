@@ -4,13 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 
-import com.company.wishlist.activity.InternetActivity;
+import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.model.User;
 import com.company.wishlist.task.FacebookMyFriendList;
 import com.company.wishlist.task.FacebookProfileData;
-import com.company.wishlist.util.Utilities;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;

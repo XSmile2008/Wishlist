@@ -20,6 +20,8 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
+import com.company.wishlist.activity.abstracts.BaseActivity;
+import com.company.wishlist.activity.abstracts.FirebaseActivity;
 import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.User;
@@ -28,7 +30,7 @@ import com.firebase.client.AuthData;
 
 import java.util.ArrayList;
 
-public class MainActivity extends BaseActivity implements IOnFriendSelectedListener, View.OnClickListener {
+public class MainActivity extends FirebaseActivity implements IOnFriendSelectedListener, View.OnClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -103,15 +105,15 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
     }
 
     private void refreshUserDataUi() {
-        User user = getUser();
+        User user = getCurrentUser();
         if (null != user) {
             profileUserName.setText(user.getDisplayName());
 
-            Glide.with(MainActivity.this)
+            /*Glide.with(MainActivity.this)
                     .load(user.getAvatarUrl())
                     .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
                     .into(userAvatarView);
-            friendListAdapter.addAll(user.getFriends());
+            friendListAdapter.addAll(user.getFriends());*/
         }
     }
 
@@ -122,11 +124,6 @@ public class MainActivity extends BaseActivity implements IOnFriendSelectedListe
         if (isConnected()) {
             refreshUserDataUi();
         }
-    }
-
-    @Override
-    public void onMissingConnection() {
-
     }
 
     @Override

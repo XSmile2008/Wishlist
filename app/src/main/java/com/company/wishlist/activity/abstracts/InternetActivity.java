@@ -29,6 +29,7 @@ public class InternetActivity extends DebugActivity {
                             Intent intent = new Intent(getApplicationContext(), Class.forName(getIntent().getStringExtra("class")))
                                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(intent);
+                            finish();
                         } catch (ClassNotFoundException e) {
                             e.printStackTrace();
                         }

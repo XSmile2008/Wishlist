@@ -5,20 +5,16 @@ import android.content.Context;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.model.User;
-import com.company.wishlist.task.FacebookProfileData;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
-
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by v.odahovskiy on 12.01.2016.
  */
 public class FirebaseUtil implements Firebase.AuthResultHandler {
 
-    //DB TABLES
-    public final String USERS = "users";
+    public static final String USER_TABLE = "users";
 
     //interface for interact util with activity for connection
     public interface IFirebaseConnection {
@@ -48,16 +44,8 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
     }
 
     private void saveUserInFirebase(AuthData authData) {
-        String id = authData.getProviderData().get("id").toString();
-        String displayName = authData.getProviderData().get("displayName").toString();
-        String provider = authData.getProvider();
-        try {
-            user = new FacebookProfileData().execute().get();
-            user.setProvider(provider);
-            firebaseRoot.child(USERS).child(id).setValue(user);
-        } catch (InterruptedException | ExecutionException e) {
-            user = new User(id, displayName, provider);//TODO: what it do?
-        }
+            user = FacebookUserBuilder.build(authData);
+            firebaseRoot.child(USER_TABLE).child(user.getId()).setValue(user);
     }
 
     @Override

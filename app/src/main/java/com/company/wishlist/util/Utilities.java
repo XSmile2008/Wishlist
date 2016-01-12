@@ -1,13 +1,8 @@
 package com.company.wishlist.util;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.util.Patterns;
-
-import com.company.wishlist.FirebaseFragment;
 
 import java.net.URLEncoder;
 
@@ -32,7 +27,7 @@ public class Utilities {
         return Patterns.WEB_URL.matcher(urlToValidate).matches();
     }
 
-    public static FirebaseFragment setupFirebase(FragmentManager fm) {
+    /*public static FirebaseFragment setupFirebase(FragmentManager fm) {
         FirebaseFragment ff =
                 (FirebaseFragment) fm.findFragmentByTag(FirebaseFragment.TAG_FIREBASE_FRAGMENT);
         if (ff == null) {
@@ -41,7 +36,7 @@ public class Utilities {
             fm.executePendingTransactions();
         }
         return ff;
-    }
+    }*/
 
     public static boolean isNullOrEmpty(String s) {
         return s == null || s.isEmpty();

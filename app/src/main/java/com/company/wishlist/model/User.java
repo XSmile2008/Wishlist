@@ -2,6 +2,7 @@ package com.company.wishlist.model;
 
 import com.company.wishlist.task.FacebookProfileData;
 import com.company.wishlist.util.Utilities;
+import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,13 +16,14 @@ import java.util.List;
  */
 public class User {
 
-    private String id;
-    private String firstName;
-    private String lastName;
-    private String birthday;
-    private String gender;
+    @SerializedName("id") private String id;
+    @SerializedName("name") private String displayName;
+    @SerializedName("first_name") private String firstName;
+    @SerializedName("last_name") private String lastName;
+    @SerializedName("birthday") private String birthday;
+    @SerializedName("gender") private String gender;
+    @SerializedName("email") private String email;
 
-    private String displayName;
     private String provider;
 
     public User(){}
@@ -88,21 +90,16 @@ public class User {
         this.provider = provider;
     }
 
-    public static User getFromJSON(JSONObject object) {
-        User user = new User();
+    public String getEmail() {
+        return email;
+    }
 
-        try {
-            user.setId(object.getString(FacebookProfileData.ID));
-            user.setFirstName(object.getString(FacebookProfileData.FIRST_NAME));
-            user.setLastName(object.getString(FacebookProfileData.LAST_NAME));
-            user.setDisplayName(object.getString(FacebookProfileData.NAME));
-            user.setBirthday(object.getString(FacebookProfileData.BIRTHDAY));
-            user.setGender(object.getString(FacebookProfileData.GENDER));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-        return user;
+    public String getAvatarURL() {
+        return "https://graph.facebook.com/" + id + "/picture?type=large";
     }
 
     @Override

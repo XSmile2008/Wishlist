@@ -30,28 +30,6 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
         this.friends = (null != friends) ? friends : new ArrayList<User>();
     }
 
-    private boolean isUnique(User friendBean){
-        for (User friend : friends){
-            if (friend.getId().equals(friendBean.getId())){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void addFriend(User friend) {
-        if (null != friend && isUnique(friend)) {
-            friends.add(friend);
-            notifyDataSetChanged();
-        }
-    }
-
-    public void addAll(List<User> friends) {
-        this.friends.clear();
-        this.friends.addAll(friends);
-        notifyDataSetChanged();
-    }
-
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.drawer_list_item, parent, false));
@@ -60,7 +38,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
     @Override
     public void onBindViewHolder(Holder holder, int position) {
         Glide.with(context)
-                .load(friends.get(position).getAvatarUrl())
+                .load(friends.get(position).getAvatarURL())
                 .bitmapTransform(new CropCircleTransformation(Glide.get(context).getBitmapPool()))
                 .into(holder.imageViewAvatar);
         holder.textViewTitle.setText(friends.get(position).getDisplayName());
@@ -69,6 +47,11 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
     @Override
     public int getItemCount() {
         return friends.size();
+    }
+
+    public void setFriends(List<User> friends) {
+        this.friends = friends;
+        notifyDataSetChanged();
     }
 
     public class Holder extends RecyclerView.ViewHolder {

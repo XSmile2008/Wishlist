@@ -24,21 +24,20 @@ import java.util.concurrent.ExecutionException;
  */
 public class FirebaseUtil implements Firebase.AuthResultHandler {
 
+    //interface for interact util with activity for connection
     public interface IFirebaseConnection {
         void onAuthenticated(AuthData authData);
         void onAuthenticationError(FirebaseError firebaseError);
         void onMissingConnection();
     }
 
-    private Context context;
-    private IFirebaseConnection iConnection;//interface for interact util with activity for connection
+    private Context context;//is IFirebaseConnection so you cant cast it
     private Firebase firebase;
     private AuthData authData;
     private User user;
 
     public FirebaseUtil(Context context) {
         this.context = context;
-        this.iConnection = (IFirebaseConnection) context;
         Firebase.setAndroidContext(context);
         firebase = new Firebase(context.getString(R.string.firebase_url));
         refresh();
@@ -52,56 +51,31 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
         String id = authData.getProviderData().get("id").toString();
         String displayName = authData.getProviderData().get("displayName").toString();
         String provider = authData.getProvider();
-        List<User> friends = getUserFriendList();
         try {
-            user = User.getFromJSON(new FacebookProfileData().execute().get());
+            user = new FacebookProfileData().execute().get();
             user.setProvider(provider);
             firebase.child("users").child(id).child("first_name").setValue(user.getFirstName());
             firebase.child("users").child(id).child("last_name").setValue(user.getLastName());
-            firebase.child("users").child(id).child("gender").setValue(user.getGender().name());
+            firebase.child("users").child(id).child("gender").setValue(user.getGender());
             firebase.child("users").child(id).child("birthday").setValue(user.getBirthday());
         } catch (InterruptedException | ExecutionException e) {
             user = new User(id, displayName, provider);
         }
-        user.setFriends(friends);
-
 
         firebase.child("users").child(id).child("provider").setValue(provider);
         firebase.child("users").child(id).child("displayName").setValue(displayName);
-        firebase.child("users").child(id).child("friends").setValue(friends);
-
-        //   new Firebase(mFirebase + "/wishes/" + getUser().id).keepSynced(true);
-    }
-
-
-    //todo it will in facebook util class
-    private List<User> getUserFriendList() {
-        List<User> result = new ArrayList<User>();
-        try {
-            JSONArray friends = new FacebookMyFriendList().execute().get();
-            for (int i = 0; i < friends.length(); i++) {
-                JSONObject jsonObject = friends.getJSONObject(i);
-                User user = new User();
-                user.setId(jsonObject.getString("id"));
-                user.setDisplayName(jsonObject.getString("name"));
-                result.add(user);
-            }
-        } catch (InterruptedException | ExecutionException | JSONException e) {
-            e.printStackTrace();
-        }
-        return result;
     }
 
     @Override
     public void onAuthenticated(AuthData authData) {
         this.authData = authData;
         saveUserInFirebase(authData);
-        iConnection.onAuthenticated(authData);
+        ((IFirebaseConnection) context).onAuthenticated(authData);
     }
 
     @Override
     public void onAuthenticationError(FirebaseError firebaseError) {
-        iConnection.onAuthenticationError(firebaseError);
+        ((IFirebaseConnection) context).onAuthenticationError(firebaseError);
     }
 
 
@@ -112,7 +86,7 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
             if (((InternetActivity) context).isConnected()) {
                 saveUserInFirebase(authData);
             } else {
-                iConnection.onMissingConnection();
+                ((IFirebaseConnection) context).onMissingConnection();
             }
         }
     }

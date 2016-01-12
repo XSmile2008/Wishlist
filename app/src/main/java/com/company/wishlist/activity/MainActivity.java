@@ -20,15 +20,16 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
-import com.company.wishlist.activity.abstracts.BaseActivity;
 import com.company.wishlist.activity.abstracts.FirebaseActivity;
 import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.User;
+import com.company.wishlist.task.FacebookMyFriendList;
 import com.company.wishlist.util.CropCircleTransformation;
 import com.firebase.client.AuthData;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends FirebaseActivity implements IOnFriendSelectedListener, View.OnClickListener {
 
@@ -105,18 +106,21 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     }
 
     private void refreshUserDataUi() {
-        User user = getCurrentUser();
+        User user = super.getCurrentUser();
         if (null != user) {
             profileUserName.setText(user.getDisplayName());
 
-            /*Glide.with(MainActivity.this)
-                    .load(user.getAvatarUrl())
+            Glide.with(MainActivity.this)
+                    .load(user.getAvatarURL())
                     .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
                     .into(userAvatarView);
-            friendListAdapter.addAll(user.getFriends());*/
+            try {
+                friendListAdapter.setFriends(new FacebookMyFriendList().execute().get());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
         }
     }
-
 
     @Override
     public void onAuthenticated(AuthData authData) {

@@ -4,49 +4,40 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.company.wishlist.model.User;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by v.odahovskiy on 08.01.2016.
  */
-public class FacebookMyFriendList extends AsyncTask<Void, Void, JSONArray> {
+public class FacebookMyFriendList extends AsyncTask<Void, Void, List<User>> {
 
     private final String TAG = FacebookMyFriendList.class.getSimpleName();
 
 
     @Override
-    protected JSONArray doInBackground(Void... params) {
-        AccessToken token = AccessToken.getCurrentAccessToken();
-        final JSONArray[] result = {new JSONArray()};
-
-        GraphRequest request = new GraphRequest(
-                AccessToken.getCurrentAccessToken(),
-                "/me/friends",
-                null,
-                HttpMethod.GET,
-                new GraphRequest.Callback() {
-                    public void onCompleted(GraphResponse response) {
-                        try {
-                            result[0] = response.getJSONObject().getJSONArray("data");
-                        } catch (JSONException e) {
-                            Log.d(TAG, e.getMessage());
-                        }
-                        Log.d(TAG, response.getJSONObject().toString());
+    protected List<User> doInBackground(Void... params) {
+        final List<User> result = new ArrayList<>();
+        GraphRequest request = GraphRequest.newMyFriendsRequest(AccessToken.getCurrentAccessToken(),
+                new GraphRequest.GraphJSONArrayCallback() {
+                    @Override
+                    public void onCompleted(JSONArray objects, GraphResponse response) {
+                        List<User> users = new Gson().fromJson(objects.toString(), new TypeToken<List<User>>() {}.getType());
+                        result.addAll(users);
                     }
-                }
-        );
-
-        Bundle parameters = new Bundle();
-        parameters.putString("data", "id,name");
-        request.setParameters(parameters);
+                });
         request.executeAndWait();
-
-        return result[0];
+        return result;
     }
 }

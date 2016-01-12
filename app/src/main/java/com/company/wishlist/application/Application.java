@@ -1,4 +1,4 @@
-package com.company.wishlist;
+package com.company.wishlist.application;
 
 import com.facebook.FacebookSdk;
 import com.firebase.client.Firebase;

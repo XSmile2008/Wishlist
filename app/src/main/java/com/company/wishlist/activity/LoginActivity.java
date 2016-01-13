@@ -20,6 +20,9 @@ import com.firebase.client.FirebaseError;
 
 import java.util.Collections;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * Created by v.odahovskiy on 05.01.2016.
  */
@@ -29,7 +32,7 @@ public class LoginActivity extends AppCompatActivity {
     public static final String AUTH_TOKEN_EXTRA = "AUTH_TOKEN_EXTRA";
     public static final String INTENT_LOGOUT = "INTENT_LOGOUT";
 
-    private LoginButton loginButton;
+    @Bind(R.id.login_button) LoginButton loginButton;
 
     /* A reference to the Firebase */
     private Firebase mFirebaseRef;
@@ -48,8 +51,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        ButterKnife.bind(this);
 
-        loginButton = (LoginButton) findViewById(R.id.login_button);
         loginButton.setReadPermissions(Collections.singletonList(getString(R.string.facebook_permissions)));
 
         mFacebookCallbackManager = CallbackManager.Factory.create();

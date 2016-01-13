@@ -18,6 +18,9 @@ import com.company.wishlist.model.Wish;
 
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * Created by vladstarikov on 08.01.16.
  */
@@ -50,17 +53,14 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
     public class Holder extends RecyclerView.ViewHolder {
 
-        ImageView imageView;
-        TextView textViewTitle;
-        TextView textViewComment;
-        ImageButton imageButtonOptions;
+        @Bind(R.id.image_view) ImageView imageView;
+        @Bind(R.id.text_view_title) TextView textViewTitle;
+        @Bind(R.id.text_view_comment) TextView textViewComment;
+        @Bind(R.id.image_button_options) ImageButton imageButtonOptions;
 
         public Holder(View itemView) {
             super(itemView);
-            imageView = (ImageView) itemView.findViewById(R.id.image_view);
-            textViewTitle = (TextView) itemView.findViewById(R.id.text_view_title);
-            textViewComment = (TextView) itemView.findViewById(R.id.text_view_comment);
-            imageButtonOptions = (ImageButton) itemView.findViewById(R.id.image_button_options);
+            ButterKnife.bind(this, itemView);
             imageButtonOptions.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

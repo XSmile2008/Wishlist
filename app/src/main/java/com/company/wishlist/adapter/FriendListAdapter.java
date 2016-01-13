@@ -17,6 +17,9 @@ import com.company.wishlist.util.CropCircleTransformation;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * Created by v.odahovskiy on 08.01.2016.
  */
@@ -56,13 +59,12 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
 
     public class Holder extends RecyclerView.ViewHolder {
 
-        ImageView imageViewAvatar;
-        TextView textViewTitle;
+        @Bind(R.id.friend_avatar_iv) ImageView imageViewAvatar;
+        @Bind(R.id.friend_name_tv) TextView textViewTitle;
 
         public Holder(View itemView) {
             super(itemView);
-            imageViewAvatar = (ImageView) itemView.findViewById(R.id.friend_avatar_iv);
-            textViewTitle = (TextView) itemView.findViewById(R.id.friend_name_tv);
+            ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

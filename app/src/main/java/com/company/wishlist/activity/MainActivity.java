@@ -37,21 +37,25 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 public class MainActivity extends FirebaseActivity implements IOnFriendSelectedListener, View.OnClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private ImageView userAvatarView;
-    private TextView profileUserName;
     private FriendListAdapter friendListAdapter;
-    private ImageButton updateUserProfile;
-    private Button logoutButton;
+
+    @Bind(R.id.profile_user_avatar_iw) ImageView userAvatarView;
+    @Bind(R.id.profile_user_name_tv) TextView profileUserName;
+    @Bind(R.id.update_user_profile) ImageButton updateUserProfile;
+    @Bind(R.id.logout_button) Button logoutButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -75,12 +79,6 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         RecyclerView recyclerViewFriends = (RecyclerView) drawer.findViewById(R.id.friends_recycler_view);
         recyclerViewFriends.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewFriends.setAdapter(friendListAdapter);
-
-        View header = findViewById(R.id.drawer_header);
-        userAvatarView = (ImageView) header.findViewById(R.id.profile_user_avatar_iw);
-        profileUserName = (TextView) header.findViewById(R.id.profile_user_name_tv);
-        updateUserProfile = (ImageButton) header.findViewById(R.id.update_user_profile);
-        logoutButton = (Button) header.findViewById(R.id.logout_button);
 
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override

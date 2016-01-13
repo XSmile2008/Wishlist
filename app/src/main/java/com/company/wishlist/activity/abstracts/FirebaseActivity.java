@@ -30,14 +30,12 @@ public abstract class FirebaseActivity extends BaseActivity implements FirebaseU
             authToken = extras.getString(LoginActivity.AUTH_TOKEN_EXTRA);
             processFirebaseLogin();
         } else {
-            if (!firebaseUtil.isAuthenticated() || isTokenExpired()) {
+            if (firebaseUtil.isDisconnected()) {
                 firebaseUtil.unauth();
                 processFacebookLogin();
             }
         }
     }
-
-
     @Override
     public void onResume() {
         super.onResume();
@@ -57,17 +55,11 @@ public abstract class FirebaseActivity extends BaseActivity implements FirebaseU
         }
     }
 
-    public void logout() {
+    public void logOut() {
         if (firebaseUtil.isAuthenticated()) {
             firebaseUtil.unauth();
             processFacebookLogout();
         }
-    }
-
-    //TODO: May be move this method to FirebaseUtil, and delete getAuthdate() ?
-    private boolean isTokenExpired() {
-        return (firebaseUtil.getAuthdata() == null
-                || Utilities.isExpired(firebaseUtil.getAuthdata().getExpires()));
     }
 
     /**

@@ -1,6 +1,5 @@
 package com.company.wishlist.util;
 
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.util.Patterns;
 

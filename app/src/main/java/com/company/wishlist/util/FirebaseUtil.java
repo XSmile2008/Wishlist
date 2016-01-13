@@ -73,16 +73,20 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
         }
     }
 
+    private boolean isTokenExpired() {
+        return (authData == null || Utilities.isExpired(authData.getExpires()));
+    }
+
+    public boolean isDisconnected(){
+        return !isAuthenticated() || isTokenExpired();
+    }
+
     public User getCurrentUser() {
         return user;
     }
 
     public boolean isAuthenticated() {
         return null != authData;
-    }
-
-    public AuthData getAuthdata() {
-        return authData;
     }
 
 }

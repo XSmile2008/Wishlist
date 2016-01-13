@@ -16,7 +16,7 @@ public abstract class BaseActivity extends InternetActivity {
     protected void processFacebookLogout() {
         Intent logoutIntent = new Intent(getApplicationContext(), LoginActivity.class);
         logoutIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        logoutIntent.putExtra(LoginActivity.INTENT_SIGNOUT, true);
+        logoutIntent.putExtra(LoginActivity.INTENT_LOGOUT, true);
         startActivity(logoutIntent);
         finish();
     }

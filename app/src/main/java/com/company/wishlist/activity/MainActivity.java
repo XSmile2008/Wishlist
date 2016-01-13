@@ -85,7 +85,7 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                logout();
+                logOut();
             }
         });
 

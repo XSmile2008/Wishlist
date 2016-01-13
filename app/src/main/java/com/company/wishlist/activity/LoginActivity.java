@@ -1,10 +1,12 @@
 package com.company.wishlist.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 
 import com.company.wishlist.R;
 import com.facebook.AccessToken;
@@ -25,9 +27,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private static String TAG = LoginActivity.class.getSimpleName();
     public static final String AUTH_TOKEN_EXTRA = "AUTH_TOKEN_EXTRA";
-    public static final String INTENT_SIGNOUT = "INTENT_SIGNOUT";
+    public static final String INTENT_LOGOUT = "INTENT_LOGOUT";
 
-    private CallbackManager callbackManager;
     private LoginButton loginButton;
 
     /* A reference to the Firebase */
@@ -36,24 +37,20 @@ public class LoginActivity extends AppCompatActivity {
     /* Data from the authenticated user */
     private AuthData mAuthData;
 
-    /* Listener for Firebase session changes */
-    private Firebase.AuthStateListener mAuthStateListener;
-
     /* The callback manager for Facebook */
     private CallbackManager mFacebookCallbackManager;
     /* Used to track user logging in/out off Facebook */
     private AccessTokenTracker mFacebookAccessTokenTracker;
+
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        callbackManager = CallbackManager.Factory.create();
-
         loginButton = (LoginButton) findViewById(R.id.login_button);
-        loginButton.setReadPermissions(Collections.singletonList("public_profile, email, user_birthday, user_friends"));
-
+        loginButton.setReadPermissions(Collections.singletonList(getString(R.string.facebook_permissions)));
 
         mFacebookCallbackManager = CallbackManager.Factory.create();
         mFacebookAccessTokenTracker = new AccessTokenTracker() {
@@ -67,25 +64,15 @@ public class LoginActivity extends AppCompatActivity {
         /* Create the Firebase ref that is used for all authentication with Firebase */
         mFirebaseRef = new Firebase(getResources().getString(R.string.firebase_url));
 
-        mAuthStateListener = new Firebase.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(AuthData authData) {
-                mAuthData = authData;
-                Log.v(TAG, " BLA BLA");
-            }
-        };
-        /* Check if the user is authenticated with Firebase already. If this is the case we can set the authenticated
-         * user and hide hide any login buttons */
-        mFirebaseRef.addAuthStateListener(mAuthStateListener);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         Intent intent = getIntent();
-        boolean signout = intent.getBooleanExtra(INTENT_SIGNOUT, false);
-        if (signout) {
-            signOut();
+        boolean logOut = intent.getBooleanExtra(INTENT_LOGOUT, false);
+        if (logOut) {
+            logOut();
         }
     }
 
@@ -96,25 +83,16 @@ public class LoginActivity extends AppCompatActivity {
         if (mFacebookAccessTokenTracker != null) {
             mFacebookAccessTokenTracker.stopTracking();
         }
-
-        // if changing configurations, stop tracking firebase session.
-        mFirebaseRef.removeAuthStateListener(mAuthStateListener);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        callbackManager.onActivityResult(requestCode, resultCode, data);
         mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-
-    private void logout() {
+    public void logOut() {
         mFirebaseRef.unauth();
         LoginManager.getInstance().logOut();
-    }
-
-    public void signOut() {
-        logout();
     }
 
     private void showErrorDialog(String message) {
@@ -126,16 +104,20 @@ public class LoginActivity extends AppCompatActivity {
                 .show();
     }
 
+    public ProgressDialog getDialog() {
+        loginButton.setVisibility(View.INVISIBLE);
+        ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setTitle(getString(R.string.app_name));
+        dialog.setMessage("Signing in...");
+        dialog.setCancelable(false);
+        return dialog;
+    }
+
     private class AuthResultHandler implements Firebase.AuthResultHandler {
-
-        private final String provider;
-
-        public AuthResultHandler(String provider) {
-            this.provider = provider;
-        }
 
         @Override
         public void onAuthenticated(AuthData authData) {
+            progressDialog.hide();
             mAuthData = authData;
             getApplicationContext()
                     .startActivity(new Intent(getApplicationContext(), MainActivity.class)
@@ -152,10 +134,13 @@ public class LoginActivity extends AppCompatActivity {
 
     private void onFacebookAccessTokenChange(AccessToken token) {
         if (token != null) {
-            mFirebaseRef.authWithOAuthToken("facebook", token.getToken(), new AuthResultHandler("facebook"));
+            progressDialog = getDialog();
+            progressDialog.show();
+            mFirebaseRef.authWithOAuthToken("facebook", token.getToken(), new AuthResultHandler());
         } else {
             if (this.mAuthData != null && this.mAuthData.getProvider().equals("facebook")) {
                 mFirebaseRef.unauth();
+                loginButton.setVisibility(View.VISIBLE);
             }
         }
     }

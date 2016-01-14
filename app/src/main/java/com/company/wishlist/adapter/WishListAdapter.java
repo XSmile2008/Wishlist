@@ -29,7 +29,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     private List<Wish> wishes;
 
     private int selectedItem = -1;
-    private  boolean editMode = false;
 
     public WishListAdapter(Context context, List<Wish> wishes) {
         this.context = context;
@@ -46,10 +45,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         holder.imageView.setImageResource(R.drawable.gift_icon);
         holder.textViewTitle.setText(wishes.get(position).getTitle());
         holder.textViewComment.setText(wishes.get(position).getComment());
-        holder.setMode((selectedItem == position) ? (editMode ? holder.EDIT : holder.DETAIL) : holder.NORMAl);
-
-        holder.editTextTitle.setText(holder.textViewTitle.getText().toString(), TextView.BufferType.EDITABLE);
-        holder.editTextComment.setText(holder.textViewComment.getText().toString(), TextView.BufferType.EDITABLE);
+        holder.setMode((selectedItem == position) ? holder.DETAIL : holder.NORMAl);
     }
 
     @Override
@@ -65,18 +61,13 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
         //Header
         @Bind(R.id.layout_main) ViewGroup layoutNormal;
-        @Bind(R.id.layout_details) ViewGroup layoutDetails;
-        @Bind(R.id.layout_edit) ViewGroup layoutEdit;
         @Bind(R.id.image_view) ImageView imageView;
         @Bind(R.id.text_view_title) TextView textViewTitle;
         @Bind(R.id.text_view_comment) TextView textViewComment;
-        @Bind(R.id.edit_text_title) EditText editTextTitle;
-        @Bind(R.id.edit_text_comment) EditText editTextComment;
 
         //Footer
         @Bind(R.id.layout_footer) ViewGroup layoutFooter;
-        @Bind(R.id.footer_detail) ViewGroup footerDetail;
-        @Bind(R.id.footer_edit) ViewGroup footerEdit;
+        @Bind(R.id.image_button_close) ImageButton imageButtonClose;
         @Bind(R.id.image_button_reserve) ImageButton imageButtonReserve;
         @Bind(R.id.image_button_edit) ImageButton imageButtonEdit;
         @Bind(R.id.image_button_delete) ImageButton imageButtonDelete;
@@ -88,22 +79,24 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         }
 
         public void setMode(int mode) {
-            layoutDetails.setVisibility(mode == NORMAl || mode == DETAIL ? View.VISIBLE : View.GONE);
-            layoutEdit.setVisibility(mode == EDIT ? View.VISIBLE : View.GONE);
             layoutFooter.setVisibility(mode == DETAIL || mode == EDIT ? View.VISIBLE : View.GONE);
             textViewComment.setSingleLine(mode == NORMAl);
-            footerDetail.setVisibility(mode == DETAIL ? View.VISIBLE : View.GONE);
-            footerEdit.setVisibility(mode == EDIT ? View.VISIBLE : View.GONE);
         }
 
         @Override
         public void onClick(View v) {
             int selectedItemOld = selectedItem;
             selectedItem = getAdapterPosition();
-            if (selectedItem == selectedItemOld) return;//selectedItem = -1;
-            else notifyItemChanged(selectedItemOld);
+            if (selectedItem != selectedItemOld) {
+                notifyItemChanged(selectedItemOld);
+                notifyItemChanged(getAdapterPosition());
+            }
+        }
+
+        @OnClick(R.id.image_button_close)
+        public void onClickClose() {
+            selectedItem = -1;
             notifyItemChanged(getAdapterPosition());
-            editMode = false;
         }
 
         @OnClick(R.id.image_button_reserve)
@@ -113,8 +106,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
         @OnClick(R.id.image_button_edit)
         public void onClickEdit() {
-            editMode = true;
-            notifyItemChanged(getAdapterPosition());
             Toast.makeText(context, "item " + getAdapterPosition() + " edit", Toast.LENGTH_SHORT).show();
         }
 
@@ -123,17 +114,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             Toast.makeText(context, "item " + getAdapterPosition() + " deleted", Toast.LENGTH_SHORT).show();
         }
 
-        @OnClick(R.id.button_accept)
-        public void onClickAccept() {
-            editMode = false;
-            notifyItemChanged(getAdapterPosition());
-        }
-
-        @OnClick(R.id.button_cancel)
-        public void onClickCancel() {
-            editMode = false;
-            notifyItemChanged(getAdapterPosition());
-        }
     }
 
 }

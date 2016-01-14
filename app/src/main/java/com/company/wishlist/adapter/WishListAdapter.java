@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -27,6 +26,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
     private Context context;
     private List<Wish> wishes;
+    private boolean isOwner = true;
 
     private int selectedItem = -1;
 
@@ -60,7 +60,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         public final int EDIT = 2;
 
         //Header
-        @Bind(R.id.layout_main) ViewGroup layoutNormal;
+        @Bind(R.id.layout_header) ViewGroup layoutHeader;
         @Bind(R.id.image_view) ImageView imageView;
         @Bind(R.id.text_view_title) TextView textViewTitle;
         @Bind(R.id.text_view_comment) TextView textViewComment;
@@ -76,6 +76,10 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
+            if (!isOwner) {
+                imageButtonEdit.setVisibility(View.GONE);
+                imageButtonDelete.setVisibility(View.GONE);
+            }
         }
 
         public void setMode(int mode) {

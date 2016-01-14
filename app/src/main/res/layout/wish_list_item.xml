@@ -15,9 +15,9 @@
         android:orientation="vertical"
         android:padding="@dimen/cardview_padding">
 
-        <!-- Main section-->
+        <!-- Header section-->
         <RelativeLayout
-            android:id="@+id/layout_main"
+            android:id="@+id/layout_header"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -78,6 +78,7 @@
                 style="@style/AppTheme.ImageButton"
                 android:layout_below="@+id/footer_divider"
                 android:layout_toLeftOf="@id/image_button_edit"
+                android:layout_alignWithParentIfMissing="true"
                 android:layout_marginLeft="8dp"
                 android:src="@drawable/ic_favorite_grey_600_24dp" />
 

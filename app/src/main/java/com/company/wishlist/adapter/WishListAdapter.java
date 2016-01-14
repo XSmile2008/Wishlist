@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -46,6 +47,9 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         holder.textViewTitle.setText(wishes.get(position).getTitle());
         holder.textViewComment.setText(wishes.get(position).getComment());
         holder.setMode((selectedItem == position) ? (editMode ? holder.EDIT : holder.DETAIL) : holder.NORMAl);
+
+        holder.editTextTitle.setText(holder.textViewTitle.getText().toString(), TextView.BufferType.EDITABLE);
+        holder.editTextComment.setText(holder.textViewComment.getText().toString(), TextView.BufferType.EDITABLE);
     }
 
     @Override
@@ -59,21 +63,23 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         public final int DETAIL = 1;
         public final int EDIT = 2;
 
-        //Normal mode layout
+        //Header
         @Bind(R.id.layout_main) ViewGroup layoutNormal;
+        @Bind(R.id.layout_details) ViewGroup layoutDetails;
+        @Bind(R.id.layout_edit) ViewGroup layoutEdit;
         @Bind(R.id.image_view) ImageView imageView;
         @Bind(R.id.text_view_title) TextView textViewTitle;
         @Bind(R.id.text_view_comment) TextView textViewComment;
+        @Bind(R.id.edit_text_title) EditText editTextTitle;
+        @Bind(R.id.edit_text_comment) EditText editTextComment;
 
-        //Footer mode layout
+        //Footer
         @Bind(R.id.layout_footer) ViewGroup layoutFooter;
+        @Bind(R.id.footer_detail) ViewGroup footerDetail;
+        @Bind(R.id.footer_edit) ViewGroup footerEdit;
         @Bind(R.id.image_button_reserve) ImageButton imageButtonReserve;
         @Bind(R.id.image_button_edit) ImageButton imageButtonEdit;
         @Bind(R.id.image_button_delete) ImageButton imageButtonDelete;
-
-        //Edit mode layout
-        @Bind(R.id.layout_edit) ViewGroup layoutEdit;
-
 
         public Holder(View itemView) {
             super(itemView);
@@ -82,20 +88,22 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         }
 
         public void setMode(int mode) {
-            layoutNormal.setVisibility(mode == NORMAl || mode == DETAIL ? View.VISIBLE : View.GONE);
-            layoutFooter.setVisibility(mode == DETAIL || mode == EDIT ? View.VISIBLE : View.GONE);
+            layoutDetails.setVisibility(mode == NORMAl || mode == DETAIL ? View.VISIBLE : View.GONE);
             layoutEdit.setVisibility(mode == EDIT ? View.VISIBLE : View.GONE);
+            layoutFooter.setVisibility(mode == DETAIL || mode == EDIT ? View.VISIBLE : View.GONE);
             textViewComment.setSingleLine(mode == NORMAl);
+            footerDetail.setVisibility(mode == DETAIL ? View.VISIBLE : View.GONE);
+            footerEdit.setVisibility(mode == EDIT ? View.VISIBLE : View.GONE);
         }
 
         @Override
         public void onClick(View v) {
             int selectedItemOld = selectedItem;
             selectedItem = getAdapterPosition();
-            editMode = false;
-            if (selectedItem == selectedItemOld) selectedItem = -1;
+            if (selectedItem == selectedItemOld) return;//selectedItem = -1;
             else notifyItemChanged(selectedItemOld);
             notifyItemChanged(getAdapterPosition());
+            editMode = false;
         }
 
         @OnClick(R.id.image_button_reserve)
@@ -113,6 +121,18 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         @OnClick(R.id.image_button_delete)
         public void onClickDelete() {
             Toast.makeText(context, "item " + getAdapterPosition() + " deleted", Toast.LENGTH_SHORT).show();
+        }
+
+        @OnClick(R.id.button_accept)
+        public void onClickAccept() {
+            editMode = false;
+            notifyItemChanged(getAdapterPosition());
+        }
+
+        @OnClick(R.id.button_cancel)
+        public void onClickCancel() {
+            editMode = false;
+            notifyItemChanged(getAdapterPosition());
         }
     }
 

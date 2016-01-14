@@ -15,8 +15,9 @@
         android:orientation="vertical"
         android:padding="@dimen/cardview_padding">
 
+        <!-- Main section-->
         <RelativeLayout
-            android:id="@+id/layout_normal"
+            android:id="@+id/layout_main"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -35,49 +36,63 @@
                 android:id="@+id/text_view_comment"
                 style="@style/SmallText"
                 android:layout_below="@+id/text_view_title"
-                android:layout_toRightOf="@+id/image_view" />
+                android:layout_toRightOf="@+id/image_view"
+                android:ellipsize="end" />
         </RelativeLayout>
 
+        <!-- Footer section-->
         <LinearLayout
-            android:id="@+id/layout_detail"
+            android:id="@+id/layout_footer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/cardview_padding"
-            android:visibility="gone">
+            android:orientation="vertical">
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginBottom="@dimen/cardview_padding"
-                android:src="@color/cardview_dark_background" />
+            <ImageView style="@style/AppTheme.CardViewDivider" />
 
-
+            <!-- Detail mode footer-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="right"
+                android:gravity="end"
                 android:orientation="horizontal">
 
                 <ImageButton
                     android:id="@+id/image_button_reserve"
                     style="@style/AppTheme.ImageButton"
-                    android:src="@drawable/ic_favorite_black_24dp" />
+                    android:src="@drawable/ic_favorite_grey_600_24dp" />
 
                 <ImageButton
                     android:id="@+id/image_button_edit"
                     style="@style/AppTheme.ImageButton"
-                    android:src="@drawable/ic_mode_edit_black_24dp" />
+                    android:src="@drawable/ic_mode_edit_grey_600_24dp" />
 
                 <ImageButton
                     android:id="@+id/image_button_delete"
                     style="@style/AppTheme.ImageButton"
-                    android:src="@drawable/ic_delete_black_24dp" />
+                    android:src="@drawable/ic_delete_grey_600_24dp" />
 
+            </LinearLayout>
+
+            <!-- Edit mode footer-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <Button
+                    style="@style/AppTheme.BorderlessButton"
+                    android:text="Chancel"
+                    android:gravity="start"/>
+
+                <Button
+                    style="@style/AppTheme.BorderlessButton"
+                    android:text="Accept"
+                    android:gravity="end"/>
             </LinearLayout>
 
         </LinearLayout>
 
+        <!-- Edit mode layout-->
         <LinearLayout
             android:id="@+id/layout_edit"
             android:layout_width="match_parent"

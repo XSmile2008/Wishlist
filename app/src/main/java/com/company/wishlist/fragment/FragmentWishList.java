@@ -42,7 +42,7 @@ public class FragmentWishList extends Fragment {
         while (list.size() < 11) {
             Wish wish = new Wish();
             wish.setTitle("Title" + list.size());
-            wish.setComment("This is comment for wish#" + list.size());
+            wish.setComment("This is comment for wish#" + list.size() + ": God’s In His Heaven… All’s Right With The World");
             list.add(wish);
         }
         return list;

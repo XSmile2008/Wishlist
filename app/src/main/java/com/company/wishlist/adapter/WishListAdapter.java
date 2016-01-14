@@ -7,9 +7,10 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,14 +21,17 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by vladstarikov on 08.01.16.
  */
 public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder> {
 
-    Context context;
-    List<Wish> wishes;
+    private Context context;
+    private List<Wish> wishes;
+
+    private int selectedItem = -1;
 
     public WishListAdapter(Context context, List<Wish> wishes) {
         this.context = context;
@@ -44,6 +48,12 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         holder.imageView.setImageResource(R.drawable.gift_icon);
         holder.textViewTitle.setText(wishes.get(position).getTitle());
         holder.textViewComment.setText(wishes.get(position).getComment());
+
+        if (selectedItem == position) {
+            holder.setMode(holder.DETAIL);
+        } else {
+            holder.setMode(holder.NORMAl);
+        }
     }
 
     @Override
@@ -53,37 +63,36 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
     public class Holder extends RecyclerView.ViewHolder {
 
+        public final int NORMAl = 0;
+        public final int DETAIL = 1;
+        public final int EDIT = 2;
+
         @Bind(R.id.image_view) ImageView imageView;
         @Bind(R.id.text_view_title) TextView textViewTitle;
         @Bind(R.id.text_view_comment) TextView textViewComment;
-        @Bind(R.id.image_button_options) ImageButton imageButtonOptions;
+        @Bind(R.id.layout_normal) RelativeLayout layout_normal;
+        @Bind(R.id.layout_detail) LinearLayout layout_detail;
+        @Bind(R.id.layout_edit) LinearLayout layout_edit;
 
         public Holder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            imageButtonOptions.setOnClickListener(new View.OnClickListener() {
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    PopupMenu popup = new PopupMenu(context, v);
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-                            Toast.makeText(context, getAdapterPosition() + ": " + item, Toast.LENGTH_SHORT).show();
-                            switch (item.getItemId()) {
-                                case R.id.action_reserve:
-                                    break;
-                                case R.id.action_edit:
-                                    break;
-                                case R.id.action_delete:
-                                    break;
-                            }
-                            return false;
-                        }
-                    });
-                    popup.inflate(R.menu.menu_wish_list_item);
-                    popup.show();
+                    int selectedItemOld = selectedItem;
+                    selectedItem = getAdapterPosition();
+                    if (selectedItem == selectedItemOld) selectedItem = -1;
+                    else notifyItemChanged(selectedItemOld);
+                    notifyItemChanged(getAdapterPosition());
                 }
             });
+        }
+
+        public void setMode(int mode) {
+            layout_normal.setVisibility(mode == NORMAl || mode == DETAIL ? View.VISIBLE : View.GONE);
+            layout_detail.setVisibility(mode == DETAIL ? View.VISIBLE : View.GONE);
+            layout_edit.setVisibility(mode == EDIT ? View.VISIBLE : View.GONE);
         }
     }
 

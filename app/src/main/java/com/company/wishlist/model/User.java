@@ -89,7 +89,7 @@ public class User {
         this.email = email;
     }
 
-    public String getAvatarURL() {
+    public String genAvatarURL() {
         return "https://graph.facebook.com/" + id + "/picture?type=large";
     }
 

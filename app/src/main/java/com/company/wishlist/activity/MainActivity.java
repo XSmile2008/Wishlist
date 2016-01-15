@@ -48,16 +48,11 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
 
     private FriendListAdapter friendListAdapter;
 
-    @Bind(R.id.profile_user_avatar_iw)
-    ImageView userAvatarView;
-    @Bind(R.id.profile_user_name_tv)
-    TextView profileUserName;
-    @Bind(R.id.update_user_profile)
-    ImageButton updateUserProfile;
-    @Bind(R.id.button_settings)
-    Button settingsButton;
-    @Bind(R.id.drawer_layout)
-    DrawerLayout drawer;
+    @Bind(R.id.profile_user_avatar_iw) ImageView userAvatarView;
+    @Bind(R.id.profile_user_name_tv) TextView profileUserName;
+    @Bind(R.id.update_user_profile) ImageButton updateUserProfile;
+    @Bind(R.id.button_settings) Button settingsButton;
+    @Bind(R.id.drawer_layout) DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

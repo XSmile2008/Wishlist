@@ -1,13 +1,15 @@
 package com.company.wishlist.model;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by vladstarikov on 07.01.16.
  */
 public class WishList {
 
-    int id;
-    long owner;
-    long forUser;
+    @SerializedName("id") int id;
+    @SerializedName("owner") long owner;
+    @SerializedName("for_user")long forUser;
 
     public int getId() {
         return id;

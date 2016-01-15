@@ -115,7 +115,7 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
             profileUserName.setText(user.getDisplayName());
 
             Glide.with(MainActivity.this)
-                    .load(user.getAvatarURL())
+                    .load(user.genAvatarURL())
                     .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
                     .into(userAvatarView);
 

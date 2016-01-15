@@ -3,26 +3,19 @@ package com.company.wishlist.model;
 import com.firebase.client.annotations.Nullable;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by vladstarikov on 07.01.16.
  */
-public class Wish {
+public class Wish implements Serializable{
 
-    @SerializedName("id") int id;
     @SerializedName("wishlist_id") int wishListID;
     @SerializedName("title") String title;
     @SerializedName("comment") String comment;
     @SerializedName("picture") String picture; //URL
     @Nullable @SerializedName("received") Boolean received;
     @Nullable @SerializedName("reserved") Reserved reserved;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public int getWishListID() {
         return wishListID;
@@ -62,6 +55,14 @@ public class Wish {
 
     public void setReceived(Boolean received) {
         this.received = received;
+    }
+
+    public Reserved getReserved() {
+        return reserved;
+    }
+
+    public void setReserved(Reserved reserved) {
+        this.reserved = reserved;
     }
 
     public class Reserved {

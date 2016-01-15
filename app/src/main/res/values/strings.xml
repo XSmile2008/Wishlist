@@ -13,4 +13,5 @@
     <string name="profile_data_error_msg">Problem with getting data from Facebook!</string>
     <string name="facebook_permissions">public_profile, email, user_birthday, user_friends</string>
     <string name="prefsLogoutButton">prefsLogoutButton</string>
+    <string name="title_activity_main2">Main2Activity</string>
 </resources>

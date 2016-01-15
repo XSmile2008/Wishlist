@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.company.wishlist.R;
+import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -26,7 +27,7 @@ import butterknife.ButterKnife;
 /**
  * Created by v.odahovskiy on 05.01.2016.
  */
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends InternetActivity {
 
     private static String TAG = LoginActivity.class.getSimpleName();
     public static final String AUTH_TOKEN_EXTRA = "AUTH_TOKEN_EXTRA";
@@ -126,7 +127,7 @@ public class LoginActivity extends AppCompatActivity {
             mAuthData = authData;
             getApplicationContext()
                     .startActivity(new Intent(getApplicationContext(), MainActivity.class)
-                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));//TODO: check
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             finish();
         }
 

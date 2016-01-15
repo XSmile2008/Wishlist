@@ -7,17 +7,8 @@ import com.google.gson.annotations.SerializedName;
  */
 public class WishList {
 
-    @SerializedName("id") int id;
     @SerializedName("owner") long owner;
     @SerializedName("for_user")long forUser;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public long getOwner() {
         return owner;

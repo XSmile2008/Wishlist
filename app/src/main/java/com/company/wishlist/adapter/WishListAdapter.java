@@ -1,6 +1,7 @@
 package com.company.wishlist.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.company.wishlist.R;
+import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.model.Wish;
 
 import java.util.List;
@@ -57,7 +59,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         return wishes.size();
     }
 
-    public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public static final int NORMAl_MODE = 0;
         public static final int DETAIL_MODE = 1;
@@ -115,6 +117,9 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         @OnClick(R.id.image_button_edit)
         public void onClickEdit() {
             Toast.makeText(context, "item " + getAdapterPosition() + " edit", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(context, WishEditActivity.class)
+                    .putExtra("wish", wishes.get(getAdapterPosition()));
+            context.startActivity(intent);
         }
 
         @OnClick(R.id.image_button_delete)

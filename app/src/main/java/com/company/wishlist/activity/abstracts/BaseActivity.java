@@ -1,5 +1,8 @@
 package com.company.wishlist.activity.abstracts;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 
 import com.company.wishlist.activity.LoginActivity;
@@ -16,7 +19,7 @@ public abstract class BaseActivity extends InternetActivity {
     protected void processFacebookLogout() {
         Intent logoutIntent = new Intent(getApplicationContext(), LoginActivity.class);
         logoutIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        logoutIntent.putExtra(LoginActivity.INTENT_LOGOUT, true);
+        logoutIntent.setAction(LoginActivity.ACTION_LOGOUT);
         startActivity(logoutIntent);
         finish();
     }

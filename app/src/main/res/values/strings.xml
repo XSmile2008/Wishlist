@@ -12,4 +12,5 @@
     <string name="no_internet_connection_msg">Internet not work, please check your connection!</string>
     <string name="profile_data_error_msg">Problem with getting data from Facebook!</string>
     <string name="facebook_permissions">public_profile, email, user_birthday, user_friends</string>
+    <string name="prefsLogoutButton">prefsLogoutButton</string>
 </resources>

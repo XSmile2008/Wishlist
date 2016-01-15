@@ -30,7 +30,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private static String TAG = LoginActivity.class.getSimpleName();
     public static final String AUTH_TOKEN_EXTRA = "AUTH_TOKEN_EXTRA";
-    public static final String INTENT_LOGOUT = "INTENT_LOGOUT";
+    public static final String ACTION_LOGOUT = "LOGOUT";
 
     @Bind(R.id.login_button) LoginButton loginButton;
 
@@ -72,11 +72,13 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Intent intent = getIntent();
-        boolean logOut = intent.getBooleanExtra(INTENT_LOGOUT, false);
-        if (logOut) {
+        if (isLogout(getIntent())) {
             logOut();
         }
+    }
+
+    private boolean isLogout(Intent intent) {
+        return null != intent.getAction() && intent.getAction().equals(ACTION_LOGOUT);
     }
 
     @Override

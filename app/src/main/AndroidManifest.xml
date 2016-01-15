@@ -38,6 +38,7 @@
 
         <activity android:name=".activity.abstracts.InternetActivity"/>
 
+        <activity android:name=".activity.SettingsActivity" />
     </application>
 
 </manifest>

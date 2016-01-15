@@ -27,12 +27,16 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     private Context context;
     private List<Wish> wishes;
     private boolean isOwner = true;
-
     private int selectedItem = -1;
 
     public WishListAdapter(Context context, List<Wish> wishes) {
         this.context = context;
         this.wishes = wishes;
+    }
+
+    public WishListAdapter(Context context, List<Wish> wishes, boolean isOwner) {
+        this(context, wishes);
+        this.isOwner = isOwner;
     }
 
     @Override
@@ -45,7 +49,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         holder.imageView.setImageResource(R.drawable.gift_icon);
         holder.textViewTitle.setText(wishes.get(position).getTitle());
         holder.textViewComment.setText(wishes.get(position).getComment());
-        holder.setMode((selectedItem == position) ? holder.DETAIL : holder.NORMAl);
+        holder.setMode((selectedItem == position) ? Holder.DETAIL_MODE : Holder.NORMAl_MODE);
     }
 
     @Override
@@ -55,9 +59,9 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
     public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        public final int NORMAl = 0;
-        public final int DETAIL = 1;
-        public final int EDIT = 2;
+        public static final int NORMAl_MODE = 0;
+        public static final int DETAIL_MODE = 1;
+        public static final int EDIT_MODE = 2;
 
         //Header
         @Bind(R.id.layout_header) ViewGroup layoutHeader;
@@ -83,8 +87,8 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         }
 
         public void setMode(int mode) {
-            layoutFooter.setVisibility(mode == DETAIL || mode == EDIT ? View.VISIBLE : View.GONE);
-            textViewComment.setSingleLine(mode == NORMAl);
+            layoutFooter.setVisibility(mode == DETAIL_MODE || mode == EDIT_MODE ? View.VISIBLE : View.GONE);
+            textViewComment.setSingleLine(mode == NORMAl_MODE);
         }
 
         @Override

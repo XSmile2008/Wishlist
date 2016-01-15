@@ -1,8 +1,10 @@
 package com.company.wishlist.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -46,10 +48,16 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
 
     private FriendListAdapter friendListAdapter;
 
-    @Bind(R.id.profile_user_avatar_iw) ImageView userAvatarView;
-    @Bind(R.id.profile_user_name_tv) TextView profileUserName;
-    @Bind(R.id.update_user_profile) ImageButton updateUserProfile;
-    @Bind(R.id.logout_button) Button logoutButton;
+    @Bind(R.id.profile_user_avatar_iw)
+    ImageView userAvatarView;
+    @Bind(R.id.profile_user_name_tv)
+    TextView profileUserName;
+    @Bind(R.id.update_user_profile)
+    ImageButton updateUserProfile;
+    @Bind(R.id.button_settings)
+    Button settingsButton;
+    @Bind(R.id.drawer_layout)
+    DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +78,6 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         });
 
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.toggle_open_drawer, R.string.toggle_close_drawer);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
@@ -80,14 +87,8 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         recyclerViewFriends.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewFriends.setAdapter(friendListAdapter);
 
-        logoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                logOut();
-            }
-        });
-
         updateUserProfile.setOnClickListener(this);
+        settingsButton.setOnClickListener(this);
 
         if (isAuthenticated()) {
             refreshUserDataUi();
@@ -124,7 +125,8 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
                         @Override
                         public void onCompleted(JSONArray objects, GraphResponse response) {
                             List<User> friends = new Gson()
-                                    .fromJson(objects.toString(), new TypeToken<List<User>>() {}.getType());
+                                    .fromJson(objects.toString(), new TypeToken<List<User>>() {
+                                    }.getType());
                             friendListAdapter.setFriends(friends);
                         }
                     }).executeAsync();
@@ -141,12 +143,27 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
 
     @Override
     public void onClick(View v) {
-        Toast.makeText(getApplicationContext(), "Bla bla", Toast.LENGTH_LONG).show();
+        switch (v.getId()) {
+            case R.id.button_settings:
+                openSettingsActivity();
+                break;
+            case R.id.update_user_profile:
+                Toast.makeText(getApplicationContext(), "Bla bla", Toast.LENGTH_LONG).show();
+                return;
+        }
+        drawer.closeDrawer(GravityCompat.START);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
+    private void openSettingsActivity() {
+        Intent i = new Intent(this, SettingsActivity.class);
+        startActivity(i);
     }
 
     @Override
     public void onFriendSelected(long id) {
         Toast.makeText(this, " Selected friend id is " + id, Toast.LENGTH_LONG).show();
         Log.d(TAG, " Selected friend id is " + id);
+        drawer.closeDrawer(GravityCompat.START);
     }
 }

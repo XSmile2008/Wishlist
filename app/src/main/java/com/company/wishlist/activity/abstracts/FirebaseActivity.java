@@ -6,6 +6,7 @@ import android.support.v7.app.AlertDialog;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.LoginActivity;
 import com.company.wishlist.model.User;
+import com.company.wishlist.model.Wish;
 import com.company.wishlist.util.FirebaseUtil;
 import com.company.wishlist.util.Utilities;
 import com.firebase.client.AuthData;
@@ -97,5 +98,13 @@ public abstract class FirebaseActivity extends BaseActivity implements FirebaseU
 
     public User getCurrentUser(){
         return firebaseUtil.getCurrentUser();
+    }
+
+    public void save(Wish wish){
+        firebaseUtil.save(wish);
+    }
+
+    public void remove(String id, Class<?> clazz) {
+        firebaseUtil.remove(id, clazz);
     }
 }

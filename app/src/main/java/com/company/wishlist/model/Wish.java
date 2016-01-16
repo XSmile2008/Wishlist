@@ -4,12 +4,14 @@ import com.firebase.client.annotations.Nullable;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * Created by vladstarikov on 07.01.16.
  */
 public class Wish implements Serializable{
 
+    @SerializedName("uuid") String uuid;
     @SerializedName("wishlist_id") int wishListID;
     @SerializedName("title") String title;
     @SerializedName("comment") String comment;
@@ -63,6 +65,14 @@ public class Wish implements Serializable{
 
     public void setReserved(Reserved reserved) {
         this.reserved = reserved;
+    }
+
+    public String getUUID() {
+        return uuid;
+    }
+
+    public Wish(){
+        uuid = UUID.randomUUID().toString();
     }
 
     public class Reserved {

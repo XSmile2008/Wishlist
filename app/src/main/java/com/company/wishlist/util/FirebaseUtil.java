@@ -5,6 +5,7 @@ import android.content.Context;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.model.User;
+import com.company.wishlist.model.Wish;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -14,7 +15,8 @@ import com.firebase.client.FirebaseError;
  */
 public class FirebaseUtil implements Firebase.AuthResultHandler {
 
-    public static final String USER_TABLE = "users";
+    public static final String USER_TABLE = User.class.getSimpleName();
+    public static final String WISH_TABLE = Wish.class.getSimpleName();
 
     //interface for interact util with activity for connection
     public interface IFirebaseConnection {
@@ -73,6 +75,10 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
         }
     }
 
+    public void save(Wish wish){
+        firebaseRoot.child(WISH_TABLE).child(wish.getUUID()).setValue(wish);
+    }
+
     private boolean isTokenExpired() {
         return (authData == null || Utilities.isExpired(authData.getExpires()));
     }
@@ -89,4 +95,7 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
         return null != authData;
     }
 
+    public void remove(String id, Class<?> clazz){
+        firebaseRoot.child(clazz.getSimpleName()).child(id).removeValue();
+    }
 }

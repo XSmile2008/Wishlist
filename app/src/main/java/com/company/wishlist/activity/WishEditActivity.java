@@ -1,6 +1,5 @@
 package com.company.wishlist.activity;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -21,7 +20,6 @@ import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.FirebaseActivity;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.util.CropCircleTransformation;
-import com.company.wishlist.util.DateUtil;
 import com.company.wishlist.util.DialogUtil;
 import com.company.wishlist.util.Utilities;
 import com.mobsandgeeks.saripaar.ValidationError;
@@ -66,31 +64,26 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wish_edit);
         ButterKnife.bind(this);
-        initValidator();
-        initReservedDatePicker();
-        setUpActionBar();
-        wish = getWish();
-        initView();
-    }
 
-    private void initReservedDatePicker() {
+        //Setup ActionBar
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
+
+        //Setup validator
+        validator = new Validator(this);
+        validator.setValidationListener(this);
+
+        //Init reserve date picker
         reservedDateDialog = new CalendarDatePickerDialogFragment();
         reservedDateDialog.setOnDateSetListener(this);
         reservedDateDialog.setFirstDayOfWeek(Calendar.MONDAY);
         reservedDateDialog.setRetainInstance(true);
         reservedDateDialog.setThemeDark(true);
-    }
 
-    private void initValidator() {
-        validator = new Validator(this);
-        validator.setValidationListener(this);
-    }
-
-    private void setUpActionBar() {
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
+        wish = getWish();
+        initView();
     }
 
     public Wish getWish() {
@@ -112,12 +105,14 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
                 return false;
             case R.id.action_done:
                 validator.validate();
+                finish();
                 return false;
             case R.id.action_reserve:
                 reserveWish();
                 return false;
             case R.id.action_delete:
                 deleteWish();
+                finish();
                 return false;
         }
         return super.onOptionsItemSelected(item);
@@ -144,19 +139,14 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
         if (!wish.isWishReserved()) {
             reservedDateDialog.show(getSupportFragmentManager(), DATE_FIALOG);
         } else {
-            unreserved();
+            DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.unreserve), this, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    wish.setReserved(null);
+                    validator.validate();
+                    Toast.makeText(getApplicationContext(), "wish " + wish.getTitle() + " unreserved", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
-    }
-
-    private void unreserved() {
-        DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.unreserve), this, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                wish.setReserved(null);
-                validator.validate();
-                Toast.makeText(getApplicationContext(), "wish " + wish.getTitle() + " unreserved", Toast.LENGTH_SHORT).show();
-                //onBackPressed();
-            }
-        });
     }
 
     private void deleteWish() {
@@ -166,9 +156,8 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
                     .setCancelable(false)
                     .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            remove(wish.getUUID(), Wish.class);
+                            getFirebaseUtil().remove(wish.getUUID(), Wish.class);
                             Toast.makeText(getApplicationContext(), "wish " + wish.getTitle() + " deleted", Toast.LENGTH_SHORT).show();
-                            //onBackPressed();
                         }
                     })
                     .setNegativeButton(getString(R.string.no), null)
@@ -178,8 +167,7 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
 
     private void commitChanges() {
         fillWishFields();
-        save(wish);
-        //todo uncomment after testing onBackPressed();
+        getFirebaseUtil().save(wish);
         Toast.makeText(this, wish.getTitle(), Toast.LENGTH_SHORT).show();
     }
 
@@ -234,7 +222,7 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
     @Override
     public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
         final long reservationDate = dialog.getSelectedDay().getDateInMillis();
-        wish.reserve(getCurrentUser().getId(), reservationDate);
+        wish.reserve(getFirebaseUtil().getCurrentUser().getId(), reservationDate);
         validator.validate();
     }
 }

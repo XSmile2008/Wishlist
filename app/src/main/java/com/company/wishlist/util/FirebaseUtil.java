@@ -21,7 +21,9 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
     //interface for interact util with activity for connection
     public interface IFirebaseConnection {
         void onAuthenticated(AuthData authData);
+
         void onAuthenticationError(FirebaseError firebaseError);
+
         void onMissingConnection();
     }
 
@@ -46,8 +48,8 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
     }
 
     private void saveUserInFirebase(AuthData authData) {
-            user = FacebookUserBuilder.build(authData);
-            firebaseRoot.child(USER_TABLE).child(user.getId()).setValue(user);
+        user = FacebookUserBuilder.build(authData);
+        firebaseRoot.child(USER_TABLE).child(user.getId()).setValue(user);
     }
 
     @Override
@@ -62,7 +64,6 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
         ((IFirebaseConnection) context).onAuthenticationError(firebaseError);
     }
 
-
     public void refresh() {
         authData = firebaseRoot.getAuth();
 
@@ -75,15 +76,11 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
         }
     }
 
-    public void save(Wish wish){
-        firebaseRoot.child(WISH_TABLE).child(wish.getUUID()).setValue(wish);
-    }
-
     private boolean isTokenExpired() {
         return (authData == null || Utilities.isExpired(authData.getExpires()));
     }
 
-    public boolean isDisconnected(){
+    public boolean isDisconnected() {
         return !isAuthenticated() || isTokenExpired();
     }
 
@@ -95,7 +92,11 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
         return null != authData;
     }
 
-    public void remove(String id, Class<?> clazz){
+    public void save(Wish wish) {
+        firebaseRoot.child(WISH_TABLE).child(wish.getUUID()).setValue(wish);
+    }
+
+    public void remove(String id, Class<?> clazz) {
         firebaseRoot.child(clazz.getSimpleName()).child(id).removeValue();
     }
 }

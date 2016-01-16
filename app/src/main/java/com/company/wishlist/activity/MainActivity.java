@@ -85,7 +85,7 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         updateUserProfile.setOnClickListener(this);
         settingsButton.setOnClickListener(this);
 
-        if (isAuthenticated()) {
+        if (getFirebaseUtil().isAuthenticated()) {
             refreshUserDataUi();
         }
     }
@@ -106,11 +106,11 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     }
 
     private void refreshUserDataUi() {
-        User user = super.getCurrentUser();
+        User user = getFirebaseUtil().getCurrentUser();
         if (null != user) {
             profileUserName.setText(user.getDisplayName());
 
-            Glide.with(MainActivity.this)
+            Glide.with(this)
                     .load(user.genAvatarURL())
                     .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
                     .into(userAvatarView);

@@ -37,6 +37,7 @@ public abstract class FirebaseActivity extends BaseActivity implements FirebaseU
             }
         }
     }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -92,19 +93,8 @@ public abstract class FirebaseActivity extends BaseActivity implements FirebaseU
                 .show();
     }
 
-    protected boolean isAuthenticated() {
-        return firebaseUtil.isAuthenticated();
+    public FirebaseUtil getFirebaseUtil() {
+        return firebaseUtil;
     }
 
-    public User getCurrentUser(){
-        return firebaseUtil.getCurrentUser();
-    }
-
-    public void save(Wish wish){
-        firebaseUtil.save(wish);
-    }
-
-    public void remove(String id, Class<?> clazz) {
-        firebaseUtil.remove(id, clazz);
-    }
 }

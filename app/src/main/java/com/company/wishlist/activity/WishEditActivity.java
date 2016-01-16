@@ -1,13 +1,10 @@
 package com.company.wishlist.activity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -19,19 +16,20 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.FirebaseActivity;
-import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.util.CropCircleTransformation;
+import com.company.wishlist.util.DateUtil;
 import com.company.wishlist.util.DialogUtil;
 import com.company.wishlist.util.Utilities;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Length;
-import com.mobsandgeeks.saripaar.annotation.Min;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.Bind;
@@ -41,9 +39,10 @@ import butterknife.OnClick;
 /**
  * Created by vladstarikov on 15.01.16.
  */
-public class WishEditActivity extends FirebaseActivity implements Validator.ValidationListener {
+public class WishEditActivity extends FirebaseActivity implements Validator.ValidationListener, CalendarDatePickerDialogFragment.OnDateSetListener {
 
     private static int RESULT_LOAD_IMAGE = 1;
+    private static String DATE_FIALOG = "DATE_PICKER";
 
     @Bind(R.id.image_view)
     ImageView imageView;
@@ -59,8 +58,8 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
     EditText editTextComment;
 
     Wish wish;
-
     Validator validator;
+    CalendarDatePickerDialogFragment reservedDateDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,9 +67,18 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
         setContentView(R.layout.activity_wish_edit);
         ButterKnife.bind(this);
         initValidator();
+        initReservedDatePicker();
         setUpActionBar();
         wish = getWish();
         initView();
+    }
+
+    private void initReservedDatePicker() {
+        reservedDateDialog = new CalendarDatePickerDialogFragment();
+        reservedDateDialog.setOnDateSetListener(this);
+        reservedDateDialog.setFirstDayOfWeek(Calendar.MONDAY);
+        reservedDateDialog.setRetainInstance(true);
+        reservedDateDialog.setThemeDark(true);
     }
 
     private void initValidator() {
@@ -132,40 +140,54 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
         }
     }
 
-    public void commitChanges() {
-        wish.setComment(editTextComment.getText().toString());
-        wish.setTitle(editTextTitle.getText().toString());
-
-        //get data from image as string (base64)
-        imageView.buildDrawingCache();
-        Bitmap bmap = imageView.getDrawingCache();
-        wish.setPicture(Utilities.getEncoded64ImageStringFromBitmap(bmap));
-        save(wish);
-        //onBackPressed();
-        Toast.makeText(this, wish.getTitle(), Toast.LENGTH_SHORT).show();
+    private void reserveWish() {
+        if (!wish.isWishReserved()) {
+            reservedDateDialog.show(getSupportFragmentManager(), DATE_FIALOG);
+        } else {
+            unreserved();
+        }
     }
 
-    private void reserveWish() {
-        //show reservation dialog
-        Toast.makeText(this, "wish " + wish.getTitle() + " reserved", Toast.LENGTH_SHORT).show();
+    private void unreserved() {
+        DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.unreserve), this, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                wish.setReserved(null);
+                validator.validate();
+                Toast.makeText(getApplicationContext(), "wish " + wish.getTitle() + " unreserved", Toast.LENGTH_SHORT).show();
+                //onBackPressed();
+            }
+        });
     }
 
     private void deleteWish() {
-        //todo show deletion dialog
         if (null != wish.getUUID()) {
             new AlertDialog.Builder(this)
-                    .setMessage("Are you sure you want to remove this wish?")
+                    .setMessage(getString(R.string.remove_wish_dialog_text))
                     .setCancelable(false)
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             remove(wish.getUUID(), Wish.class);
                             Toast.makeText(getApplicationContext(), "wish " + wish.getTitle() + " deleted", Toast.LENGTH_SHORT).show();
-                            onBackPressed();
+                            //onBackPressed();
                         }
                     })
-                    .setNegativeButton("No", null)
+                    .setNegativeButton(getString(R.string.no), null)
                     .show();
         }
+    }
+
+    private void commitChanges() {
+        fillWishFields();
+        save(wish);
+        //todo uncomment after testing onBackPressed();
+        Toast.makeText(this, wish.getTitle(), Toast.LENGTH_SHORT).show();
+    }
+
+    private void fillWishFields() {
+        wish.setComment(editTextComment.getText().toString());
+        wish.setTitle(editTextTitle.getText().toString());
+        imageView.buildDrawingCache();
+        wish.setPicture(Utilities.getEncoded64ImageStringFromBitmap(imageView.getDrawingCache()));
     }
 
     @OnClick(R.id.image_view)
@@ -173,7 +195,7 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
         startActivityForResult(
                 Intent.createChooser(
                         new Intent(Intent.ACTION_GET_CONTENT)
-                                .setType("image/*"), "Choose an image"),
+                                .setType("image/*"), getString(R.string.choose_image)),
                 RESULT_LOAD_IMAGE);
     }
 
@@ -187,7 +209,7 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
                     .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
                     .into(imageView);
         } else {
-            DialogUtil.alertShow(getString(R.string.app_name), "Problem with taking a picture", this);
+            DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.choose_image_error_text), this);
         }
     }
 
@@ -207,5 +229,12 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    @Override
+    public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
+        final long reservationDate = dialog.getSelectedDay().getDateInMillis();
+        wish.reserve(getCurrentUser().getId(), reservationDate);
+        validator.validate();
     }
 }

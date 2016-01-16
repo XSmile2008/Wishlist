@@ -38,4 +38,6 @@ dependencies {
     compile 'com.facebook.android:facebook-android-sdk:4.6.0'
     compile 'com.firebase:firebase-client-android:2.5.0'
     compile 'com.mobsandgeeks:android-saripaar:2.0-SNAPSHOT'
+    compile 'com.code-troopers.betterpickers:library:2.2.2'
+
 }

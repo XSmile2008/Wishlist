@@ -14,4 +14,12 @@
     <string name="facebook_permissions">public_profile, email, user_birthday, user_friends</string>
     <string name="prefsLogoutButton">prefsLogoutButton</string>
     <string name="title_activity_main2">Main2Activity</string>
+    <string name="remove_wish_dialog_text">Are you sure you want to remove this wish?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="choose_image">Choose an image</string>
+    <string name="choose_image_error_text">Problem with taking a picture</string>
+    <string name="reservation_date_picker_title">Select date for reservation</string>
+    <string name="formatted_date">Your reservation for: %1$s</string>
+    <string name="unreserve">Are you shure to unreserve wish?</string>
 </resources>

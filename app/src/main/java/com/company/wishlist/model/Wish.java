@@ -1,5 +1,6 @@
 package com.company.wishlist.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.firebase.client.annotations.Nullable;
 import com.google.gson.annotations.SerializedName;
 
@@ -67,17 +68,24 @@ public class Wish implements Serializable{
         this.reserved = reserved;
     }
 
+    public void reserve(String userId, long dateInMillis) {
+        this.reserved = new Reserved(userId, String.valueOf(dateInMillis));
+    }
+
     public String getUUID() {
+        if (null == uuid) {
+            uuid = UUID.randomUUID().toString();
+        }
         return uuid;
+    }
+
+    @JsonIgnore
+    public boolean isWishReserved() {
+        return null != reserved;
     }
 
     public Wish(){
         uuid = UUID.randomUUID().toString();
-    }
-
-    public class Reserved {
-        @SerializedName("by_user") String byUser;
-        @SerializedName("for_date") String forDate;
     }
 
 }

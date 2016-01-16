@@ -3,8 +3,11 @@ package com.company.wishlist.util;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
+import android.widget.Toast;
 
+import com.company.wishlist.R;
 import com.company.wishlist.activity.MainActivity;
+import com.company.wishlist.model.Wish;
 
 /**
  * Created by v.odahovskiy on 05.01.2016.
@@ -22,5 +25,15 @@ public class DialogUtil {
                     }
                 });
         alertDialog.show();
+    }
+
+    public static void alertShow(String title, String message, Context context, DialogInterface.OnClickListener onClickListener){
+        new AlertDialog.Builder(context)
+                .setTitle(title)
+                .setMessage(message)
+                .setCancelable(false)
+                .setPositiveButton(context.getString(R.string.yes), onClickListener)
+                .setNegativeButton(context.getString(R.string.no), null)
+                .show();
     }
 }

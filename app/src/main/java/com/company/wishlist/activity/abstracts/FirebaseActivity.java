@@ -1,14 +1,12 @@
 package com.company.wishlist.activity.abstracts;
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.LoginActivity;
-import com.company.wishlist.model.User;
-import com.company.wishlist.model.Wish;
 import com.company.wishlist.util.FirebaseUtil;
-import com.company.wishlist.util.Utilities;
 import com.firebase.client.AuthData;
 import com.firebase.client.FirebaseError;
 
@@ -44,7 +42,7 @@ public abstract class FirebaseActivity extends BaseActivity implements FirebaseU
         if (null != this.getIntent().getExtras()) {
             boolean reloadData = this.getIntent().getExtras().getBoolean(RELOAD_DATA, false);
             if (reloadData) {
-                firebaseUtil.refresh();
+                firebaseUtil.refreshAuth();
             }
         }
     }

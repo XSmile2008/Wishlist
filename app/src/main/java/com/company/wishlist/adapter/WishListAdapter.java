@@ -3,6 +3,7 @@ package com.company.wishlist.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,13 @@ import android.widget.Toast;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.model.Wish;
+import com.company.wishlist.util.FirebaseUtil;
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -31,14 +38,60 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     private boolean isOwner = true;
     private int selectedItem = -1;
 
-    public WishListAdapter(Context context, List<Wish> wishes) {
+    public WishListAdapter(Context context) {
         this.context = context;
-        this.wishes = wishes;
+        this.wishes = new ArrayList<>();
+        getWishes();
     }
 
-    public WishListAdapter(Context context, List<Wish> wishes, boolean isOwner) {
-        this(context, wishes);
-        this.isOwner = isOwner;
+    private void getWishes() {
+        FirebaseUtil firebaseUtil = new FirebaseUtil(context);
+        Firebase firebaseRoot = firebaseUtil.getFirebaseRoot();
+        firebaseRoot.child(FirebaseUtil.WISH_TABLE).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String prevKey) {
+                Wish wish = dataSnapshot.getValue(Wish.class);
+                wish.setId(dataSnapshot.getKey());//TODO: this will be set wish Id
+                wishes.add(wish);
+                notifyDataSetChanged();
+                Log.d("wishes.onChildAdded()", wish.toString());
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String prevKey) {
+                Wish wish = dataSnapshot.getValue(Wish.class);
+                wish.setId(dataSnapshot.getKey());//TODO: this will be set wish Id
+                wishes.set(findWishIndexById(wish.getId()), wish);
+                Log.d("wishes.onChildChanged()", wish.toString());
+                notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                wishes.remove(findWishIndexById(dataSnapshot.getKey()));
+                notifyDataSetChanged();
+                Log.d("wishes.onChildRemoved()", dataSnapshot.getValue(Wish.class).toString());
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String prevKey) {
+                Log.d("wishes.onChildMoved()", dataSnapshot.getValue(Wish.class).toString());
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.d("wishes.onChanceled()", firebaseError.toString());
+            }
+        });
+    }
+
+    //TODO: will be replaced with HashMap or write sort, etc...
+    @Deprecated
+    int findWishIndexById(String id) {
+        for (int i = 0; i < wishes.size(); i++) {
+            if (wishes.get(i).getId().equals(id)) return i;
+        }
+        return -1;
     }
 
     @Override

@@ -12,13 +12,21 @@ import java.util.UUID;
  */
 public class Wish implements Serializable{
 
-    @SerializedName("uuid") String uuid;
+    @JsonIgnore String id;
     @SerializedName("wishlist_id") int wishListID;
     @SerializedName("title") String title;
     @SerializedName("comment") String comment;
     @SerializedName("picture") String picture; //URL
     @Nullable @SerializedName("received") Boolean received;
     @Nullable @SerializedName("reserved") Reserved reserved;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public int getWishListID() {
         return wishListID;
@@ -72,20 +80,17 @@ public class Wish implements Serializable{
         this.reserved = new Reserved(userId, String.valueOf(dateInMillis));
     }
 
-    public String getUUID() {
-        if (null == uuid) {
-            uuid = UUID.randomUUID().toString();
-        }
-        return uuid;
-    }
-
     @JsonIgnore
     public boolean isWishReserved() {
         return null != reserved;
     }
 
     public Wish(){
-        uuid = UUID.randomUUID().toString();
+        id = UUID.randomUUID().toString();
     }
 
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + ": id = " + id + ", title = " + title + ", comment = " + comment;
+    }
 }

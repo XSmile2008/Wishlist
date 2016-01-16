@@ -5,13 +5,20 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.company.wishlist.R;
 import com.company.wishlist.adapter.WishListAdapter;
 import com.company.wishlist.model.Wish;
+import com.company.wishlist.util.FirebaseUtil;
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,21 +37,11 @@ public class FragmentWishList extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        WishListAdapter adapter = new WishListAdapter(getContext(), createTestData());
+        WishListAdapter adapter = new WishListAdapter(getContext());
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
     }
 
-    @java.lang.Deprecated
-    private List<Wish> createTestData() {
-        List<Wish> list = new ArrayList<>();
-        while (list.size() < 11) {
-            Wish wish = new Wish();
-            wish.setTitle("Title" + list.size());
-            wish.setComment("This is comment for wish#" + list.size() + ": God’s In His Heaven… All’s Right With The World");
-            list.add(wish);
-        }
-        return list;
-    }
+
 }

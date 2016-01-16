@@ -17,10 +17,11 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 import com.company.wishlist.R;
-import com.company.wishlist.activity.abstracts.FirebaseActivity;
+import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.util.CropCircleTransformation;
 import com.company.wishlist.util.DialogUtil;
+import com.company.wishlist.util.FirebaseUtil;
 import com.company.wishlist.util.Utilities;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
@@ -37,7 +38,7 @@ import butterknife.OnClick;
 /**
  * Created by vladstarikov on 15.01.16.
  */
-public class WishEditActivity extends FirebaseActivity implements Validator.ValidationListener, CalendarDatePickerDialogFragment.OnDateSetListener {
+public class WishEditActivity extends InternetActivity implements Validator.ValidationListener, CalendarDatePickerDialogFragment.OnDateSetListener {
 
     private static int RESULT_LOAD_IMAGE = 1;
     private static String DATE_FIALOG = "DATE_PICKER";
@@ -55,6 +56,8 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
     @Length(min = 2)
     EditText editTextComment;
 
+    FirebaseUtil firebaseUtil;
+
     Wish wish;
     Validator validator;
     CalendarDatePickerDialogFragment reservedDateDialog;
@@ -64,6 +67,8 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wish_edit);
         ButterKnife.bind(this);
+
+        this.firebaseUtil = new FirebaseUtil(this);
 
         //Setup ActionBar
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
@@ -94,6 +99,10 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_wish_edit, menu);
+        Bundle args = getIntent().getExtras();
+        if (args == null || !args.containsKey("wish")) {
+            menu.findItem(R.id.action_delete).setVisible(false);
+        }
         return true;
     }
 
@@ -112,24 +121,19 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
                 return false;
             case R.id.action_delete:
                 deleteWish();
-                finish();
                 return false;
         }
         return super.onOptionsItemSelected(item);
     }
 
     private void initView() {
-        if (wish != null) {
-            editTextTitle.setText(wish.getTitle());
-            editTextComment.setText(wish.getComment());
-            if (wish.getPicture() != null && !wish.getPicture().isEmpty()) {
-                Glide.with(this)
-                        .load(wish.getPicture())
-                        .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
-                        .into(imageView);
-            } else {
-                imageView.setImageResource(R.drawable.gift_icon);
-            }
+        editTextTitle.setText(wish.getTitle());
+        editTextComment.setText(wish.getComment());
+        if (wish.getPicture() != null && !wish.getPicture().isEmpty()) {
+            Glide.with(this)
+                    .load(wish.getPicture())
+                    .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
+                    .into(imageView);
         } else {
             imageView.setImageResource(R.drawable.gift_icon);
         }
@@ -150,24 +154,23 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
     }
 
     private void deleteWish() {
-        if (null != wish.getUUID()) {
-            new AlertDialog.Builder(this)
-                    .setMessage(getString(R.string.remove_wish_dialog_text))
-                    .setCancelable(false)
-                    .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            getFirebaseUtil().remove(wish.getUUID(), Wish.class);
-                            Toast.makeText(getApplicationContext(), "wish " + wish.getTitle() + " deleted", Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .setNegativeButton(getString(R.string.no), null)
-                    .show();
-        }
+        new AlertDialog.Builder(this)
+                .setMessage(getString(R.string.remove_wish_dialog_text))
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        firebaseUtil.remove(wish.getId(), Wish.class);
+                        Toast.makeText(getApplicationContext(), "wish " + wish.getTitle() + " deleted", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                })
+                .setNegativeButton(getString(R.string.no), null)
+                .show();
     }
 
     private void commitChanges() {
         fillWishFields();
-        getFirebaseUtil().save(wish);
+        firebaseUtil.save(wish);
         Toast.makeText(this, wish.getTitle(), Toast.LENGTH_SHORT).show();
     }
 
@@ -175,7 +178,7 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
         wish.setComment(editTextComment.getText().toString());
         wish.setTitle(editTextTitle.getText().toString());
         imageView.buildDrawingCache();
-        wish.setPicture(Utilities.getEncoded64ImageStringFromBitmap(imageView.getDrawingCache()));
+        wish.setPicture(Utilities.getEncoded64ImageStringFromBitmap(imageView.getDrawingCache()));//TODO: don't load default icon to database
     }
 
     @OnClick(R.id.image_view)
@@ -222,7 +225,7 @@ public class WishEditActivity extends FirebaseActivity implements Validator.Vali
     @Override
     public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
         final long reservationDate = dialog.getSelectedDay().getDateInMillis();
-        wish.reserve(getFirebaseUtil().getCurrentUser().getId(), reservationDate);
+        wish.reserve(firebaseUtil.getCurrentUser().getId(), reservationDate);
         validator.validate();
     }
 }

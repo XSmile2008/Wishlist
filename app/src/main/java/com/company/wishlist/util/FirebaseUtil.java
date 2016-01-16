@@ -36,7 +36,7 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
         this.context = context;
         Firebase.setAndroidContext(context);
         firebaseRoot = new Firebase(context.getString(R.string.firebase_url));
-        refresh();
+        refreshAuth();
     }
 
     public void auth(String provider, String token) {
@@ -49,7 +49,7 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
 
     private void saveUserInFirebase(AuthData authData) {
         user = FacebookUserBuilder.build(authData);
-        firebaseRoot.child(USER_TABLE).child(user.getId()).setValue(user);
+        firebaseRoot.child(USER_TABLE).child(authData.getUid()).setValue(user);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
         ((IFirebaseConnection) context).onAuthenticationError(firebaseError);
     }
 
-    public void refresh() {
+    public void refreshAuth() {
         authData = firebaseRoot.getAuth();
 
         if (isAuthenticated()) {
@@ -92,11 +92,26 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
         return null != authData;
     }
 
+    //TODO: leave for monday
+    //TODO: This method will be called once at all project, maybe will be better move this to commitChanges()?
     public void save(Wish wish) {
-        firebaseRoot.child(WISH_TABLE).child(wish.getUUID()).setValue(wish);
+        if (wish.getId() == null || wish.getId().isEmpty()) {
+            firebaseRoot.child(WISH_TABLE).push().setValue(wish);//Automatically gen new key on DB side
+        } else {
+            firebaseRoot.child(WISH_TABLE).child(wish.getId()).setValue(wish);
+        }
     }
 
+    //TODO: This method will be called once at all project, maybe will be better move this to deleteWish()?
     public void remove(String id, Class<?> clazz) {
         firebaseRoot.child(clazz.getSimpleName()).child(id).removeValue();
+    }
+
+    public Firebase getFirebaseRoot() {
+        return firebaseRoot;
+    }
+
+    public void getWishes(String wishlist_id) {
+
     }
 }

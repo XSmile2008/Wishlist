@@ -2,9 +2,11 @@ package com.company.wishlist.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,6 +26,7 @@ import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.FirebaseActivity;
 import com.company.wishlist.adapter.FriendListAdapter;
+import com.company.wishlist.adapter.WishListPageViewAdapter;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.User;
 import com.company.wishlist.util.CropCircleTransformation;
@@ -51,7 +54,8 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     @Bind(R.id.profile_user_avatar_iw) ImageView userAvatarView;
     @Bind(R.id.profile_user_name_tv) TextView profileUserName;
     @Bind(R.id.update_user_profile) ImageButton updateUserProfile;
-    @Bind(R.id.button_settings) Button settingsButton;
+    @Bind(R.id.button_settings)
+    Button settingsButton;
     @Bind(R.id.drawer_layout) DrawerLayout drawer;
 
     @Override
@@ -88,6 +92,19 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         if (getFirebaseUtil().isAuthenticated()) {
             refreshUserDataUi();
         }
+
+        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbar.setTitle("Second Activity");
+        //updateUserData();
+        setUpTabLayout();
+    }
+
+    private void setUpTabLayout() {
+        WishListPageViewAdapter adapter = new WishListPageViewAdapter(getSupportFragmentManager());
+        ViewPager viewPager = (ViewPager) findViewById(R.id.wish_list_view_pager);
+        viewPager.setAdapter(adapter);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.wish_tab_layout);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.company.wishlist.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -7,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
  */
 public class User {
 
-    @SerializedName("id") private String id;
+    @JsonIgnore@SerializedName("id") private String id;
     @SerializedName("name") private String displayName;
     @SerializedName("first_name") private String firstName;
     @SerializedName("last_name") private String lastName;

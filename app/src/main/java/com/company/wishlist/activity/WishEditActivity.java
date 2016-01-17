@@ -2,11 +2,15 @@ package com.company.wishlist.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +32,8 @@ import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Length;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Calendar;
 import java.util.List;
 
@@ -130,10 +136,11 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         editTextTitle.setText(wish.getTitle());
         editTextComment.setText(wish.getComment());
         if (wish.getPicture() != null && !wish.getPicture().isEmpty()) {
-            Glide.with(this)
-                    .load(wish.getPicture())
+            /*Glide.with(this)
+                    .load(Utilities.decodeThumbnail(wish.getPicture()))
                     .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
-                    .into(imageView);
+                    .into(imageView);*/
+            imageView.setImageBitmap(Utilities.decodeThumbnail(wish.getPicture()));
         } else {
             imageView.setImageResource(R.drawable.gift_icon);
         }
@@ -177,8 +184,6 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     private void fillWishFields() {
         wish.setComment(editTextComment.getText().toString());
         wish.setTitle(editTextTitle.getText().toString());
-        imageView.buildDrawingCache();
-        wish.setPicture(Utilities.getEncoded64ImageStringFromBitmap(imageView.getDrawingCache()));//TODO: don't load default icon to database
     }
 
     @OnClick(R.id.image_view)
@@ -199,8 +204,8 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
                     .load(selectedImageUri)
                     .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
                     .into(imageView);
-        } else {
-            DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.choose_image_error_text), this);
+            imageView.buildDrawingCache();
+            wish.setPicture(Utilities.encodeThumbnail(imageView.getDrawingCache()));
         }
     }
 

@@ -49,7 +49,7 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
 
     private void saveUserInFirebase(AuthData authData) {
         user = FacebookUserBuilder.build(authData);
-        firebaseRoot.child(USER_TABLE).child(authData.getUid()).setValue(user);
+        firebaseRoot.child(USER_TABLE).child(user.getId()).setValue(user);
     }
 
     @Override

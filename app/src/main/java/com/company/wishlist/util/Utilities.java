@@ -1,6 +1,7 @@
 package com.company.wishlist.util;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
@@ -37,14 +38,14 @@ public class Utilities {
         return expirationDate <= System.currentTimeMillis() / 1000;
     }
 
-    public static String getEncoded64ImageStringFromBitmap(Bitmap bitmap) {
+    public static String encodeThumbnail(Bitmap bitmap) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
-        byte[] byteFormat = stream.toByteArray();
-        // get the base 64 string
-        String imgString = Base64.encodeToString(byteFormat, Base64.NO_WRAP);
-
-        return imgString;
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return Base64.encodeToString(stream.toByteArray(), Base64.NO_WRAP);
     }
 
+    public static Bitmap decodeThumbnail(String thumbData) {
+        byte[] bytes = Base64.decode(thumbData, Base64.NO_WRAP);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    }
 }

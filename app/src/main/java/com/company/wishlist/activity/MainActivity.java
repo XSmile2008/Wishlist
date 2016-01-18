@@ -3,7 +3,6 @@ package com.company.wishlist.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -16,8 +15,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -87,10 +84,10 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     }
 
     private void setUpTabLayout() {
-        wishListPageViewAdapter = new WishListPageViewAdapter(this, getSupportFragmentManager());
-        ViewPager viewPager = (ViewPager) findViewById(R.id.wish_list_view_pager);
-        viewPager.setAdapter(wishListPageViewAdapter);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.wish_tab_layout);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.wish_list_view_pager);
+        wishListPageViewAdapter = new WishListPageViewAdapter(this, tabLayout);
+        viewPager.setAdapter(wishListPageViewAdapter);
         tabLayout.setupWithViewPager(viewPager);
     }
 

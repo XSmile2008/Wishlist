@@ -74,5 +74,8 @@ public class WishListPageViewAdapter extends FragmentStatePagerAdapter implement
     public void notifyDataSetChanged() {
         super.notifyDataSetChanged();
         tabLayout.setTabsFromPagerAdapter(this);
+        //for (int i = 1; i < getCount(); i++) {
+        //    ((IOnFriendSelectedListener) getItem(i)).onFriendSelected("id");
+        //}
     }
 }

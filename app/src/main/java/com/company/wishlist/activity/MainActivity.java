@@ -50,6 +50,7 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private FriendListAdapter friendListAdapter;
+    WishListPageViewAdapter wishListPageViewAdapter;
 
     @Bind(R.id.profile_user_avatar_iw) ImageView userAvatarView;
     @Bind(R.id.profile_user_name_tv) TextView profileUserName;
@@ -100,9 +101,9 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     }
 
     private void setUpTabLayout() {
-        WishListPageViewAdapter adapter = new WishListPageViewAdapter(getSupportFragmentManager());
+        wishListPageViewAdapter = new WishListPageViewAdapter(this, getSupportFragmentManager());
         ViewPager viewPager = (ViewPager) findViewById(R.id.wish_list_view_pager);
-        viewPager.setAdapter(adapter);
+        viewPager.setAdapter(wishListPageViewAdapter);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.wish_tab_layout);
         tabLayout.setupWithViewPager(viewPager);
     }
@@ -173,9 +174,10 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     }
 
     @Override
-    public void onFriendSelected(long id) {
+    public void onFriendSelected(String id) {
         Toast.makeText(this, " Selected friend id is " + id, Toast.LENGTH_LONG).show();
         Log.d(TAG, " Selected friend id is " + id);
         drawer.closeDrawer(GravityCompat.START);
+        wishListPageViewAdapter.onFriendSelected(id);
     }
 }

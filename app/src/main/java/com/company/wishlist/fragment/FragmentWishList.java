@@ -11,11 +11,12 @@ import android.view.ViewGroup;
 
 import com.company.wishlist.R;
 import com.company.wishlist.adapter.WishListAdapter;
+import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 
 /**
  * Created by vladstarikov on 07.01.16.
  */
-public class FragmentWishList extends Fragment {
+public class FragmentWishList extends Fragment implements IOnFriendSelectedListener{
 
     @Nullable
     @Override
@@ -32,4 +33,8 @@ public class FragmentWishList extends Fragment {
         recyclerView.setAdapter(adapter);
     }
 
+    @Override
+    public void onFriendSelected(String id) {
+
+    }
 }

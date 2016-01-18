@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.WishEditActivity;
+import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.util.FirebaseUtil;
 import com.firebase.client.ChildEventListener;
@@ -31,7 +32,7 @@ import butterknife.OnClick;
 /**
  * Created by vladstarikov on 08.01.16.
  */
-public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder> {
+public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder> implements IOnFriendSelectedListener{
 
     private Context context;
     private List<Wish> wishes;
@@ -110,6 +111,11 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     @Override
     public int getItemCount() {
         return wishes.size();
+    }
+
+    @Override
+    public void onFriendSelected(String id) {
+
     }
 
     public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener {

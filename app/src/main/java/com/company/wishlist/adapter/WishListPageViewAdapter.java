@@ -1,21 +1,27 @@
 package com.company.wishlist.adapter;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.company.wishlist.fragment.FragmentWishList;
+import com.company.wishlist.interfaces.IOnFriendSelectedListener;
+import com.company.wishlist.util.FirebaseUtil;
 
 /**
  * Created by v.odahovskiy on 11.01.2016.
  */
-public class WishListPageViewAdapter extends FragmentStatePagerAdapter {
+public class WishListPageViewAdapter extends FragmentStatePagerAdapter implements IOnFriendSelectedListener{
+
+    FirebaseUtil firebaseUtil;
 
     public static final String[] tabs = {"Wish list", "Gift list"};
 
-    public WishListPageViewAdapter(FragmentManager fm) {
+    public WishListPageViewAdapter(Context context, FragmentManager fm) {
         super(fm);
+        firebaseUtil = new FirebaseUtil(context);
     }
 
     @Override
@@ -35,5 +41,14 @@ public class WishListPageViewAdapter extends FragmentStatePagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         return tabs[position];
+    }
+
+    @Override
+    public void onFriendSelected(String id) {
+        if (firebaseUtil.getCurrentUser().getId().equals(id)) {
+
+        } else {
+
+        }
     }
 }

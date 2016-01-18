@@ -68,8 +68,8 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    long id = Long.parseLong(friends.get(getAdapterPosition()).getId());
-                    ((IOnFriendSelectedListener) context).onFriendSelected(id);
+                    ((IOnFriendSelectedListener) context)
+                            .onFriendSelected(friends.get(getAdapterPosition()).getId());
                 }
             });
         }

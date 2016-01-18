@@ -18,6 +18,8 @@ import com.company.wishlist.interfaces.IOnFriendSelectedListener;
  */
 public class FragmentWishList extends Fragment implements IOnFriendSelectedListener{
 
+    WishListAdapter adapter;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -27,7 +29,7 @@ public class FragmentWishList extends Fragment implements IOnFriendSelectedListe
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        WishListAdapter adapter = new WishListAdapter(getContext());
+        adapter = new WishListAdapter(getContext());
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
@@ -35,6 +37,6 @@ public class FragmentWishList extends Fragment implements IOnFriendSelectedListe
 
     @Override
     public void onFriendSelected(String id) {
-
+        adapter.onFriendSelected(id);
     }
 }

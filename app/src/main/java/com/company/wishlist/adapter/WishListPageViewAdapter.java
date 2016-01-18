@@ -1,6 +1,7 @@
 package com.company.wishlist.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,6 +19,7 @@ public class WishListPageViewAdapter extends FragmentStatePagerAdapter implement
     FirebaseUtil firebaseUtil;
 
     public static final String[] tabs = {"Wish list", "Gift list"};
+    private boolean isOwner;
 
     public WishListPageViewAdapter(Context context, FragmentManager fm) {
         super(fm);
@@ -35,7 +37,7 @@ public class WishListPageViewAdapter extends FragmentStatePagerAdapter implement
 
     @Override
     public int getCount() {
-        return tabs.length;
+        return tabs.length - (isOwner ? 1 : 0);
     }
 
     @Override
@@ -46,9 +48,9 @@ public class WishListPageViewAdapter extends FragmentStatePagerAdapter implement
     @Override
     public void onFriendSelected(String id) {
         if (firebaseUtil.getCurrentUser().getId().equals(id)) {
-
+            isOwner = true;
         } else {
-
+            isOwner = false;
         }
     }
 }

@@ -44,19 +44,18 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
-public class MainActivity extends FirebaseActivity implements IOnFriendSelectedListener, View.OnClickListener {
+public class MainActivity extends FirebaseActivity implements IOnFriendSelectedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private FriendListAdapter friendListAdapter;
     WishListPageViewAdapter wishListPageViewAdapter;
 
+    //NavigationDrawer
     @Bind(R.id.profile_user_avatar_iw) ImageView userAvatarView;
     @Bind(R.id.profile_user_name_tv) TextView profileUserName;
-    @Bind(R.id.update_user_profile) ImageButton updateUserProfile;
-    @Bind(R.id.button_settings)
-    Button settingsButton;
     @Bind(R.id.drawer_layout) DrawerLayout drawer;
 
     @Override
@@ -68,16 +67,6 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), WishEditActivity.class);
-                startActivity(intent);
-            }
-        });
-
-
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.toggle_open_drawer, R.string.toggle_close_drawer);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
@@ -86,9 +75,6 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         RecyclerView recyclerViewFriends = (RecyclerView) drawer.findViewById(R.id.friends_recycler_view);
         recyclerViewFriends.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewFriends.setAdapter(friendListAdapter);
-
-        updateUserProfile.setOnClickListener(this);
-        settingsButton.setOnClickListener(this);
 
         if (getFirebaseUtil().isAuthenticated()) {
             refreshUserDataUi();
@@ -154,9 +140,16 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         }
     }
 
-    @Override
+    @OnClick({R.id.fab, R.id.button_my_wish_list, R.id.button_settings, R.id.update_user_profile})
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.fab:
+                Intent intent = new Intent(getApplicationContext(), WishEditActivity.class);
+                startActivity(intent);
+                return;
+            case R.id.button_my_wish_list:
+                onFriendSelected(getFirebaseUtil().getCurrentUser().getId());
+                break;
             case R.id.button_settings:
                 openSettingsActivity();
                 break;

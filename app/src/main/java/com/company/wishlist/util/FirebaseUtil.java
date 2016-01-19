@@ -6,6 +6,7 @@ import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.model.User;
 import com.company.wishlist.model.Wish;
+import com.company.wishlist.model.WishList;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -17,6 +18,7 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
 
     public static final String USER_TABLE = User.class.getSimpleName();
     public static final String WISH_TABLE = Wish.class.getSimpleName();
+    public static final String WISH_LIST_TABLE = WishList.class.getSimpleName();
 
     //interface for interact util with activity for connection
     public interface IFirebaseConnection {

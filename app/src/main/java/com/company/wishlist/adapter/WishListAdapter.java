@@ -38,15 +38,57 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     private List<Wish> wishes;
     private boolean isOwner = true;
     private int selectedItem = -1;
+    private String mode = WishListPageViewAdapter.WISH_LIST_TAB;
+    FirebaseUtil firebaseUtil;
+    private String friendId;
 
     public WishListAdapter(Context context) {
         this.context = context;
         this.wishes = new ArrayList<>();
-        getWishes();
+        firebaseUtil  = new FirebaseUtil(context);
+        getWishLists(friendId);
     }
 
-    private void getWishes() {
-        FirebaseUtil firebaseUtil = new FirebaseUtil(context);
+    private void getWishLists(String friendId){
+        switch (mode){
+            case WishListPageViewAdapter.WISH_LIST_TAB:
+                firebaseUtil.getFirebaseRoot()
+                        .child(FirebaseUtil.WISH_LIST_TABLE)
+                        .orderByChild("for_user")
+                        .startAt(friendId).endAt(friendId).addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        getWishes(dataSnapshot.getKey());
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
+
+                    }
+                });
+                break;
+            case WishListPageViewAdapter.GIFT_LIST_TAB:
+
+                break;
+        }
+    }
+
+    private void getWishes(String wishListId) {
         Firebase firebaseRoot = firebaseUtil.getFirebaseRoot();
         firebaseRoot.child(FirebaseUtil.WISH_TABLE).addChildEventListener(new ChildEventListener() {
             @Override

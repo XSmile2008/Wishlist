@@ -21,8 +21,9 @@ import com.company.wishlist.util.FirebaseUtil;
 public class WishListPageViewAdapter extends FragmentStatePagerAdapter implements IOnFriendSelectedListener{
 
     FirebaseUtil firebaseUtil;
-
-    public static final String[] tabs = {"Wish list", "Gift list"};
+    public static final String WISH_LIST_TAB = "Wish list";
+    public static final String GIFT_LIST_TAB = "Gift list";
+    public static final String[] tabs = {WISH_LIST_TAB, GIFT_LIST_TAB};
     private boolean isOwner = true;
 
     FragmentManager fragmentManager;

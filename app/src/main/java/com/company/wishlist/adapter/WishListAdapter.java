@@ -14,9 +14,11 @@ import android.widget.Toast;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.WishEditActivity;
+import com.company.wishlist.bean.EditWishBean;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.util.FirebaseUtil;
+import com.company.wishlist.util.LocalStorage;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -176,8 +178,9 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         @OnClick(R.id.image_button_edit)
         public void onClickEdit() {
             Toast.makeText(context, "item " + getAdapterPosition() + " edit", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(context, WishEditActivity.class)
-                    .putExtra("wish", wishes.get(getAdapterPosition()));
+            Intent intent = new Intent(context, WishEditActivity.class);
+            LocalStorage.getInstance().setWish(wishes.get(getAdapterPosition()));
+            intent.setAction(WishEditActivity.ACTION_EDIT);
             context.startActivity(intent);
         }
 

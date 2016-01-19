@@ -142,6 +142,7 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         switch (v.getId()) {
             case R.id.fab:
                 Intent intent = new Intent(getApplicationContext(), WishEditActivity.class);
+                intent.setAction(WishEditActivity.ACTION_CREATE);
                 startActivity(intent);
                 return;
             case R.id.button_my_wish_list:

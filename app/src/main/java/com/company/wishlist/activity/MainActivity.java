@@ -46,7 +46,7 @@ import butterknife.OnClick;
 
 public class MainActivity extends FirebaseActivity implements IOnFriendSelectedListener {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private FriendListAdapter friendListAdapter;
     WishListPageViewAdapter wishListPageViewAdapter;

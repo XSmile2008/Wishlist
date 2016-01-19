@@ -2,15 +2,10 @@ package com.company.wishlist.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,12 +32,8 @@ import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Length;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -54,7 +45,7 @@ import butterknife.OnClick;
 public class WishEditActivity extends InternetActivity implements Validator.ValidationListener, CalendarDatePickerDialogFragment.OnDateSetListener {
 
     private static int RESULT_LOAD_IMAGE = 1;
-    private static String DATE_FIALOG = "DATE_PICKER";
+    private static String DATE_DIALOG = "DATE_PICKER";
     public static String ACTION_EDIT = "com.company.wishlist.ACTION_EDIT";
     public static String ACTION_CREATE = "com.company.wishlist.ACTION_CREATE";
 
@@ -75,7 +66,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     private EditWishBean editWishBean;
     private Validator validator;
     private CalendarDatePickerDialogFragment reservedDateDialog;
-    private Firebase firebaseWishTableObject;
+    private Firebase wishRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +105,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         }else {
             finish();//todo may be init new object
         }
-        firebaseWishTableObject = firebaseUtil.getFirebaseRoot().child(FirebaseUtil.WISH_TABLE).child(editWishBean.getId());
+        wishRef = firebaseUtil.getFirebaseRoot().child(FirebaseUtil.WISH_TABLE).child(editWishBean.getId());
     }
 
     private String action() {
@@ -124,8 +115,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_wish_edit, menu);
-        Bundle args = getIntent().getExtras();
-        if (args == null || !args.containsKey("wish")) {
+        if (getIntent().getAction().equals(ACTION_CREATE)) {
             menu.findItem(R.id.action_delete).setVisible(false);
         }
         return true;
@@ -167,11 +157,11 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
      */
     private void reserveWish() {
         if (!editWishBean.isReserved()) {
-            reservedDateDialog.show(getSupportFragmentManager(), DATE_FIALOG);
+            reservedDateDialog.show(getSupportFragmentManager(), DATE_DIALOG);
         } else {
             DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.unreserve), this, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    firebaseWishTableObject.child("reserved").removeValue(new Firebase.CompletionListener() {
+                    wishRef.child("reserved").removeValue(new Firebase.CompletionListener() {
                         @Override
                         public void onComplete(FirebaseError firebaseError, Firebase firebase) {
                             Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " unreserved", Toast.LENGTH_SHORT).show();
@@ -186,7 +176,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     private void deleteWish() {
         DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.remove_wish_dialog_text), this, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                firebaseUtil.remove(editWishBean.getId(), Wish.class);
+                wishRef.removeValue();
                 Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " deleted", Toast.LENGTH_SHORT).show();
                 finish();
             }
@@ -201,10 +191,10 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
 
     private void save() {
         if (action().equals(ACTION_CREATE)) {
-            firebaseWishTableObject.setValue(editWishBean);
+            wishRef.setValue(editWishBean);
         }
         if (action().equals(ACTION_EDIT)) {
-            firebaseWishTableObject.updateChildren(editWishBean.getMapToUpdate());
+            wishRef.updateChildren(editWishBean.getMapToUpdate());
         }
     }
 
@@ -258,7 +248,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
         final long reservationDate = dialog.getSelectedDay().getDateInMillis();
         final Reserved reserved = new Reserved(firebaseUtil.getCurrentUser().getId(), reservationDate);
-        firebaseWishTableObject.child("reserved").setValue(reserved, new Firebase.CompletionListener() {
+        wishRef.child("reserved").setValue(reserved, new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
                 editWishBean.setReserved(true);

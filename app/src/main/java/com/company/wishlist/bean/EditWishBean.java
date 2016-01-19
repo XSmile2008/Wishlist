@@ -78,6 +78,10 @@ public class EditWishBean {
         return reserved;
     }
 
+    public void setReserved(boolean reserved) {
+        this.reserved = reserved;
+    }
+
     @JsonIgnore
     public Map<String, Object> getMapToUpdate() {
         Map<String, Object> result = new HashMap<>();

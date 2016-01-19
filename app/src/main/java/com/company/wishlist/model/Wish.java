@@ -1,5 +1,6 @@
 package com.company.wishlist.model;
 
+import com.company.wishlist.bean.EditWishBean;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.firebase.client.annotations.Nullable;
 import com.google.gson.annotations.SerializedName;
@@ -77,7 +78,7 @@ public class Wish implements Serializable{
     }
 
     public void reserve(String userId, long dateInMillis) {
-        this.reserved = new Reserved(userId, String.valueOf(dateInMillis));
+        this.reserved = new Reserved(userId, dateInMillis);
     }
 
     @JsonIgnore
@@ -87,6 +88,13 @@ public class Wish implements Serializable{
 
     public Wish(){
         id = UUID.randomUUID().toString();
+    }
+
+    public Wish(EditWishBean editWishBean) {
+        this.id = editWishBean.getId();
+        this.title = editWishBean.getTitle();
+        this.comment = editWishBean.getComment();
+        this.picture = editWishBean.getPicture();
     }
 
     @Override

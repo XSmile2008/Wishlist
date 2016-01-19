@@ -12,9 +12,9 @@ public class Reserved {
 
     public Reserved(){}
 
-    public Reserved(String byUser, String forDate) {
+    public Reserved(String byUser, long forDateInMillis) {
         this.byUser = byUser;
-        this.forDate = forDate;
+        this.forDate = String.valueOf(forDateInMillis);
     }
 
     public String getByUser() {

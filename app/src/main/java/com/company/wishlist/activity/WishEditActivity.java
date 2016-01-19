@@ -22,11 +22,16 @@ import com.bumptech.glide.Glide;
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.InternetActivity;
+import com.company.wishlist.bean.EditWishBean;
+import com.company.wishlist.model.Reserved;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.util.CropCircleTransformation;
 import com.company.wishlist.util.DialogUtil;
 import com.company.wishlist.util.FirebaseUtil;
+import com.company.wishlist.util.LocalStorage;
 import com.company.wishlist.util.Utilities;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Length;
@@ -35,7 +40,9 @@ import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -48,6 +55,8 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
 
     private static int RESULT_LOAD_IMAGE = 1;
     private static String DATE_FIALOG = "DATE_PICKER";
+    public static String ACTION_EDIT = "com.company.wishlist.ACTION_EDIT";
+    public static String ACTION_CREATE = "com.company.wishlist.ACTION_CREATE";
 
     @Bind(R.id.image_view)
     ImageView imageView;
@@ -62,11 +71,11 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     @Length(min = 2)
     EditText editTextComment;
 
-    FirebaseUtil firebaseUtil;
-
-    Wish wish;
-    Validator validator;
-    CalendarDatePickerDialogFragment reservedDateDialog;
+    private FirebaseUtil firebaseUtil;
+    private EditWishBean editWishBean;
+    private Validator validator;
+    private CalendarDatePickerDialogFragment reservedDateDialog;
+    private Firebase firebaseWishTableObject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,13 +102,23 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         reservedDateDialog.setRetainInstance(true);
         reservedDateDialog.setThemeDark(true);
 
-        wish = getWish();
+        initWishEdit();
         initView();
     }
 
-    public Wish getWish() {
-        Bundle args = getIntent().getExtras();
-        return (args != null && args.containsKey("wish")) ? (Wish) args.getSerializable("wish") : new Wish();
+    public void initWishEdit() {
+        if (action().equals(ACTION_CREATE)) {
+            editWishBean = new EditWishBean(new Wish());
+        }else if (action().equals(ACTION_EDIT)) {
+            editWishBean = new EditWishBean(LocalStorage.getInstance().getWish());
+        }else {
+            finish();//todo may be init new object
+        }
+        firebaseWishTableObject = firebaseUtil.getFirebaseRoot().child(FirebaseUtil.WISH_TABLE).child(editWishBean.getId());
+    }
+
+    private String action() {
+        return getIntent().getAction();
     }
 
     @Override
@@ -120,6 +139,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
                 return false;
             case R.id.action_done:
                 validator.validate();
+                LocalStorage.getInstance().setWish(null);
                 finish();
                 return false;
             case R.id.action_reserve:
@@ -133,57 +153,64 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     }
 
     private void initView() {
-        editTextTitle.setText(wish.getTitle());
-        editTextComment.setText(wish.getComment());
-        if (wish.getPicture() != null && !wish.getPicture().isEmpty()) {
-            /*Glide.with(this)
-                    .load(Utilities.decodeThumbnail(wish.getPicture()))
-                    .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
-                    .into(imageView);*/
-            imageView.setImageBitmap(Utilities.decodeThumbnail(wish.getPicture()));
+        editTextTitle.setText(editWishBean.getTitle());
+        editTextComment.setText(editWishBean.getComment());
+        if (!Utilities.isBlank(editWishBean.getPicture())) {
+            imageView.setImageBitmap(Utilities.decodeThumbnail(editWishBean.getPicture()));
         } else {
             imageView.setImageResource(R.drawable.gift_icon);
         }
     }
 
+    /**
+     * Change logic
+     */
     private void reserveWish() {
-        if (!wish.isWishReserved()) {
+        if (!editWishBean.isReserved()) {
             reservedDateDialog.show(getSupportFragmentManager(), DATE_FIALOG);
         } else {
             DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.unreserve), this, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    wish.setReserved(null);
-                    validator.validate();
-                    Toast.makeText(getApplicationContext(), "wish " + wish.getTitle() + " unreserved", Toast.LENGTH_SHORT).show();
+                    firebaseWishTableObject.child("reserved").removeValue(new Firebase.CompletionListener() {
+                        @Override
+                        public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                            Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " unreserved", Toast.LENGTH_SHORT).show();
+                            editWishBean.setReserved(false);
+                        }
+                    });
                 }
             });
         }
     }
 
     private void deleteWish() {
-        new AlertDialog.Builder(this)
-                .setMessage(getString(R.string.remove_wish_dialog_text))
-                .setCancelable(false)
-                .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        firebaseUtil.remove(wish.getId(), Wish.class);
-                        Toast.makeText(getApplicationContext(), "wish " + wish.getTitle() + " deleted", Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                })
-                .setNegativeButton(getString(R.string.no), null)
-                .show();
+        DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.remove_wish_dialog_text), this, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                firebaseUtil.remove(editWishBean.getId(), Wish.class);
+                Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " deleted", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
     }
 
     private void commitChanges() {
         fillWishFields();
-        firebaseUtil.save(wish);
-        Toast.makeText(this, wish.getTitle(), Toast.LENGTH_SHORT).show();
+        save();
+        Toast.makeText(this, editWishBean.getTitle(), Toast.LENGTH_SHORT).show();
+    }
+
+    private void save() {
+        if (action().equals(ACTION_CREATE)) {
+            firebaseWishTableObject.setValue(editWishBean);
+        }
+        if (action().equals(ACTION_EDIT)) {
+            firebaseWishTableObject.updateChildren(editWishBean.getMapToUpdate());
+        }
     }
 
     private void fillWishFields() {
-        wish.setComment(editTextComment.getText().toString());
-        wish.setTitle(editTextTitle.getText().toString());
+        editWishBean.setComment(editTextComment.getText().toString());
+        editWishBean.setTitle(editTextTitle.getText().toString());
     }
 
     @OnClick(R.id.image_view)
@@ -205,7 +232,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
                     .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
                     .into(imageView);
             imageView.buildDrawingCache();
-            wish.setPicture(Utilities.encodeThumbnail(imageView.getDrawingCache()));
+            editWishBean.setPicture(Utilities.encodeThumbnail(imageView.getDrawingCache()));
         }
     }
 
@@ -230,7 +257,13 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     @Override
     public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
         final long reservationDate = dialog.getSelectedDay().getDateInMillis();
-        wish.reserve(firebaseUtil.getCurrentUser().getId(), reservationDate);
-        validator.validate();
+        final Reserved reserved = new Reserved(firebaseUtil.getCurrentUser().getId(), reservationDate);
+        firebaseWishTableObject.child("reserved").setValue(reserved, new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                editWishBean.setReserved(true);
+                Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " reserved", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

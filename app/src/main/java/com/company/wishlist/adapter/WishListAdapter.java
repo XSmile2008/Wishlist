@@ -36,6 +36,8 @@ import butterknife.OnClick;
  */
 public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder> implements IOnFriendSelectedListener{
 
+    private String LOG_TAG = getClass().getSimpleName();
+
     private Context context;
     private List<Wish> wishes;
     private boolean isOwner = true;

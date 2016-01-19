@@ -10,12 +10,12 @@ public class Reserved {
     @SerializedName("by_user") String byUser;
     @SerializedName("for_date") String forDate;
 
+    public Reserved(){}
+
     public Reserved(String byUser, long forDateInMillis) {
         this.byUser = byUser;
         this.forDate = String.valueOf(forDateInMillis);
     }
-
-    public Reserved(){}
 
     public String getByUser() {
         return byUser;

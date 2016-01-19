@@ -24,6 +24,7 @@ import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.FirebaseActivity;
 import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.adapter.WishListPageViewAdapter;
+import com.company.wishlist.fragment.FragmentWishList;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.User;
 import com.company.wishlist.util.CropCircleTransformation;
@@ -165,8 +166,6 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
 
     @Override
     public void onFriendSelected(String id) {
-        Toast.makeText(this, " Selected friend id is " + id, Toast.LENGTH_LONG).show();
-        Log.d(TAG, " Selected friend id is " + id);
         drawer.closeDrawer(GravityCompat.START);
         wishListPageViewAdapter.onFriendSelected(id);
     }

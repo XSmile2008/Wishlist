@@ -80,7 +80,6 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
 
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle("Second Activity");
-        //updateUserData();
         setUpTabLayout();
     }
 
@@ -138,22 +137,19 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         }
     }
 
-    @OnClick({R.id.fab, R.id.button_my_wish_list, R.id.button_settings, R.id.update_user_profile})
+    @OnClick({R.id.fab, R.id.header_layout, R.id.button_settings})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab:
                 Intent intent = new Intent(getApplicationContext(), WishEditActivity.class);
                 startActivity(intent);
                 return;
-            case R.id.button_my_wish_list:
+            case R.id.header_layout:
                 onFriendSelected(getFirebaseUtil().getCurrentUser().getId());
                 break;
             case R.id.button_settings:
                 openSettingsActivity();
                 break;
-            case R.id.update_user_profile:
-                Toast.makeText(getApplicationContext(), "Bla bla", Toast.LENGTH_LONG).show();
-                return;
         }
         drawer.closeDrawer(GravityCompat.START);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);

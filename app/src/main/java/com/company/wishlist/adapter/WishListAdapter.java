@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.bean.EditWishBean;
+import com.company.wishlist.fragment.FragmentWishList;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
@@ -71,11 +72,11 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
                         WishList wishList = dataSnapshot.getValue(WishList.class);
                         wishList.setId(dataSnapshot.getKey());
                         switch (mode) {
-                            case WishListPageViewAdapter.WISH_LIST_TAB:
+                            case FragmentWishList.WISH_LIST_MODE:
                                 //if (!wishList.getOwner().equals(firebaseUtil.getCurrentUser().getId()))
                                 getWishes(wishList.getId());
                                 break;
-                            case WishListPageViewAdapter.GIFT_LIST_TAB:
+                            case FragmentWishList.GIFT_LIST_MODE:
                                 if (wishList.getOwner().equals(firebaseUtil.getCurrentUser().getId()))
                                     getWishes(wishList.getId());
                                 break;
@@ -208,7 +209,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
-            if (mode.equals(WishListPageViewAdapter.WISH_LIST_TAB)) {
+            if (mode.equals(FragmentWishList.WISH_LIST_MODE)) {
                 imageButtonEdit.setVisibility(View.GONE);
                 imageButtonDelete.setVisibility(View.GONE);
             }

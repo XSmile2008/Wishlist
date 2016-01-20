@@ -2,20 +2,13 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#ae0008</color>
+    <color name="colorAccent">#FF5252</color>
+    <color name="colorAccentDark">#FF1744</color>
 
     <color name="list_item_title">#000000</color>
     <color name="list_divider">#A8A8A8</color>
     <color name="list_background_pressed">#FF00FF</color>
     <color name="list_background">#000000</color>
-
-
-    <color name="primary_light">#B2DFDB</color>
-    <color name="primary">#009688</color>
-    <color name="primary_dark">#00796B</color>
-    <color name="primary_darkest">#004D40</color>
-    <color name="accent">#FF5252</color>
-    <color name="accent_dark">#FF1744</color>
 
     <color name="semi_translucent_white">#D2E0E0E0</color>
 

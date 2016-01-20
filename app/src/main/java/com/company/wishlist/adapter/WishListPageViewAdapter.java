@@ -24,14 +24,11 @@ public class WishListPageViewAdapter extends FragmentStatePagerAdapter implement
 
     private String LOG_TAG = getClass().getSimpleName();
 
-    FirebaseUtil firebaseUtil;
-    public static final String WISH_LIST_TAB = "Wish list";
-    public static final String GIFT_LIST_TAB = "Gift list";
-    public static final String[] tabs = {WISH_LIST_TAB, GIFT_LIST_TAB};
+    private static final String[] tabs = {FragmentWishList.WISH_LIST_MODE, FragmentWishList.GIFT_LIST_MODE};
+    private FragmentManager fragmentManager;
+    private TabLayout tabLayout;
+    private FirebaseUtil firebaseUtil;
     private boolean isOwner = true;
-
-    FragmentManager fragmentManager;
-    TabLayout tabLayout;
 
     public WishListPageViewAdapter(Context context, TabLayout tabLayout) {
         super(((AppCompatActivity) context).getSupportFragmentManager());

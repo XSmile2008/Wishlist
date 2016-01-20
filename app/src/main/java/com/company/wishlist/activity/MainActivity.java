@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -54,8 +55,6 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     @Bind(R.id.profile_user_avatar_iw) ImageView userAvatarView;
     @Bind(R.id.profile_user_name_tv) TextView profileUserName;
     @Bind(R.id.drawer_layout) DrawerLayout drawer;
-    @Bind(R.id.floating_action_menu) FloatingActionMenu mFab;
-    @Bind(R.id.coordinatorlayout) CoordinatorLayout mCoordinatorLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,19 +137,9 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         }
     }
 
-    @OnClick({R.id.floating_action_button_add, R.id.floating_action_button_chose , R.id.header_layout, R.id.button_settings})
+    @OnClick({R.id.header_layout, R.id.button_settings})
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.floating_action_button_add:
-                mFab.toggle(true);
-                Intent intent = new Intent(getApplicationContext(), WishEditActivity.class);
-                intent.setAction(WishEditActivity.ACTION_CREATE);
-                startActivity(intent);
-                return;
-            case R.id.floating_action_button_chose:
-                showSnackbar("action btn chose");
-                mFab.close(true);
-                break;
             case R.id.header_layout:
                 onFriendSelected(getFirebaseUtil().getCurrentUser().getId());
                 break;
@@ -178,8 +167,4 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         return R.layout.activity_main;
     }
 
-    @Override
-    protected View getCoordinatorLayoutView() {
-        return mCoordinatorLayout;
-    }
 }

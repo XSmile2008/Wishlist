@@ -23,14 +23,9 @@ public abstract class BaseActivity extends InternetActivity {
         finish();
     }
 
-    public void showSnackbar(String message) {
-        Snackbar.make(getCoordinatorLayoutView(), message, Snackbar.LENGTH_LONG).show();
-    }
-
     /**
      * Abstract methods that MUST be implemented by the extending class
      */
     protected abstract int getLayoutResourceId();
 
-    protected abstract View getCoordinatorLayoutView();
 }

@@ -130,7 +130,6 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
 
         initWishEdit();
         initView();
-
     }
 
     @OnClick(R.id.insta_images_btn)

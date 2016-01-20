@@ -11,8 +11,8 @@
     android:padding="@dimen/default_padding_large"
     app:layout_behavior="com.company.wishlist.util.FloatingActionMenuBehavior"
     fab:menu_backgroundColor="@color/semi_translucent_white"
-    fab:menu_colorNormal="@color/accent"
-    fab:menu_colorPressed="@color/accent_dark"
+    fab:menu_colorNormal="@color/colorAccent"
+    fab:menu_colorPressed="@color/colorAccentDark"
     fab:menu_icon="@drawable/ic_add_white_24dp"
     fab:menu_labels_margin="@dimen/default_padding_medium"
     fab:menu_labels_style="@style/fab_menu_labels_style"
@@ -24,18 +24,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_add_white_24dp"
-        app:fab_colorNormal="@color/accent"
-        app:fab_colorPressed="@color/accent_dark"
+        app:fab_colorNormal="@color/colorAccent"
+        app:fab_colorPressed="@color/colorAccentDark"
         fab:fab_label="Create new"
         fab:fab_size="mini"/>
 
     <com.github.clans.fab.FloatingActionButton
-        android:id="@+id/floating_action_button_chose"
+        android:id="@+id/floating_action_button_choose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_done_white_24dp"
-        app:fab_colorNormal="@color/accent"
-        app:fab_colorPressed="@color/accent_dark"
+        android:src="@drawable/ic_book_white_24dp"
+        app:fab_colorNormal="@color/colorAccent"
+        app:fab_colorPressed="@color/colorAccentDark"
         fab:fab_label="Choose from existing"
         fab:fab_size="mini"/>
 

@@ -1,4 +1,4 @@
-package com.company.wishlist.util;
+package com.company.wishlist.util.social;
 
 import com.company.wishlist.model.User;
 import com.firebase.client.AuthData;

@@ -2,7 +2,6 @@ package com.company.wishlist.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.firebase.client.annotations.Nullable;
-import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
@@ -12,12 +11,12 @@ import java.io.Serializable;
 public class Wish implements Serializable{
 
     @JsonIgnore String id;
-    @SerializedName("wishlist_id") String wishListId;
-    @SerializedName("title") String title;
-    @SerializedName("comment") String comment;
-    @SerializedName("picture") String picture; //URL
-    @Nullable @SerializedName("received") Boolean received;
-    @Nullable @SerializedName("reserved") Reserved reserved;
+    String wishListId;
+    String title;
+    String comment;
+    String picture; //URL
+    @Nullable Boolean received;
+    @Nullable Reserved reserved;
 
     public Wish(){}
 

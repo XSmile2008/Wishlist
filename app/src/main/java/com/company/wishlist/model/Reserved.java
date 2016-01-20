@@ -1,14 +1,12 @@
 package com.company.wishlist.model;
 
-import com.google.gson.annotations.SerializedName;
-
 /**
  * Created by v.odahovskiy on 16.01.2016.
  */
 public class Reserved {
 
-    @SerializedName("by_user") String byUser;
-    @SerializedName("for_date") String forDate;
+    String byUser;
+    String forDate;
 
     public Reserved(){}
 

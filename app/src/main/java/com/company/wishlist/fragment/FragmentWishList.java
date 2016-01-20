@@ -30,7 +30,12 @@ public class FragmentWishList extends DebugFragment implements IOnFriendSelected
     WishListAdapter adapter;
     RecyclerView recyclerView;
     FirebaseUtil firebaseUtil;
-    private String friendId;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        firebaseUtil = new FirebaseUtil(getContext());
+    }
 
     @Nullable
     @Override
@@ -41,26 +46,18 @@ public class FragmentWishList extends DebugFragment implements IOnFriendSelected
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        adapter = new WishListAdapter(getContext());
+        Bundle bundle = getArguments();
+        String mode = bundle.getString("mode");
+        //String friendId = bundle.getString(FRIEND_ID, null);
+        adapter = new WishListAdapter(getContext(), mode, firebaseUtil.getCurrentUser().getId());//TODO:
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        firebaseUtil = new FirebaseUtil(getContext());
-
-        Bundle bundle = getArguments();
-        String mode = bundle.getString("mode");
-        friendId = bundle.getString(FRIEND_ID, null);
-        String currentUserId = firebaseUtil.getCurrentUser().getId();
-    }
-
-    @Override
     public void onFriendSelected(String id) {
-        Log.d(LOG_TAG, "onFriendSelected(" + id + ")");
+        adapter.onFriendSelected(id);
     }
 
     public static FragmentWishList newInstance(String mode) {

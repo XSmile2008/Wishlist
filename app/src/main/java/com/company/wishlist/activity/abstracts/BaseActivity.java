@@ -1,6 +1,8 @@
 package com.company.wishlist.activity.abstracts;
 
 import android.content.Intent;
+import android.support.design.widget.Snackbar;
+import android.view.View;
 
 import com.company.wishlist.activity.LoginActivity;
 
@@ -20,4 +22,15 @@ public abstract class BaseActivity extends InternetActivity {
         startActivity(logoutIntent);
         finish();
     }
+
+    public void showSnackbar(String message) {
+        Snackbar.make(getCoordinatorLayoutView(), message, Snackbar.LENGTH_LONG).show();
+    }
+
+    /**
+     * Abstract methods that MUST be implemented by the extending class
+     */
+    protected abstract int getLayoutResourceId();
+
+    protected abstract View getCoordinatorLayoutView();
 }

@@ -16,10 +16,22 @@
 
     <!--fab parameters-->
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="default_padding_large">16dp</dimen>
 
     <dimen name="circle_icon_size">56dp</dimen>
     <dimen name="friend_img_padding">15dp</dimen>
     <dimen name="design_navigation_padding_top_default" tools:override="true">0dp</dimen>
     <dimen name="design_navigation_separator_vertical_padding" tools:override="true">0dp</dimen>
     <dimen name="design_navigation_padding_bottom" tools:override="true">0dp</dimen>
+
+    <!--Generic text dimensions-->
+    <dimen name="text_extra_small">12sp</dimen>
+    <dimen name="text_small">14sp</dimen>
+    <dimen name="text_medium">16sp</dimen>
+    <dimen name="text_medium_large">18sp</dimen>
+    <dimen name="text_large">22sp</dimen>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="default_padding_small">4dp</dimen>
+    <dimen name="default_padding_medium">8dp</dimen>
 </resources>

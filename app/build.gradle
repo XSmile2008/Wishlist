@@ -19,9 +19,15 @@ android {
     }
 
     packagingOptions {
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/LICENSE-FIREBASE.txt'
+        exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/LICENSE-FIREBASE.txt'
     }
 }
 
@@ -39,5 +45,6 @@ dependencies {
     compile 'com.firebase:firebase-client-android:2.5.0'
     compile 'com.mobsandgeeks:android-saripaar:+'
     compile 'com.code-troopers.betterpickers:library:2.2.2'
-
+    compile 'com.sachinhandiekar:jInstagram:1.1.5'
+    compile 'com.orhanobut:dialogplus:1.10@aar'
 }

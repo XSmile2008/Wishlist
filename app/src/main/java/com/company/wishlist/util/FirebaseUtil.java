@@ -6,6 +6,7 @@ import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.model.User;
 import com.company.wishlist.model.Wish;
+import com.company.wishlist.util.social.FacebookUserBuilder;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;

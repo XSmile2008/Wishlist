@@ -31,7 +31,7 @@ public class Utilities {
     }
 
     public static boolean isBlank(String s) {
-        return s == null && s.isEmpty();
+        return s == null || s.isEmpty();
     }
 
     public static boolean isExpired(long expirationDate) {

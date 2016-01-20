@@ -14,9 +14,12 @@ import android.widget.Toast;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.WishEditActivity;
+import com.company.wishlist.bean.EditWishBean;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.util.FirebaseUtil;
+import com.company.wishlist.util.LocalStorage;
+import com.company.wishlist.util.Utilities;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -33,6 +36,8 @@ import butterknife.OnClick;
  * Created by vladstarikov on 08.01.16.
  */
 public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder> implements IOnFriendSelectedListener{
+
+    private String LOG_TAG = getClass().getSimpleName();
 
     private Context context;
     private List<Wish> wishes;
@@ -54,33 +59,35 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             case WishListPageViewAdapter.WISH_LIST_TAB:
                 firebaseUtil.getFirebaseRoot()
                         .child(FirebaseUtil.WISH_LIST_TABLE)
-                        .orderByChild("for_user")
-                        .startAt(friendId).endAt(friendId).addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        getWishes(dataSnapshot.getKey());
-                    }
+                        .orderByChild("owner")
+                        .equalTo(firebaseUtil.getCurrentUser().getId())
+                        .addChildEventListener(new ChildEventListener() {
+                            @Override
+                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                                getWishes(dataSnapshot.getKey());
+                                Log.d(LOG_TAG, "wish_list" + dataSnapshot);
+                            }
 
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                            @Override
+                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
-                    }
+                            }
 
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+                            @Override
+                            public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-                    }
+                            }
 
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                            @Override
+                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-                    }
+                            }
 
-                    @Override
-                    public void onCancelled(FirebaseError firebaseError) {
+                            @Override
+                            public void onCancelled(FirebaseError firebaseError) {
 
-                    }
-                });
+                            }
+                        });
                 break;
             case WishListPageViewAdapter.GIFT_LIST_TAB:
 
@@ -94,7 +101,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String prevKey) {
                 Wish wish = dataSnapshot.getValue(Wish.class);
-                wish.setId(dataSnapshot.getKey());//TODO: this will be set wish Id
+                wish.setId(dataSnapshot.getKey());
                 wishes.add(wish);
                 notifyDataSetChanged();
                 Log.d("wishes.onChildAdded()", wish.toString());
@@ -103,7 +110,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String prevKey) {
                 Wish wish = dataSnapshot.getValue(Wish.class);
-                wish.setId(dataSnapshot.getKey());//TODO: this will be set wish Id
+                wish.setId(dataSnapshot.getKey());
                 wishes.set(findWishIndexById(wish.getId()), wish);
                 Log.d("wishes.onChildChanged()", wish.toString());
                 notifyDataSetChanged();
@@ -144,7 +151,11 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
     @Override
     public void onBindViewHolder(Holder holder, int position) {
-        holder.imageView.setImageResource(R.drawable.gift_icon);
+        if (wishes.get(position).getPicture() == null) {
+            holder.imageView.setImageResource(R.drawable.gift_icon);
+        } else {
+            holder.imageView.setImageBitmap(Utilities.decodeThumbnail(wishes.get(position).getPicture()));
+        }
         holder.textViewTitle.setText(wishes.get(position).getTitle());
         holder.textViewComment.setText(wishes.get(position).getComment());
         holder.setMode((selectedItem == position) ? Holder.DETAIL_MODE : Holder.NORMAl_MODE);
@@ -218,8 +229,9 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         @OnClick(R.id.image_button_edit)
         public void onClickEdit() {
             Toast.makeText(context, "item " + getAdapterPosition() + " edit", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(context, WishEditActivity.class)
-                    .putExtra("wish", wishes.get(getAdapterPosition()));
+            Intent intent = new Intent(context, WishEditActivity.class);
+            LocalStorage.getInstance().setWish(wishes.get(getAdapterPosition()));
+            intent.setAction(WishEditActivity.ACTION_EDIT);
             context.startActivity(intent);
         }
 

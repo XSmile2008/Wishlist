@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.company.wishlist.R;
 import com.company.wishlist.adapter.WishListAdapter;
@@ -61,7 +60,15 @@ public class FragmentWishList extends DebugFragment implements IOnFriendSelected
 
     @Override
     public void onFriendSelected(String id) {
-        Log.d(this.getClass().getSimpleName(), ".onFriendSelected(" + id + ")");
-        ((IOnFriendSelectedListener) recyclerView.getAdapter()).onFriendSelected(id);
+        Log.d(LOG_TAG, "onFriendSelected(" + id + ")");
     }
+
+    public static FragmentWishList newInstance(String mode) {
+        FragmentWishList fragment = new FragmentWishList();
+        Bundle args = new Bundle();
+        args.putString("mode", mode);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
 }

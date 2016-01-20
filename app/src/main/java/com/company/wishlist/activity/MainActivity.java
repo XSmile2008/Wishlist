@@ -11,13 +11,11 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
@@ -45,7 +43,7 @@ import butterknife.OnClick;
 
 public class MainActivity extends FirebaseActivity implements IOnFriendSelectedListener {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private FriendListAdapter friendListAdapter;
     WishListPageViewAdapter wishListPageViewAdapter;
@@ -79,7 +77,6 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
 
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle("Second Activity");
-        //updateUserData();
         setUpTabLayout();
     }
 
@@ -112,7 +109,7 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
             profileUserName.setText(user.getDisplayName());
 
             Glide.with(this)
-                    .load(user.genAvatarURL())
+                    .load(user.getAvatarURL())
                     .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
                     .into(userAvatarView);
 
@@ -137,22 +134,20 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         }
     }
 
-    @OnClick({R.id.fab, R.id.button_my_wish_list, R.id.button_settings, R.id.update_user_profile})
+    @OnClick({R.id.fab, R.id.header_layout, R.id.button_settings})
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab:
                 Intent intent = new Intent(getApplicationContext(), WishEditActivity.class);
+                intent.setAction(WishEditActivity.ACTION_CREATE);
                 startActivity(intent);
                 return;
-            case R.id.button_my_wish_list:
+            case R.id.header_layout:
                 onFriendSelected(getFirebaseUtil().getCurrentUser().getId());
                 break;
             case R.id.button_settings:
                 openSettingsActivity();
                 break;
-            case R.id.update_user_profile:
-                Toast.makeText(getApplicationContext(), "Bla bla", Toast.LENGTH_LONG).show();
-                return;
         }
         drawer.closeDrawer(GravityCompat.START);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
@@ -165,8 +160,6 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
 
     @Override
     public void onFriendSelected(String id) {
-        Toast.makeText(this, " Selected friend id is " + id, Toast.LENGTH_LONG).show();
-        Log.d(TAG, " Selected friend id is " + id);
         drawer.closeDrawer(GravityCompat.START);
         wishListPageViewAdapter.onFriendSelected(id);
     }

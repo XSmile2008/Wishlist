@@ -8,9 +8,9 @@ import com.google.gson.annotations.SerializedName;
  */
 public class WishList {
 
-    @JsonIgnore @SerializedName("id") String id;
-    @SerializedName("owner") long owner;
-    @SerializedName("for_user")long forUser;
+    @JsonIgnore String id;
+    @SerializedName("owner") String owner;
+    @SerializedName("for_user") String forUser;
 
     public String getId() {
         return id;
@@ -20,19 +20,19 @@ public class WishList {
         this.id = id;
     }
 
-    public long getOwner() {
+    public String getOwner() {
         return owner;
     }
 
-    public void setOwner(long owner) {
+    public void setOwner(String owner) {
         this.owner = owner;
     }
 
-    public long getForUser() {
+    public String getForUser() {
         return forUser;
     }
 
-    public void setForUser(long forUser) {
+    public void setForUser(String forUser) {
         this.forUser = forUser;
     }
 }

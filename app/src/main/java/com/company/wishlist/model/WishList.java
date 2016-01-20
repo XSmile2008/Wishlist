@@ -1,7 +1,6 @@
 package com.company.wishlist.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by vladstarikov on 07.01.16.
@@ -9,8 +8,8 @@ import com.google.gson.annotations.SerializedName;
 public class WishList {
 
     @JsonIgnore String id;
-    @SerializedName("owner") String owner;
-    @SerializedName("for_user") String forUser;
+    String owner;
+    String forUser;
 
     public String getId() {
         return id;

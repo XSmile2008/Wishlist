@@ -1,6 +1,7 @@
 package com.company.wishlist.adapter;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.AvoidXfermode;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +20,7 @@ import com.company.wishlist.bean.EditWishBean;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
+import com.company.wishlist.util.DialogUtil;
 import com.company.wishlist.util.FirebaseUtil;
 import com.company.wishlist.util.LocalStorage;
 import com.company.wishlist.util.Utilities;
@@ -71,7 +73,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
                         switch (mode) {
                             case WishListPageViewAdapter.WISH_LIST_TAB:
                                 //if (!wishList.getOwner().equals(firebaseUtil.getCurrentUser().getId()))
-                                    getWishes(wishList.getId());
+                                getWishes(wishList.getId());
                                 break;
                             case WishListPageViewAdapter.GIFT_LIST_TAB:
                                 if (wishList.getOwner().equals(firebaseUtil.getCurrentUser().getId()))
@@ -249,6 +251,12 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
         @OnClick(R.id.image_button_delete)
         public void onClickDelete() {
+            DialogUtil.alertShow(context.getString(R.string.app_name), context.getString(R.string.remove_wish_dialog_text), context, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    firebaseUtil.getFirebaseRoot().child(FirebaseUtil.WISH_TABLE).child(wishes.get(getAdapterPosition()).getId()).removeValue();
+                    //notifyDataSetChanged();
+                }
+            });
             Toast.makeText(context, "item " + getAdapterPosition() + " deleted", Toast.LENGTH_SHORT).show();
         }
 

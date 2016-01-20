@@ -1,12 +1,10 @@
 package com.company.wishlist.model;
 
-import com.company.wishlist.bean.EditWishBean;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.firebase.client.annotations.Nullable;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 /**
  * Created by vladstarikov on 07.01.16.
@@ -14,12 +12,14 @@ import java.util.UUID;
 public class Wish implements Serializable{
 
     @JsonIgnore String id;
-    @SerializedName("wishlist_id") int wishListID;
+    @SerializedName("wishlist_id") String wishListId;
     @SerializedName("title") String title;
     @SerializedName("comment") String comment;
     @SerializedName("picture") String picture; //URL
     @Nullable @SerializedName("received") Boolean received;
     @Nullable @SerializedName("reserved") Reserved reserved;
+
+    public Wish(){}
 
     public String getId() {
         return id;
@@ -29,12 +29,12 @@ public class Wish implements Serializable{
         this.id = id;
     }
 
-    public int getWishListID() {
-        return wishListID;
+    public String getWishListId() {
+        return wishListId;
     }
 
-    public void setWishListID(int wishListID) {
-        this.wishListID = wishListID;
+    public void setWishListId(String wishListId) {
+        this.wishListId = wishListId;
     }
 
     public String getTitle() {
@@ -82,19 +82,8 @@ public class Wish implements Serializable{
     }
 
     @JsonIgnore
-    public boolean isWishReserved() {
+    public boolean isReserved() {
         return null != reserved;
-    }
-
-    public Wish(){
-        id = UUID.randomUUID().toString();
-    }
-
-    public Wish(EditWishBean editWishBean) {
-        this.id = editWishBean.getId();
-        this.title = editWishBean.getTitle();
-        this.comment = editWishBean.getComment();
-        this.picture = editWishBean.getPicture();
     }
 
     @Override

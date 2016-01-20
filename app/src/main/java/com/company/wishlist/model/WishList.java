@@ -1,5 +1,6 @@
 package com.company.wishlist.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -7,22 +8,31 @@ import com.google.gson.annotations.SerializedName;
  */
 public class WishList {
 
-    @SerializedName("owner") long owner;
-    @SerializedName("for_user")long forUser;
+    @JsonIgnore String id;
+    @SerializedName("owner") String owner;
+    @SerializedName("for_user") String forUser;
 
-    public long getOwner() {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getOwner() {
         return owner;
     }
 
-    public void setOwner(long owner) {
+    public void setOwner(String owner) {
         this.owner = owner;
     }
 
-    public long getForUser() {
+    public String getForUser() {
         return forUser;
     }
 
-    public void setForUser(long forUser) {
+    public void setForUser(String forUser) {
         this.forUser = forUser;
     }
 }

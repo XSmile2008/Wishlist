@@ -41,7 +41,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
     @Override
     public void onBindViewHolder(Holder holder, int position) {
         Glide.with(context)
-                .load(friends.get(position).genAvatarURL())
+                .load(friends.get(position).getAvatarURL())
                 .bitmapTransform(new CropCircleTransformation(Glide.get(context).getBitmapPool()))
                 .into(holder.imageViewAvatar);
         holder.textViewTitle.setText(friends.get(position).getDisplayName());

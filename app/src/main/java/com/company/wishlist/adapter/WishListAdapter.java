@@ -19,6 +19,7 @@ import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.util.FirebaseUtil;
 import com.company.wishlist.util.LocalStorage;
+import com.company.wishlist.util.Utilities;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -56,7 +57,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String prevKey) {
                 Wish wish = dataSnapshot.getValue(Wish.class);
-                wish.setId(dataSnapshot.getKey());//TODO: this will be set wish Id
+                wish.setId(dataSnapshot.getKey());
                 wishes.add(wish);
                 notifyDataSetChanged();
                 Log.d("wishes.onChildAdded()", wish.toString());
@@ -65,7 +66,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String prevKey) {
                 Wish wish = dataSnapshot.getValue(Wish.class);
-                wish.setId(dataSnapshot.getKey());//TODO: this will be set wish Id
+                wish.setId(dataSnapshot.getKey());
                 wishes.set(findWishIndexById(wish.getId()), wish);
                 Log.d("wishes.onChildChanged()", wish.toString());
                 notifyDataSetChanged();
@@ -106,7 +107,11 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
     @Override
     public void onBindViewHolder(Holder holder, int position) {
-        holder.imageView.setImageResource(R.drawable.gift_icon);
+        if (wishes.get(position).getPicture() == null) {
+            holder.imageView.setImageResource(R.drawable.gift_icon);
+        } else {
+            holder.imageView.setImageBitmap(Utilities.decodeThumbnail(wishes.get(position).getPicture()));
+        }
         holder.textViewTitle.setText(wishes.get(position).getTitle());
         holder.textViewComment.setText(wishes.get(position).getComment());
         holder.setMode((selectedItem == position) ? Holder.DETAIL_MODE : Holder.NORMAl_MODE);

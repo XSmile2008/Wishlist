@@ -3,7 +3,6 @@ package com.company.wishlist.adapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.AvoidXfermode;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,7 +15,6 @@ import android.widget.Toast;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.WishEditActivity;
-import com.company.wishlist.bean.EditWishBean;
 import com.company.wishlist.fragment.FragmentWishList;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.Wish;
@@ -27,8 +25,8 @@ import com.company.wishlist.util.LocalStorage;
 import com.company.wishlist.util.Utilities;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,38 +62,25 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
                 .child(FirebaseUtil.WISH_LIST_TABLE)
                 .orderByChild("forUser")
                 .equalTo(forUser)
-                .addChildEventListener(new ChildEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    public void onDataChange(DataSnapshot dataSnapshot) {
                         Log.e(LOG_TAG, forUser);
                         Log.d(LOG_TAG, "WishList.onChildAdded" + dataSnapshot);
-                        WishList wishList = dataSnapshot.getValue(WishList.class);
-                        wishList.setId(dataSnapshot.getKey());
-                        switch (mode) {
-                            case FragmentWishList.WISH_LIST_MODE:
-                                //if (!wishList.getOwner().equals(firebaseUtil.getCurrentUser().getId()))
-                                getWishes(wishList.getId());
-                                break;
-                            case FragmentWishList.GIFT_LIST_MODE:
-                                if (wishList.getOwner().equals(firebaseUtil.getCurrentUser().getId()))
+                        for (DataSnapshot wishListDS : dataSnapshot.getChildren()) {
+                            WishList wishList = wishListDS.getValue(WishList.class);
+                            wishList.setId(wishListDS.getKey());
+                            switch (mode) {
+                                case FragmentWishList.WISH_LIST_MODE:
+                                    //if (!wishList.getOwner().equals(firebaseUtil.getCurrentUser().getId()))
                                     getWishes(wishList.getId());
-                                break;
+                                    break;
+                                case FragmentWishList.GIFT_LIST_MODE:
+                                    if (wishList.getOwner().equals(firebaseUtil.getCurrentUser().getId()))
+                                        getWishes(wishList.getId());
+                                    break;
+                            }
                         }
-                    }
-
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
                     }
 
                     @Override

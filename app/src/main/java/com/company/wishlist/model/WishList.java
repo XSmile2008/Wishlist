@@ -11,6 +11,14 @@ public class WishList {
     String owner;
     String forUser;
 
+    public WishList(){}
+
+    public WishList(String id, String owner, String forUser) {
+        this.id = id;
+        this.owner = owner;
+        this.forUser = forUser;
+    }
+
     public String getId() {
         return id;
     }

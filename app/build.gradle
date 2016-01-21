@@ -42,9 +42,9 @@ dependencies {
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.facebook.android:facebook-android-sdk:4.6.0'
     compile 'com.firebase:firebase-client-android:2.5.0'
-    compile 'com.mobsandgeeks:android-saripaar:+'
+    compile 'com.mobsandgeeks:android-saripaar:2.0.3'
     compile 'com.code-troopers.betterpickers:library:2.2.2'
     compile 'com.sachinhandiekar:jInstagram:1.1.5'
     compile 'com.orhanobut:dialogplus:1.10@aar'
-    compile 'com.github.clans:fab:1.5.5'
+    compile 'com.github.clans:fab:1.6.2'
 }

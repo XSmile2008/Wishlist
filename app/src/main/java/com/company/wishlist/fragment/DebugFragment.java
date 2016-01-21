@@ -15,7 +15,7 @@ import android.view.ViewGroup;
  */
 public abstract class DebugFragment extends Fragment {
 
-    String LOG_TAG = this.getClass().getSimpleName();
+    String LOG_TAG = getClass().getSimpleName();
 
     @Override
     public void onAttach(Context context) {

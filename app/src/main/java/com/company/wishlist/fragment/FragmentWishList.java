@@ -3,10 +3,9 @@ package com.company.wishlist.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,12 @@ import com.company.wishlist.R;
 import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.adapter.WishListAdapter;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
+import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.FirebaseUtil;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.github.clans.fab.FloatingActionMenu;
 
 import butterknife.Bind;
@@ -29,18 +33,21 @@ public class FragmentWishList extends DebugFragment implements IOnFriendSelected
 
     public static final String WISH_LIST_MODE = "Wish list";
     public static final String GIFT_LIST_MODE = "Gift list";
+    public static final String WISH_LIST_ID = "WISH_LIST_ID";
     public static final String FRIEND_ID = "FRIEND_ID";
+    public static final String MODE = "mode";
 
     private WishListAdapter adapter;
     private FirebaseUtil firebaseUtil;
+    private String friendId;
 
-    @Bind(R.id.floating_action_menu) FloatingActionMenu mFab;
-    @Bind(R.id.coordinatorlayout) CoordinatorLayout mCoordinatorLayout;
+    @Bind(R.id.fab_menu) FloatingActionMenu mFab;
 
-    public static FragmentWishList newInstance(String mode) {
+    public static FragmentWishList newInstance(String mode, String friendId) {
         FragmentWishList fragment = new FragmentWishList();
         Bundle args = new Bundle();
-        args.putString("mode", mode);
+        args.putString(MODE, mode);
+        args.putString(FRIEND_ID, friendId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -63,7 +70,8 @@ public class FragmentWishList extends DebugFragment implements IOnFriendSelected
         ButterKnife.bind(this, view);
         //mFab = (FloatingActionMenu) view.findViewById(R.id.floating_action_menu);
         Bundle bundle = getArguments();
-        String mode = bundle.getString("mode");
+        String mode = bundle.getString(MODE);
+        friendId = bundle.getString(FRIEND_ID);
         if (mode.equals(WISH_LIST_MODE)) {
             mFab.setVisibility(View.GONE);
         }
@@ -79,20 +87,50 @@ public class FragmentWishList extends DebugFragment implements IOnFriendSelected
         adapter.onFriendSelected(id);
     }
 
-    @OnClick({R.id.floating_action_button_add, R.id.floating_action_button_choose})
-    public void onClick(View v) {
+
+    public void onClick(View v, String wishListId) {
         switch (v.getId()) {
-            case R.id.floating_action_button_add:
+            case R.id.fab_add:
                 mFab.toggle(true);
-                Intent intent = new Intent(getContext(), WishEditActivity.class);
-                intent.setAction(WishEditActivity.ACTION_CREATE);
+                Intent intent = new Intent(getContext(), WishEditActivity.class)
+                        .setAction(WishEditActivity.ACTION_CREATE)
+                        .putExtra(WISH_LIST_ID, wishListId);
                 startActivity(intent);
                 return;
-            case R.id.floating_action_button_choose:
-                Snackbar.make(mCoordinatorLayout, "action button close", Snackbar.LENGTH_LONG).show();
+            case R.id.fab_choose:
+                //Snackbar.make(mCoordinatorLayout, "action button close", Snackbar.LENGTH_LONG).show();
                 mFab.close(true);
                 break;
         }
+    }
+
+    //TODO:  may be call this check on friend selected
+    @OnClick({R.id.fab_menu, R.id.fab_add, R.id.fab_choose})
+    public void initWishList(final View view) {
+        final Firebase wishListTable = firebaseUtil.getFirebaseRoot().child(firebaseUtil.WISH_LIST_TABLE);
+        wishListTable
+                .orderByChild("forUser")
+                .equalTo(friendId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.d(LOG_TAG, ".onDataChange(" + dataSnapshot + ")");
+                        for (DataSnapshot wishListDS : dataSnapshot.getChildren()) {
+                            if (wishListDS.getValue(WishList.class).getOwner().equals(firebaseUtil.getCurrentUser().getId())) {
+                                onClick(view, wishListDS.getKey());
+                                return;
+                            }
+                        }
+                        WishList wishList = new WishList(wishListTable.push().getKey(), firebaseUtil.getCurrentUser().getId(), friendId);
+                        wishListTable.child(wishList.getId()).setValue(wishList);
+                        onClick(view, wishList.getId());
+                    }
+
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
+                        Log.e(LOG_TAG, firebaseError.toString());
+                    }
+                });
     }
 
 }

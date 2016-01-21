@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <com.github.clans.fab.FloatingActionMenu
-    android:id="@+id/floating_action_menu"
+    android:id="@+id/fab_menu"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:layout_gravity="bottom|end"
     android:padding="@dimen/default_padding_large"
     app:layout_behavior="com.company.wishlist.util.FloatingActionMenuBehavior"
@@ -20,7 +19,7 @@
     fab:menu_shadowColor="#37000000">
 
     <com.github.clans.fab.FloatingActionButton
-        android:id="@+id/floating_action_button_add"
+        android:id="@+id/fab_add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_add_white_24dp"
@@ -30,7 +29,7 @@
         fab:fab_size="mini"/>
 
     <com.github.clans.fab.FloatingActionButton
-        android:id="@+id/floating_action_button_choose"
+        android:id="@+id/fab_choose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_book_white_24dp"

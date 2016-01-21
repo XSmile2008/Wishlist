@@ -7,20 +7,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -33,6 +25,7 @@ import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.adapter.InstaGridViewAdapter;
 import com.company.wishlist.bean.EditWishBean;
+import com.company.wishlist.fragment.FragmentWishList;
 import com.company.wishlist.model.Reserved;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.util.CropCircleTransformation;
@@ -54,9 +47,7 @@ import com.orhanobut.dialogplus.OnItemClickListener;
 import org.jinstagram.entity.common.Images;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 
 import butterknife.Bind;
@@ -116,6 +107,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
+        actionBar.setTitle(getIntent().getAction() == ACTION_CREATE ? "New wish" : "Edit wish");
 
         //Setup validator
         validator = new Validator(this);
@@ -130,49 +122,6 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
 
         initWishEdit();
         initView();
-    }
-
-    @OnClick(R.id.insta_images_btn)
-    public void showInstaImagesDialog(View view) {
-        String[] tags = editTextTitle.getText().toString().split("\\s+");
-
-        DialogPlus dialog = DialogPlus.newDialog(this)
-                .setAdapter(new InstaGridViewAdapter(this, InstagramUtil.getInstance().getPicturesByTag(tags)))
-                .setOnItemClickListener(new OnItemClickListener() {
-                    @Override
-                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-                        Images image = (Images) item;
-                        Glide.with(getApplicationContext())
-                                .load(image.getLowResolution().getImageUrl())
-                                .bitmapTransform(new CropCircleTransformation(Glide.get(getApplicationContext()).getBitmapPool()))
-                                .into(imageView);
-                        editWishBean.setPicture(Utilities.encodeThumbnail(Utilities.getBitmapFromURL(image.getLowResolution().getImageUrl())));
-                        dialog.dismiss();
-
-                    }
-                })
-                .setCancelable(true)
-                .setContentHolder(new GridHolder(4))
-                .setGravity(Gravity.BOTTOM)
-                        .setExpanded(true)  // This will enable the expand feature, (similar to android L share dialog)
-                        .create();
-        dialog.show();
-    }
-
-    public void initWishEdit() {
-        if (action().equals(ACTION_CREATE)) {//TODO: use firebase push, not random UUID, ID must set on firebase side
-            editWishBean = new EditWishBean(new Wish());
-            editWishBean.setWishListId("0");//TODO:
-        } else if (action().equals(ACTION_EDIT)) {
-            editWishBean = new EditWishBean(LocalStorage.getInstance().getWish());
-        } else {
-            finish();//todo may be init new object
-        }
-        wishesRef = firebaseUtil.getFirebaseRoot().child(FirebaseUtil.WISH_TABLE);
-    }
-
-    private String action() {
-        return getIntent().getAction();
     }
 
     @Override
@@ -203,6 +152,18 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
                 return false;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void initWishEdit() {
+        if (getIntent().getAction().equals(ACTION_CREATE)) {//TODO: use firebase push, not random UUID, ID must set on firebase side
+            editWishBean = new EditWishBean(new Wish());
+            editWishBean.setWishListId(getIntent().getStringExtra(FragmentWishList.WISH_LIST_ID));//TODO:
+        } else if (getIntent().getAction().equals(ACTION_EDIT)) {
+            editWishBean = new EditWishBean(LocalStorage.getInstance().getWish());
+        } else {
+            finish();//todo may be init new object
+        }
+        wishesRef = firebaseUtil.getFirebaseRoot().child(FirebaseUtil.WISH_TABLE);
     }
 
     private void initView() {
@@ -249,19 +210,41 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     }
 
     private void commitChanges() {
-        fillWishFields();
-        if (action().equals(ACTION_CREATE)) {
-            String key = wishesRef.push().getKey();
-            wishesRef.child(key).setValue(editWishBean);
-        } else if (action().equals(ACTION_EDIT)) {
+        editWishBean.setComment(editTextComment.getText().toString());
+        editWishBean.setTitle(editTextTitle.getText().toString());
+        if (getIntent().getAction().equals(ACTION_CREATE)) {
+            wishesRef.child(wishesRef.push().getKey()).setValue(editWishBean);
+        } else if (getIntent().getAction().equals(ACTION_EDIT)) {
             wishesRef.child(editWishBean.getId()).updateChildren(editWishBean.getMapToUpdate());
         }
         Toast.makeText(this, editWishBean.getTitle(), Toast.LENGTH_SHORT).show();
     }
 
-    private void fillWishFields() {
-        editWishBean.setComment(editTextComment.getText().toString());
-        editWishBean.setTitle(editTextTitle.getText().toString());
+    @OnClick(R.id.insta_images_btn)
+    public void showInstaImagesDialog(View view) {
+        String[] tags = editTextTitle.getText().toString().split("\\s+");
+
+        DialogPlus dialog = DialogPlus.newDialog(this)
+                .setAdapter(new InstaGridViewAdapter(this, InstagramUtil.getInstance().getPicturesByTag(tags)))
+                .setOnItemClickListener(new OnItemClickListener() {
+                    @Override
+                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                        Images image = (Images) item;
+                        Glide.with(getApplicationContext())
+                                .load(image.getLowResolution().getImageUrl())
+                                .bitmapTransform(new CropCircleTransformation(Glide.get(getApplicationContext()).getBitmapPool()))
+                                .into(imageView);
+                        editWishBean.setPicture(Utilities.encodeThumbnail(Utilities.getBitmapFromURL(image.getLowResolution().getImageUrl())));
+                        dialog.dismiss();
+
+                    }
+                })
+                .setCancelable(true)
+                .setContentHolder(new GridHolder(4))
+                .setGravity(Gravity.BOTTOM)
+                .setExpanded(true)  // This will enable the expand feature, (similar to android L share dialog)
+                .create();
+        dialog.show();
     }
 
     @OnClick(R.id.image_view)

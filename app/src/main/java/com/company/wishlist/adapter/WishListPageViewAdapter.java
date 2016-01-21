@@ -30,17 +30,20 @@ public class WishListPageViewAdapter extends FragmentStatePagerAdapter implement
     private FirebaseUtil firebaseUtil;
     private boolean isOwner = true;
 
+    private String friendId;
+
     public WishListPageViewAdapter(Context context, TabLayout tabLayout) {
         super(((AppCompatActivity) context).getSupportFragmentManager());
         this.fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
         this.firebaseUtil = new FirebaseUtil(context);
         this.tabLayout = tabLayout;
+        this.friendId = firebaseUtil.getCurrentUser().getId();
     }
 
     @Override
     public Fragment getItem(int position) {
         Log.d(LOG_TAG, ".getItem(" + position + ")");
-        return FragmentWishList.newInstance(tabs[position]);
+        return FragmentWishList.newInstance(tabs[position], friendId);
     }
 
     @Override
@@ -53,16 +56,17 @@ public class WishListPageViewAdapter extends FragmentStatePagerAdapter implement
         return tabs[position];
     }
 
-    @Override
+    /*@Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         super.destroyItem(container, position, object);
         //fragmentManager.beginTransaction().remove((Fragment)object).commit();
         Log.d(LOG_TAG, ".destroyItem()");
-    }
+    }*/
 
     @Override
     public void onFriendSelected(String id) {
-        isOwner = firebaseUtil.getCurrentUser().getId().equals(id);
+        this.friendId = id;
+        this.isOwner = firebaseUtil.getCurrentUser().getId().equals(id);
         notifyDataSetChanged();
         for (Fragment fragment: fragmentManager.getFragments()) {
             if (fragment instanceof FragmentWishList)

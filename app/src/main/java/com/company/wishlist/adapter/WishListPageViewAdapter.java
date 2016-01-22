@@ -20,35 +20,28 @@ import com.company.wishlist.util.FirebaseUtil;
 /**
  * Created by v.odahovskiy on 11.01.2016.
  */
-public class WishListPageViewAdapter extends FragmentStatePagerAdapter implements IOnFriendSelectedListener{
+public class WishListPageViewAdapter extends FragmentStatePagerAdapter {
 
     private String LOG_TAG = getClass().getSimpleName();
 
     private static final String[] tabs = {FragmentWishList.WISH_LIST_MODE, FragmentWishList.GIFT_LIST_MODE};
-    private FragmentManager fragmentManager;
-    private TabLayout tabLayout;
-    private FirebaseUtil firebaseUtil;
-    private boolean isOwner = true;
 
     private String friendId;
 
-    public WishListPageViewAdapter(Context context, TabLayout tabLayout) {
+    public WishListPageViewAdapter(Context context) {
         super(((AppCompatActivity) context).getSupportFragmentManager());
-        this.fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
-        this.firebaseUtil = new FirebaseUtil(context);
-        this.tabLayout = tabLayout;
-        this.friendId = firebaseUtil.getCurrentUser().getId();
+        //FirebaseUtil firebaseUtil = new FirebaseUtil(context);
+        //this.friendId = firebaseUtil.getCurrentUser().getId();
     }
 
     @Override
     public Fragment getItem(int position) {
-        Log.d(LOG_TAG, ".getItem(" + position + ")");
         return FragmentWishList.newInstance(tabs[position], friendId);
     }
 
     @Override
     public int getCount() {
-        return isOwner ? 1 : 2;
+        return tabs.length;
     }
 
     @Override
@@ -56,28 +49,4 @@ public class WishListPageViewAdapter extends FragmentStatePagerAdapter implement
         return tabs[position];
     }
 
-    /*@Override
-    public void destroyItem(ViewGroup container, int position, Object object) {
-        super.destroyItem(container, position, object);
-        //fragmentManager.beginTransaction().remove((Fragment)object).commit();
-        Log.d(LOG_TAG, ".destroyItem()");
-    }*/
-
-    @Override
-    public void onFriendSelected(String id) {
-        this.friendId = id;
-        this.isOwner = firebaseUtil.getCurrentUser().getId().equals(id);
-        notifyDataSetChanged();
-        for (Fragment fragment: fragmentManager.getFragments()) {
-            if (fragment instanceof FragmentWishList)
-                ((FragmentWishList)fragment).onFriendSelected(id);
-        }
-        Log.d(LOG_TAG, fragmentManager.getFragments().toString());
-    }
-
-    @Override
-    public void notifyDataSetChanged() {
-        super.notifyDataSetChanged();
-        tabLayout.setTabsFromPagerAdapter(this);
-    }
 }

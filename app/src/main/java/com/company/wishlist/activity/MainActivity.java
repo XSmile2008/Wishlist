@@ -3,9 +3,8 @@ package com.company.wishlist.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -16,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,6 +24,7 @@ import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.FirebaseActivity;
 import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.adapter.WishListPageViewAdapter;
+import com.company.wishlist.fragment.FragmentWishList;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.User;
 import com.company.wishlist.util.CropCircleTransformation;
@@ -31,7 +32,6 @@ import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.firebase.client.AuthData;
-import com.github.clans.fab.FloatingActionMenu;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -55,6 +55,9 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     @Bind(R.id.profile_user_avatar_iw) ImageView userAvatarView;
     @Bind(R.id.profile_user_name_tv) TextView profileUserName;
     @Bind(R.id.drawer_layout) DrawerLayout drawer;
+    @Bind(R.id.tab_layout) TabLayout tabLayout;
+    @Bind(R.id.view_pager) ViewPager viewPager;
+    @Bind(R.id.container_my_wish_list) FrameLayout containerMyWishList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +72,7 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+        //Setup friend list in drawer
         friendListAdapter = new FriendListAdapter(this, new ArrayList<User>());
         RecyclerView recyclerViewFriends = (RecyclerView) drawer.findViewById(R.id.friends_recycler_view);
         recyclerViewFriends.setLayoutManager(new LinearLayoutManager(this));
@@ -78,17 +82,23 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
             refreshUserDataUi();
         }
 
+        //Setup collapsing toolbar
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle("Second Activity");
-        setUpTabLayout();
-    }
+        collapsingToolbar.setTitle("My wish list");
 
-    private void setUpTabLayout() {
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.wish_tab_layout);
-        ViewPager viewPager = (ViewPager) findViewById(R.id.wish_list_view_pager);
-        wishListPageViewAdapter = new WishListPageViewAdapter(this, tabLayout);
+        //Setup tab layout
+        wishListPageViewAdapter = new WishListPageViewAdapter(this);
         viewPager.setAdapter(wishListPageViewAdapter);
         tabLayout.setupWithViewPager(viewPager);
+
+        Fragment fragment = FragmentWishList.newInstance(FragmentWishList.GIFT_LIST_MODE, getFirebaseUtil().getCurrentUser().getId());
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.container_my_wish_list, fragment)
+                .commit();
+
+        tabLayout.setVisibility(View.GONE);
+        viewPager.setVisibility(View.GONE);
     }
 
     @Override
@@ -141,7 +151,9 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.header_layout:
-                onFriendSelected(getFirebaseUtil().getCurrentUser().getId());
+                containerMyWishList.setVisibility(View.VISIBLE);
+                tabLayout.setVisibility(View.GONE);
+                viewPager.setVisibility(View.GONE);
                 break;
             case R.id.button_settings:
                 openSettingsActivity();
@@ -159,7 +171,9 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     @Override
     public void onFriendSelected(String id) {
         drawer.closeDrawer(GravityCompat.START);
-        wishListPageViewAdapter.onFriendSelected(id);
+        containerMyWishList.setVisibility(View.GONE);
+        tabLayout.setVisibility(View.VISIBLE);
+        viewPager.setVisibility(View.VISIBLE);
     }
 
     @Override

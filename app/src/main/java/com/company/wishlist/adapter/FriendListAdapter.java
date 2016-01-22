@@ -1,6 +1,7 @@
 package com.company.wishlist.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +28,9 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
 
     private Context context;
     private List<User> friends;
+
+    public static String FRIEND_ID = "friend_id";
+    public static String ON_FRIEND_SELECTED = "com.company.wishlist.on_friend_selected";
 
     public FriendListAdapter(Context context, List<User> friends) {
         this.context = context;
@@ -70,6 +74,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
                 public void onClick(View v) {
                     ((IOnFriendSelectedListener) context)
                             .onFriendSelected(friends.get(getAdapterPosition()).getId());
+                    context.sendBroadcast(new Intent(ON_FRIEND_SELECTED).putExtra(FRIEND_ID, friends.get(getAdapterPosition()).getId()));
                 }
             });
         }

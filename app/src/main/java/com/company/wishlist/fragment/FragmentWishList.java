@@ -1,8 +1,12 @@
 package com.company.wishlist.fragment;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,6 +16,7 @@ import android.view.ViewGroup;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.WishEditActivity;
+import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.adapter.WishListAdapter;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.WishList;
@@ -22,6 +27,8 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.github.clans.fab.FloatingActionMenu;
 
+import java.util.Date;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -31,15 +38,16 @@ import butterknife.OnClick;
  */
 public class FragmentWishList extends DebugFragment implements IOnFriendSelectedListener{
 
+    public static final String MY_WISH_LIST_MODE = "My wish list";//TODO
     public static final String WISH_LIST_MODE = "Wish list";
     public static final String GIFT_LIST_MODE = "Gift list";
     public static final String WISH_LIST_ID = "WISH_LIST_ID";
-    public static final String FRIEND_ID = "FRIEND_ID";
     public static final String MODE = "mode";
 
     private WishListAdapter adapter;
     private FirebaseUtil firebaseUtil;
-    private String friendId;
+    private String wishListId;
+    private OnFriendSelectedReceiver receiver;
 
     @Bind(R.id.fab_menu) FloatingActionMenu mFab;
 
@@ -47,7 +55,7 @@ public class FragmentWishList extends DebugFragment implements IOnFriendSelected
         FragmentWishList fragment = new FragmentWishList();
         Bundle args = new Bundle();
         args.putString(MODE, mode);
-        args.putString(FRIEND_ID, friendId);
+        args.putString(FriendListAdapter.FRIEND_ID, friendId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -56,6 +64,21 @@ public class FragmentWishList extends DebugFragment implements IOnFriendSelected
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         firebaseUtil = new FirebaseUtil(getContext());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(FriendListAdapter.ON_FRIEND_SELECTED);
+        receiver = new OnFriendSelectedReceiver();
+        getContext().registerReceiver(receiver, intentFilter);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getContext().unregisterReceiver(receiver);
     }
 
     @Nullable
@@ -71,7 +94,7 @@ public class FragmentWishList extends DebugFragment implements IOnFriendSelected
         //mFab = (FloatingActionMenu) view.findViewById(R.id.floating_action_menu);
         Bundle bundle = getArguments();
         String mode = bundle.getString(MODE);
-        friendId = bundle.getString(FRIEND_ID);
+        String friendId = bundle.getString(FriendListAdapter.FRIEND_ID);
         if (mode.equals(WISH_LIST_MODE)) {
             mFab.setVisibility(View.GONE);
         }
@@ -82,13 +105,8 @@ public class FragmentWishList extends DebugFragment implements IOnFriendSelected
         recyclerView.setAdapter(adapter);
     }
 
-    @Override
-    public void onFriendSelected(String id) {
-        adapter.onFriendSelected(id);
-    }
-
-
-    public void onClick(View v, String wishListId) {
+    @OnClick({R.id.fab_add, R.id.fab_choose})
+    public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fab_add:
                 mFab.toggle(true);
@@ -98,17 +116,14 @@ public class FragmentWishList extends DebugFragment implements IOnFriendSelected
                 startActivity(intent);
                 return;
             case R.id.fab_choose:
-                //Snackbar.make(mCoordinatorLayout, "action button close", Snackbar.LENGTH_LONG).show();
                 mFab.close(true);
                 break;
         }
     }
 
-    //TODO:  may be call this check on friend selected
-    @OnClick({R.id.fab_add, R.id.fab_choose})
-    public void initWishList(final View view) {
-        final Firebase wishListTable = firebaseUtil.getFirebaseRoot().child(firebaseUtil.WISH_LIST_TABLE);
-        wishListTable
+    @Override
+    public void onFriendSelected(final String friendId) {
+        firebaseUtil.getFirebaseRoot().child(firebaseUtil.WISH_LIST_TABLE)
                 .orderByChild("forUser")
                 .equalTo(friendId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -117,13 +132,15 @@ public class FragmentWishList extends DebugFragment implements IOnFriendSelected
                         Log.d(LOG_TAG, ".onDataChange(" + dataSnapshot + ")");
                         for (DataSnapshot wishListDS : dataSnapshot.getChildren()) {
                             if (wishListDS.getValue(WishList.class).getOwner().equals(firebaseUtil.getCurrentUser().getId())) {
-                                onClick(view, wishListDS.getKey());
+                                wishListId = wishListDS.getKey();
+                                adapter.onFriendSelected(friendId);
                                 return;
                             }
                         }
-                        WishList wishList = new WishList(wishListTable.push().getKey(), firebaseUtil.getCurrentUser().getId(), friendId);
-                        wishListTable.child(wishList.getId()).setValue(wishList);
-                        onClick(view, wishList.getId());
+                        WishList wishList = new WishList(dataSnapshot.getRef().push().getKey(), firebaseUtil.getCurrentUser().getId(), friendId);
+                        dataSnapshot.getRef().child(wishList.getId()).setValue(wishList);
+                        wishListId = wishList.getId();
+                        adapter.onFriendSelected(friendId);
                     }
 
                     @Override
@@ -131,6 +148,15 @@ public class FragmentWishList extends DebugFragment implements IOnFriendSelected
                         Log.e(LOG_TAG, firebaseError.toString());
                     }
                 });
+    }
+
+    public class OnFriendSelectedReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String friendId = intent.getStringExtra(FriendListAdapter.FRIEND_ID);
+            onFriendSelected(friendId);
+        }
     }
 
 }

@@ -26,6 +26,7 @@ import com.company.wishlist.util.Utilities;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
@@ -47,99 +48,17 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     private int selectedItem = -1;
     private String mode;
     private FirebaseUtil firebaseUtil;
+    private WishEventListener listenersWish;
+    private List<Query> queriesWish = new ArrayList<>();
+
 
     public WishListAdapter(Context context, String mode, String forUser) {
         this.context = context;
         this.mode = mode;
         this.wishes = new ArrayList<>();
         this.firebaseUtil = new FirebaseUtil(context);
+        listenersWish = new WishEventListener();
         getWishLists(forUser);
-    }
-
-    private void getWishLists(final String forUser) {
-
-        firebaseUtil.getFirebaseRoot()
-                .child(FirebaseUtil.WISH_LIST_TABLE)
-                .orderByChild("forUser")
-                .equalTo(forUser)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Log.e(LOG_TAG, forUser);
-                        Log.d(LOG_TAG, "WishList.onChildAdded" + dataSnapshot);
-                        for (DataSnapshot wishListDS : dataSnapshot.getChildren()) {
-                            WishList wishList = wishListDS.getValue(WishList.class);
-                            wishList.setId(wishListDS.getKey());
-                            switch (mode) {
-                                case FragmentWishList.WISH_LIST_MODE:
-                                    //if (!wishList.getOwner().equals(firebaseUtil.getCurrentUser().getId()))
-                                    getWishes(wishList.getId());
-                                    break;
-                                case FragmentWishList.GIFT_LIST_MODE:
-                                    if (wishList.getOwner().equals(firebaseUtil.getCurrentUser().getId()))
-                                        getWishes(wishList.getId());
-                                    break;
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(FirebaseError firebaseError) {
-                        Log.d("wish_list.onChanceled()", firebaseError.toString());
-                    }
-                });
-    }
-
-    private void getWishes(String wishListId) {
-        firebaseUtil.getFirebaseRoot()
-                .child(FirebaseUtil.WISH_TABLE)
-                .orderByChild("wishListId")
-                .equalTo(wishListId)
-                .addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String prevKey) {
-                        Wish wish = dataSnapshot.getValue(Wish.class);
-                        wish.setId(dataSnapshot.getKey());
-                        wishes.add(wish);
-                        notifyDataSetChanged();
-                        Log.d(LOG_TAG, "Wish.onChildAdded()" + wish.toString());
-                    }
-
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String prevKey) {
-                        Wish wish = dataSnapshot.getValue(Wish.class);
-                        wish.setId(dataSnapshot.getKey());
-                        wishes.set(findWishIndexById(wish.getId()), wish);
-                        Log.d(LOG_TAG, "Wish.onChildChanged()" + wish.toString());
-                        notifyDataSetChanged();
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-                        wishes.remove(findWishIndexById(dataSnapshot.getKey()));
-                        notifyDataSetChanged();
-                        Log.d(LOG_TAG, "Wish.onChildRemoved()" + dataSnapshot.getValue(Wish.class).toString());
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String prevKey) {
-                        Log.d(LOG_TAG, "Wish.onChildMoved()" + dataSnapshot.getValue(Wish.class).toString());
-                    }
-
-                    @Override
-                    public void onCancelled(FirebaseError firebaseError) {
-                        Log.d(LOG_TAG, "Wish.onChanceled()" + firebaseError.toString());
-                    }
-                });
-    }
-
-    //TODO: will be replaced with HashMap or write sort, etc...
-    @Deprecated
-    int findWishIndexById(String id) {
-        for (int i = 0; i < wishes.size(); i++) {
-            if (wishes.get(i).getId().equals(id)) return i;
-        }
-        return -1;
     }
 
     @Override
@@ -168,8 +87,101 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     public void onFriendSelected(String id) {
         Log.d(LOG_TAG, "onFriendSelected(" + id + ")");
         wishes.clear();
+        for (Query query : queriesWish) query.removeEventListener(listenersWish);//remove all unused listeners
         getWishLists(id);
         notifyDataSetChanged();
+    }
+
+    private void getWishLists(final String forUser) {
+        firebaseUtil.getFirebaseRoot()
+                .child(FirebaseUtil.WISH_LIST_TABLE)
+                .orderByChild("forUser")
+                .equalTo(forUser)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.d(LOG_TAG, "WishList.onChildAdded" + dataSnapshot);
+                        for (DataSnapshot wishListDS : dataSnapshot.getChildren()) {
+                            WishList wishList = wishListDS.getValue(WishList.class);
+                            wishList.setId(wishListDS.getKey());
+                            switch (mode) {
+                                case FragmentWishList.WISH_LIST_MODE:
+                                    if (!wishList.getOwner().equals(firebaseUtil.getCurrentUser().getId()))
+                                        getWishes(wishList.getId());
+                                    break;
+                                case FragmentWishList.GIFT_LIST_MODE:
+                                    if (wishList.getOwner().equals(firebaseUtil.getCurrentUser().getId()))
+                                        getWishes(wishList.getId());
+                                    break;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
+                        Log.d("wish_list.onChanceled()", firebaseError.toString());
+                    }
+                });
+    }
+
+    private void getWishes(final String wishListId) {
+        Log.d(LOG_TAG, "punyan =" + wishListId);
+        Query query = firebaseUtil.getFirebaseRoot()
+                .child(FirebaseUtil.WISH_TABLE)
+                .orderByChild("wishListId")
+                .equalTo(wishListId);
+        query.addChildEventListener(listenersWish);
+        queriesWish.add(query);
+    }
+
+    @Deprecated
+    int findWishIndexById(String id) {
+        for (int i = 0; i < wishes.size(); i++) {
+            if (wishes.get(i).getId().equals(id))
+                return i;
+        }
+        return -1;
+    }
+
+    private class WishEventListener implements ChildEventListener {
+
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String prevKey) {
+            Wish wish = dataSnapshot.getValue(Wish.class);
+            wish.setId(dataSnapshot.getKey());
+            wishes.add(wish);
+            notifyDataSetChanged();
+            Log.d(LOG_TAG, "Wish.onChildAdded()" + wish.toString());
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String prevKey) {
+            Wish wish = dataSnapshot.getValue(Wish.class);
+            wish.setId(dataSnapshot.getKey());
+            wishes.set(findWishIndexById(wish.getId()), wish);
+            Log.d(LOG_TAG, "Wish.onChildChanged()" + wish.toString());
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+            Wish wish = dataSnapshot.getValue(Wish.class);
+            wish.setId(dataSnapshot.getKey());
+            wishes.remove(findWishIndexById(dataSnapshot.getKey()));
+            notifyDataSetChanged();
+            Log.d(LOG_TAG, "Wish.onChildRemoved()" + dataSnapshot.getValue(Wish.class).toString());
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String prevKey) {
+            Log.d(LOG_TAG, "Wish.onChildMoved()" + dataSnapshot.getValue(Wish.class).toString());
+        }
+
+        @Override
+        public void onCancelled(FirebaseError firebaseError) {
+            Log.d(LOG_TAG, "Wish.onChanceled()" + firebaseError.toString());
+        }
+
     }
 
     public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener {

@@ -105,7 +105,7 @@ public class FragmentWishList extends DebugFragment implements IOnFriendSelected
     }
 
     //TODO:  may be call this check on friend selected
-    @OnClick({R.id.fab_menu, R.id.fab_add, R.id.fab_choose})
+    @OnClick({R.id.fab_add, R.id.fab_choose})
     public void initWishList(final View view) {
         final Firebase wishListTable = firebaseUtil.getFirebaseRoot().child(firebaseUtil.WISH_LIST_TABLE);
         wishListTable

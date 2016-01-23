@@ -25,7 +25,7 @@ import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.adapter.InstaGridViewAdapter;
 import com.company.wishlist.bean.EditWishBean;
-import com.company.wishlist.fragment.FragmentWishList;
+import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.model.Reserved;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.util.CropCircleTransformation;
@@ -157,7 +157,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     public void initWishEdit() {
         if (getIntent().getAction().equals(ACTION_CREATE)) {//TODO: use firebase push, not random UUID, ID must set on firebase side
             editWishBean = new EditWishBean(new Wish());
-            editWishBean.setWishListId(getIntent().getStringExtra(FragmentWishList.WISH_LIST_ID));//TODO:
+            editWishBean.setWishListId(getIntent().getStringExtra(WishListFragment.WISH_LIST_ID));//TODO:
         } else if (getIntent().getAction().equals(ACTION_EDIT)) {
             editWishBean = new EditWishBean(LocalStorage.getInstance().getWish());
         } else {

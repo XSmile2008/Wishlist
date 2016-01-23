@@ -3,10 +3,9 @@ package com.company.wishlist.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,7 +14,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,8 +21,8 @@ import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.FirebaseActivity;
 import com.company.wishlist.adapter.FriendListAdapter;
-import com.company.wishlist.adapter.WishListPageViewAdapter;
-import com.company.wishlist.fragment.FragmentWishList;
+import com.company.wishlist.fragment.TabbedWishListFragment;
+import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.User;
 import com.company.wishlist.util.CropCircleTransformation;
@@ -49,15 +47,12 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private FriendListAdapter friendListAdapter;
-    WishListPageViewAdapter wishListPageViewAdapter;
 
     //NavigationDrawer
     @Bind(R.id.profile_user_avatar_iw) ImageView userAvatarView;
     @Bind(R.id.profile_user_name_tv) TextView profileUserName;
     @Bind(R.id.drawer_layout) DrawerLayout drawer;
-    @Bind(R.id.tab_layout) TabLayout tabLayout;
-    @Bind(R.id.view_pager) ViewPager viewPager;
-    @Bind(R.id.container_my_wish_list) FrameLayout containerMyWishList;
+    @Bind(R.id.collapsing_toolbar) CollapsingToolbarLayout collapsingToolbarLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,24 +76,6 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         if (getFirebaseUtil().isAuthenticated()) {
             refreshUserDataUi();
         }
-
-        //Setup collapsing toolbar
-        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbar.setTitle("My wish list");
-
-        //Setup tab layout
-        wishListPageViewAdapter = new WishListPageViewAdapter(this);
-        viewPager.setAdapter(wishListPageViewAdapter);
-        tabLayout.setupWithViewPager(viewPager);
-
-        Fragment fragment = FragmentWishList.newInstance(FragmentWishList.GIFT_LIST_MODE, getFirebaseUtil().getCurrentUser().getId());
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.container_my_wish_list, fragment)
-                .commit();
-
-        tabLayout.setVisibility(View.GONE);
-        viewPager.setVisibility(View.GONE);
     }
 
     @Override
@@ -151,34 +128,61 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.header_layout:
-                containerMyWishList.setVisibility(View.VISIBLE);
-                tabLayout.setVisibility(View.GONE);
-                viewPager.setVisibility(View.GONE);
+                showMyWishList();
+                collapsingToolbarLayout.setTitle("My wish list");
                 break;
             case R.id.button_settings:
-                openSettingsActivity();
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
         }
         drawer.closeDrawer(GravityCompat.START);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
-    private void openSettingsActivity() {
-        Intent i = new Intent(this, SettingsActivity.class);
-        startActivity(i);
-    }
-
     @Override
-    public void onFriendSelected(String id) {
+    public void onFriendSelected(String friendId) {
         drawer.closeDrawer(GravityCompat.START);
-        containerMyWishList.setVisibility(View.GONE);
-        tabLayout.setVisibility(View.VISIBLE);
-        viewPager.setVisibility(View.VISIBLE);
+        collapsingToolbarLayout.setTitle(friendId);
+        showFriendWishList(friendId);
     }
 
     @Override
     protected int getLayoutResourceId() {
         return R.layout.activity_main;
+    }
+
+    private void showMyWishList() {
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_wish_list);
+        if (fragment == null) {
+            fragment = WishListFragment.newInstance(WishListFragment.GIFT_LIST_MODE, getFirebaseUtil().getCurrentUser().getId());
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.container_wish_list, fragment)
+                    .commit();
+        } else if (!(fragment instanceof WishListFragment)) {
+            fragment = WishListFragment.newInstance(WishListFragment.GIFT_LIST_MODE, getFirebaseUtil().getCurrentUser().getId());
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.container_wish_list, fragment)
+                    .commit();
+        }
+    }
+
+    private void showFriendWishList(String friendId) {
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_wish_list);
+        if (fragment == null) {
+            fragment = TabbedWishListFragment.newInstance(friendId);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.container_wish_list, fragment)
+                    .commit();
+        } else if (!(fragment instanceof TabbedWishListFragment)) {
+            fragment = TabbedWishListFragment.newInstance(friendId);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.container_wish_list, fragment)
+                    .commit();
+        }
     }
 
 }

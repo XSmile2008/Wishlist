@@ -90,14 +90,16 @@ public class WishListFragment extends DebugFragment implements IOnFriendSelected
         Bundle bundle = getArguments();
         String mode = bundle.getString(MODE);
         String friendId = bundle.getString(FriendListAdapter.FRIEND_ID);
-        if (mode.equals(WISH_LIST_MODE)) {
-            mFab.setVisibility(View.GONE);
-        }
         adapter = new WishListAdapter(getContext(), mode, friendId);//TODO:
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
-        onFriendSelected(friendId);
+        if (mode.equals(WISH_LIST_MODE)) {
+            adapter.onFriendSelected(friendId);
+            mFab.setVisibility(View.GONE);
+        } else {
+            onFriendSelected(friendId);
+        }
     }
 
     @OnClick({R.id.fab_add, R.id.fab_choose})
@@ -150,7 +152,11 @@ public class WishListFragment extends DebugFragment implements IOnFriendSelected
         @Override
         public void onReceive(Context context, Intent intent) {
             final String friendId = intent.getStringExtra(FriendListAdapter.FRIEND_ID);
-            onFriendSelected(friendId);
+            if (getArguments().getString(MODE).equals(WISH_LIST_MODE)) {
+                adapter.onFriendSelected(friendId);
+            } else {
+                onFriendSelected(friendId);
+            }
         }
     }
 

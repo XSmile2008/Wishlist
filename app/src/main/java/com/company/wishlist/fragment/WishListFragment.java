@@ -14,8 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.company.wishlist.R;
+import com.company.wishlist.activity.TopWishActivity;
 import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.adapter.FriendListAdapter;
+import com.company.wishlist.adapter.TopWishListAdapter;
 import com.company.wishlist.adapter.WishListAdapter;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.WishList;
@@ -104,15 +106,21 @@ public class WishListFragment extends DebugFragment implements IOnFriendSelected
 
     @OnClick({R.id.fab_add, R.id.fab_choose})
     public void onClick(View v) {
+        Intent intent;
         switch (v.getId()) {
             case R.id.fab_add:
                 mFab.toggle(true);
-                Intent intent = new Intent(getContext(), WishEditActivity.class)
+                intent = new Intent(getContext(), WishEditActivity.class)
                         .setAction(WishEditActivity.ACTION_CREATE)
                         .putExtra(WISH_LIST_ID, wishListId);
                 startActivity(intent);
                 return;
             case R.id.fab_choose:
+                mFab.toggle(true);
+                intent = new Intent(getContext(), TopWishActivity.class)
+                        .setAction(WishEditActivity.ACTION_CREATE)
+                        .putExtra(WISH_LIST_ID, wishListId);
+                startActivity(intent);
                 mFab.close(true);
                 break;
         }

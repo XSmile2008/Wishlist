@@ -63,6 +63,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     private static String DATE_DIALOG = "DATE_PICKER";
     public static String ACTION_EDIT = "com.company.wishlist.ACTION_EDIT";
     public static String ACTION_CREATE = "com.company.wishlist.ACTION_CREATE";
+    public static String ACTION_TAKE_FROM_TOP = "com.company.wishlist.ACTION_TAKE_FROM_TOP";
 
     @Bind(R.id.image_view)
     ImageView imageView;
@@ -160,9 +161,12 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
             editWishBean.setWishListId(getIntent().getStringExtra(WishListFragment.WISH_LIST_ID));//TODO:
         } else if (getIntent().getAction().equals(ACTION_EDIT)) {
             editWishBean = new EditWishBean(LocalStorage.getInstance().getWish());
-        } else {
-            finish();//todo may be init new object
+        } else if(getIntent().getAction().equals(ACTION_TAKE_FROM_TOP)) {
+            editWishBean = new EditWishBean(LocalStorage.getInstance().getWish());
+            editWishBean.setId(null);
+            editWishBean.setWishListId(getIntent().getStringExtra(WishListFragment.WISH_LIST_ID));//TODO:
         }
+
         wishesRef = firebaseUtil.getFirebaseRoot().child(FirebaseUtil.WISH_TABLE);
     }
 
@@ -212,7 +216,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     private void commitChanges() {
         editWishBean.setComment(editTextComment.getText().toString());
         editWishBean.setTitle(editTextTitle.getText().toString());
-        if (getIntent().getAction().equals(ACTION_CREATE)) {
+        if (getIntent().getAction().equals(ACTION_CREATE) || getIntent().getAction().equals(ACTION_TAKE_FROM_TOP)) {
             wishesRef.child(wishesRef.push().getKey()).setValue(editWishBean);
         } else if (getIntent().getAction().equals(ACTION_EDIT)) {
             wishesRef.child(editWishBean.getId()).updateChildren(editWishBean.getMapToUpdate());

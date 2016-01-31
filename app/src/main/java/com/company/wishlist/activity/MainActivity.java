@@ -75,6 +75,7 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
 
         if (getFirebaseUtil().isAuthenticated()) {
             refreshUserDataUi();
+            showMyWishList();
         }
     }
 

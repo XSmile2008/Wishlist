@@ -100,6 +100,12 @@ public class WishListFragment extends DebugFragment implements IOnFriendSelected
             adapter.onFriendSelected(friendId);
             mFab.setVisibility(View.GONE);
         } else {
+//            mFab.setOnClickListener(new View.OnClickListener() {//TODO: may be need refactoring
+//                @Override
+//                public void onClick(View v) {
+//                    mFab.close(true);
+//                }
+//            });
             onFriendSelected(friendId);
         }
     }

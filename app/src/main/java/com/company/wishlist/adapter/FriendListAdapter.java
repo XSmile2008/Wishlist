@@ -11,9 +11,12 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
+import com.company.wishlist.events.FriendSelectedEvent;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.User;
 import com.company.wishlist.util.CropCircleTransformation;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +33,6 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
     private List<User> friends;
 
     public static String FRIEND_ID = "friend_id";
-    public static String ON_FRIEND_SELECTED = "com.company.wishlist.on_friend_selected";
 
     public FriendListAdapter(Context context, List<User> friends) {
         this.context = context;
@@ -72,11 +74,12 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((IOnFriendSelectedListener) context)
-                            .onFriendSelected(friends.get(getAdapterPosition()).getId());
-                    context.sendBroadcast(new Intent(ON_FRIEND_SELECTED).putExtra(FRIEND_ID, friends.get(getAdapterPosition()).getId()));
+                    String friendId = friends.get(getAdapterPosition()).getId();
+                    ((IOnFriendSelectedListener) context).onFriendSelected(friendId);
+                    EventBus.getDefault().post(new FriendSelectedEvent(friendId));
                 }
             });
         }
     }
+
 }

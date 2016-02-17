@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="prefsLogoutButton">prefsLogoutButton</string>
-    <string name="formatted_date">Your reservation for: %1$s</string>
-    <string name="unreserve">Are you shure to unreserve wish?</string>
-</resources>

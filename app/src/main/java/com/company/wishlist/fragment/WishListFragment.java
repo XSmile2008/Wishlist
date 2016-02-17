@@ -19,6 +19,7 @@ import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.adapter.TopWishListAdapter;
 import com.company.wishlist.adapter.WishListAdapter;
+import com.company.wishlist.events.FriendSelectedEvent;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.FirebaseUtil;
@@ -27,6 +28,9 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.github.clans.fab.FloatingActionMenu;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -34,7 +38,7 @@ import butterknife.OnClick;
 /**
  * Created by vladstarikov on 07.01.16.
  */
-public class WishListFragment extends DebugFragment implements IOnFriendSelectedListener{
+public class WishListFragment extends DebugFragment {
 
     public static final String MY_WISH_LIST_MODE = "My wish list";//TODO
     public static final String WISH_LIST_MODE = "Wish list";
@@ -45,7 +49,7 @@ public class WishListFragment extends DebugFragment implements IOnFriendSelected
     private WishListAdapter adapter;
     private FirebaseUtil firebaseUtil;
     private String wishListId;
-    private OnFriendSelectedReceiver receiver;
+    private String mode;
 
     @Bind(R.id.fab_menu) FloatingActionMenu mFab;
 
@@ -67,16 +71,13 @@ public class WishListFragment extends DebugFragment implements IOnFriendSelected
     @Override
     public void onResume() {
         super.onResume();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(FriendListAdapter.ON_FRIEND_SELECTED);
-        receiver = new OnFriendSelectedReceiver();
-        getContext().registerReceiver(receiver, intentFilter);
+        EventBus.getDefault().register(this);
     }
 
     @Override
     public void onPause() {
+        EventBus.getDefault().unregister(this);
         super.onPause();
-        getContext().unregisterReceiver(receiver);
     }
 
     @Nullable
@@ -89,25 +90,38 @@ public class WishListFragment extends DebugFragment implements IOnFriendSelected
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
+
         Bundle bundle = getArguments();
-        String mode = bundle.getString(MODE);
+        this.mode = bundle.getString(MODE);
         String friendId = bundle.getString(FriendListAdapter.FRIEND_ID);
+
         adapter = new WishListAdapter(getContext(), mode, friendId);//TODO:
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
-        if (mode.equals(WISH_LIST_MODE)) {
-            adapter.onFriendSelected(friendId);
-            mFab.setVisibility(View.GONE);
-        } else {
-//            mFab.setOnClickListener(new View.OnClickListener() {//TODO: may be need refactoring
-//                @Override
-//                public void onClick(View v) {
-//                    mFab.close(true);
-//                }
-//            });
-            onFriendSelected(friendId);
-        }
+
+        mFab.setOnMenuButtonClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mFab.isOpened()) {
+                    mFab.setClickable(false);
+                    mFab.close(true);
+                } else {
+                    mFab.setClickable(true);
+                    mFab.open(true);
+                }
+            }
+        });
+
+        mFab.setOnClickListener(new View.OnClickListener() {//TODO: may be need refactoring
+                @Override
+                public void onClick(View v) {
+                    mFab.setClickable(false);
+                    mFab.close(true);
+                }
+            });
+        if (mode.equals(WISH_LIST_MODE)) mFab.setVisibility(View.GONE);
+        onFriendSelectedEvent(new FriendSelectedEvent(friendId));
     }
 
     @OnClick({R.id.fab_add, R.id.fab_choose})
@@ -132,45 +146,37 @@ public class WishListFragment extends DebugFragment implements IOnFriendSelected
         }
     }
 
-    @Override
-    public void onFriendSelected(final String friendId) {
-        firebaseUtil.getFirebaseRoot().child(FirebaseUtil.WISH_LIST_TABLE)
-                .orderByChild("forUser")
-                .equalTo(friendId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Log.d(LOG_TAG, ".onDataChange(" + dataSnapshot + ")");
-                        for (DataSnapshot wishListDS : dataSnapshot.getChildren()) {
-                            if (wishListDS.getValue(WishList.class).getOwner().equals(firebaseUtil.getCurrentUser().getId())) {
-                                wishListId = wishListDS.getKey();
-                                adapter.onFriendSelected(friendId);
-                                return;
+    @Subscribe
+    public void onFriendSelectedEvent(FriendSelectedEvent event) {
+        final String friendId = event.getFriendId();
+        if (mode.equals(WISH_LIST_MODE)) {
+            adapter.onFriendSelected(friendId);
+        } else {
+            firebaseUtil.getFirebaseRoot().child(FirebaseUtil.WISH_LIST_TABLE)
+                    .orderByChild("forUser")
+                    .equalTo(friendId)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Log.d(LOG_TAG, ".onDataChange(" + dataSnapshot + ")");
+                            for (DataSnapshot wishListDS : dataSnapshot.getChildren()) {
+                                if (wishListDS.getValue(WishList.class).getOwner().equals(firebaseUtil.getCurrentUser().getId())) {
+                                    wishListId = wishListDS.getKey();
+                                    adapter.onFriendSelected(friendId);
+                                    return;
+                                }
                             }
+                            WishList wishList = new WishList(dataSnapshot.getRef().push().getKey(), firebaseUtil.getCurrentUser().getId(), friendId);
+                            dataSnapshot.getRef().child(wishList.getId()).setValue(wishList);
+                            wishListId = wishList.getId();
+                            adapter.onFriendSelected(friendId);
                         }
-                        WishList wishList = new WishList(dataSnapshot.getRef().push().getKey(), firebaseUtil.getCurrentUser().getId(), friendId);
-                        dataSnapshot.getRef().child(wishList.getId()).setValue(wishList);
-                        wishListId = wishList.getId();
-                        adapter.onFriendSelected(friendId);
-                    }
 
-                    @Override
-                    public void onCancelled(FirebaseError firebaseError) {
-                        Log.e(LOG_TAG, firebaseError.toString());
-                    }
-                });
-    }
-
-    public class OnFriendSelectedReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String friendId = intent.getStringExtra(FriendListAdapter.FRIEND_ID);
-            if (getArguments().getString(MODE).equals(WISH_LIST_MODE)) {
-                adapter.onFriendSelected(friendId);
-            } else {
-                onFriendSelected(friendId);
-            }
+                        @Override
+                        public void onCancelled(FirebaseError firebaseError) {
+                            Log.e(LOG_TAG, firebaseError.toString());
+                        }
+                    });
         }
     }
 

@@ -52,7 +52,7 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     @Bind(R.id.profile_user_avatar_iw) ImageView userAvatarView;
     @Bind(R.id.profile_user_name_tv) TextView profileUserName;
     @Bind(R.id.drawer_layout) DrawerLayout drawer;
-    @Bind(R.id.collapsing_toolbar) CollapsingToolbarLayout collapsingToolbarLayout;
+    //@Bind(R.id.collapsing_toolbar) CollapsingToolbarLayout collapsingToolbarLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,7 +130,7 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         switch (v.getId()) {
             case R.id.header_layout:
                 showMyWishList();
-                collapsingToolbarLayout.setTitle("My wish list");
+                getSupportActionBar().setTitle("My wish list");
                 break;
             case R.id.button_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
@@ -143,7 +143,7 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     @Override
     public void onFriendSelected(String friendId) {
         drawer.closeDrawer(GravityCompat.START);
-        collapsingToolbarLayout.setTitle(friendId);
+        getSupportActionBar().setTitle(friendId);
         showFriendWishList(friendId);
     }
 

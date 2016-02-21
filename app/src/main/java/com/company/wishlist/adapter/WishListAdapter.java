@@ -46,13 +46,13 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     private Context context;
     private List<Wish> wishes;
     private int selectedItem = -1;
-    private String mode;
+    private int mode;
     private FirebaseUtil firebaseUtil;
     private WishEventListener listenersWish;
     private List<Query> queriesWish = new ArrayList<>();
 
 
-    public WishListAdapter(Context context, String mode, String forUser) {
+    public WishListAdapter(Context context, int mode, String forUser) {
         this.context = context;
         this.mode = mode;
         this.wishes = new ArrayList<>();
@@ -206,7 +206,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
-            if (mode.equals(WishListFragment.WISH_LIST_MODE)) {
+            if (mode == WishListFragment.WISH_LIST_MODE) {
                 imageButtonEdit.setVisibility(View.GONE);
                 imageButtonDelete.setVisibility(View.GONE);
             }

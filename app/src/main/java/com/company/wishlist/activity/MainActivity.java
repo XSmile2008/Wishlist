@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,6 +37,7 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.Bind;
@@ -145,6 +147,9 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         drawer.closeDrawer(GravityCompat.START);
         getSupportActionBar().setTitle(friendId);
         showFriendWishList(friendId);
+
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        Log.d("onyan", Arrays.toString(fragments.toArray()));
     }
 
     @Override
@@ -155,13 +160,13 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     private void showMyWishList() {
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_wish_list);
         if (fragment == null) {
-            fragment = WishListFragment.newInstance(WishListFragment.GIFT_LIST_MODE, getFirebaseUtil().getCurrentUser().getId());
+            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, getFirebaseUtil().getCurrentUser().getId());
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.container_wish_list, fragment)
                     .commit();
         } else if (!(fragment instanceof WishListFragment)) {
-            fragment = WishListFragment.newInstance(WishListFragment.GIFT_LIST_MODE, getFirebaseUtil().getCurrentUser().getId());
+            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, getFirebaseUtil().getCurrentUser().getId());
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.container_wish_list, fragment)

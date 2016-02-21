@@ -3,6 +3,8 @@ package com.company.wishlist.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,4 +50,13 @@ public class TabbedWishListFragment extends DebugFragment {
         tabLayout.setupWithViewPager(viewPager);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        for (Fragment fragment : wishListPageViewAdapter.getFragments()) {
+            transaction.remove(fragment);
+        }
+        transaction.commit();
+    }
 }

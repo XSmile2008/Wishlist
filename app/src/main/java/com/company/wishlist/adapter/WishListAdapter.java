@@ -52,13 +52,12 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     private List<Query> queriesWish = new ArrayList<>();
 
 
-    public WishListAdapter(Context context, int mode, String forUser) {
+    public WishListAdapter(Context context, int mode) {
         this.context = context;
         this.mode = mode;
         this.wishes = new ArrayList<>();
         this.firebaseUtil = new FirebaseUtil(context);
-        listenersWish = new WishEventListener();
-        getWishLists(forUser);
+        this.listenersWish = new WishEventListener();
     }
 
     @Override
@@ -93,6 +92,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     }
 
     private void getWishLists(final String forUser) {
+        Log.e(LOG_TAG, "GET wishes for user " + forUser);
         firebaseUtil.getFirebaseRoot()
                 .child(FirebaseUtil.WISH_LIST_TABLE)
                 .orderByChild("forUser")

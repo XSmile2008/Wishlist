@@ -57,6 +57,6 @@ public class TabbedWishListFragment extends DebugFragment {
         for (Fragment fragment : wishListPageViewAdapter.getFragments()) {
             transaction.remove(fragment);
         }
-        transaction.commit();
+        transaction.commit();//TODO: do not destroy if rotate screen
     }
 }

@@ -108,7 +108,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
-        actionBar.setTitle(getIntent().getAction() == ACTION_CREATE ? "New wish" : "Edit wish");
+        actionBar.setTitle(getIntent().getAction().equals(ACTION_CREATE) ? "New wish" : "Edit wish");
 
         //Setup validator
         validator = new Validator(this);
@@ -156,7 +156,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     }
 
     public void initWishEdit() {
-        if (getIntent().getAction().equals(ACTION_CREATE)) {//TODO: use firebase push, not random UUID, ID must set on firebase side
+        if (getIntent().getAction().equals(ACTION_CREATE)) {
             editWishBean = new EditWishBean(new Wish());
             editWishBean.setWishListId(getIntent().getStringExtra(WishListFragment.WISH_LIST_ID));//TODO:
         } else if (getIntent().getAction().equals(ACTION_EDIT)) {
@@ -175,7 +175,6 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         editTextComment.setText(editWishBean.getComment());
         if (!Utilities.isBlank(editWishBean.getPicture())) {
             //Glide.with(this).load(Utilities.decodeThumbnail(editWishBean.getPicture())).into(imageView);
-
             imageView.setImageBitmap(Utilities.decodeThumbnail(editWishBean.getPicture()));//TODO: CropCircleTransformation
         } else {
             imageView.setImageResource(R.drawable.gift_icon);

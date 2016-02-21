@@ -2,9 +2,7 @@ package com.company.wishlist.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -132,7 +130,6 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         switch (v.getId()) {
             case R.id.header_layout:
                 showMyWishList();
-                getSupportActionBar().setTitle("My wish list");
                 break;
             case R.id.button_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
@@ -145,11 +142,10 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     @Override
     public void onFriendSelected(String friendId) {
         drawer.closeDrawer(GravityCompat.START);
-        getSupportActionBar().setTitle(friendId);
         showFriendWishList(friendId);
 
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
-        Log.d("onyan", Arrays.toString(fragments.toArray()));
+        Log.d(LOG_TAG, Arrays.toString(fragments.toArray()));
     }
 
     @Override
@@ -158,6 +154,7 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     }
 
     private void showMyWishList() {
+        getSupportActionBar().setTitle(getResources().getString(R.string.my_wish_list));
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_wish_list);
         if (fragment == null) {
             fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, getFirebaseUtil().getCurrentUser().getId());
@@ -175,6 +172,7 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     }
 
     private void showFriendWishList(String friendId) {
+        getSupportActionBar().setTitle(friendId);
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_wish_list);
         if (fragment == null) {
             fragment = TabbedWishListFragment.newInstance(friendId);

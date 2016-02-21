@@ -85,18 +85,20 @@ public class WishListFragment extends DebugFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
+        ButterKnife.bind(this, view);//TODO: may be not bind if mFab is not visible?
 
         Bundle bundle = getArguments();
         this.mode = bundle.getInt(MODE);
         String friendId = bundle.getString(FriendListAdapter.FRIEND_ID);
 
-        adapter = new WishListAdapter(getContext(), mode == MY_WISH_LIST_MODE ? GIFT_LIST_MODE : mode, friendId);//TODO:
+        adapter = new WishListAdapter(getContext(), mode == MY_WISH_LIST_MODE ? GIFT_LIST_MODE : mode);
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+        onFriendSelectedEvent(new FriendSelectedEvent(friendId));
 
-        mFab.setOnMenuButtonClickListener(new View.OnClickListener() {
+        if (mode == WISH_LIST_MODE) mFab.setVisibility(View.GONE);
+        else mFab.setOnMenuButtonClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mFab.isOpened()) {
@@ -108,23 +110,15 @@ public class WishListFragment extends DebugFragment {
                 }
             }
         });
-
-        mFab.setOnClickListener(new View.OnClickListener() {//TODO: may be need refactoring
-            @Override
-            public void onClick(View v) {
-                mFab.setClickable(false);
-                mFab.close(true);
-            }
-        });
-        if (mode == WISH_LIST_MODE) mFab.setVisibility(View.GONE);
-        onFriendSelectedEvent(new FriendSelectedEvent(friendId));
     }
 
-    @OnClick({R.id.fab_add, R.id.fab_choose})
+    @OnClick({R.id.fab_menu, R.id.fab_add, R.id.fab_choose})
     public void onClick(View v) {
-        mFab.close(true);
         mFab.toggle(true);
         switch (v.getId()) {
+            case R.id.fab_menu:
+                mFab.setClickable(false);
+                break;
             case R.id.fab_add:
                 startActivity(new Intent(getContext(), WishEditActivity.class)
                         .setAction(WishEditActivity.ACTION_CREATE)
@@ -173,7 +167,6 @@ public class WishListFragment extends DebugFragment {
                                 Log.e(LOG_TAG, firebaseError.toString());
                             }
                         });
-                break;
         }
     }
 

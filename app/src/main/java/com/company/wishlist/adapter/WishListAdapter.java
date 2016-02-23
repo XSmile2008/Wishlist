@@ -119,7 +119,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
                     @Override
                     public void onCancelled(FirebaseError firebaseError) {
-                        Log.d("wish_list.onChanceled()", firebaseError.toString());
+                        Log.d("wish_list.onCanceled()", firebaseError.toString());
                     }
                 });
     }

@@ -6,7 +6,7 @@ import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.model.User;
 import com.company.wishlist.model.Wish;
-import com.company.wishlist.util.social.FacebookUserBuilder;
+import com.company.wishlist.util.social.FacebookUtil;
 import com.company.wishlist.model.WishList;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
@@ -51,7 +51,7 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
     }
 
     private void saveUserInFirebase(AuthData authData) {
-        user = FacebookUserBuilder.build(authData);
+        user = FacebookUtil.build(authData);
         firebaseRoot.child(USER_TABLE).child(user.getId()).setValue(user);
     }
 

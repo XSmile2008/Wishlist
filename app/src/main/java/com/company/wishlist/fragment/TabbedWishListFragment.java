@@ -45,18 +45,9 @@ public class TabbedWishListFragment extends DebugFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-        wishListPageViewAdapter = new WishListPageViewAdapter(getContext(), getArguments().getString(FriendListAdapter.FRIEND_ID));
+        wishListPageViewAdapter = new WishListPageViewAdapter(getChildFragmentManager(), getArguments().getString(FriendListAdapter.FRIEND_ID));
         viewPager.setAdapter(wishListPageViewAdapter);
         tabLayout.setupWithViewPager(viewPager);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        for (Fragment fragment : wishListPageViewAdapter.getFragments()) {
-            transaction.remove(fragment);
-        }
-        transaction.commit();//TODO: do not destroy if rotate screen
-    }
 }

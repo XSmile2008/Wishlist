@@ -47,7 +47,7 @@ public class WishListFragment extends DebugFragment {
     private String wishListId;
     private int mode;
 
-    @Bind(R.id.fab_menu) FloatingActionMenu mFab;
+    @Bind(R.id.fab) FloatingActionMenu mFab;
 
     public static WishListFragment newInstance(int mode, String friendId) {
         WishListFragment fragment = new WishListFragment();
@@ -98,25 +98,28 @@ public class WishListFragment extends DebugFragment {
         onFriendSelectedEvent(new FriendSelectedEvent(friendId));
 
         if (mode == WISH_LIST_MODE) mFab.setVisibility(View.GONE);
-        else mFab.setOnMenuButtonClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mFab.isOpened()) {
-                    mFab.setClickable(false);
-                    mFab.close(true);
-                } else {
-                    mFab.setClickable(true);
-                    mFab.open(true);
+        else {
+            mFab.setClickable(false);
+            mFab.setOnMenuButtonClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mFab.isOpened()) {
+                        mFab.setClickable(false);
+                        mFab.close(true);
+                    } else {
+                        mFab.setClickable(true);
+                        mFab.open(true);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
-    @OnClick({R.id.fab_menu, R.id.fab_add, R.id.fab_choose})
+    @OnClick({R.id.fab, R.id.fab_add, R.id.fab_choose})
     public void onClick(View v) {
         mFab.toggle(true);
         switch (v.getId()) {
-            case R.id.fab_menu:
+            case R.id.fab:
                 mFab.setClickable(false);
                 break;
             case R.id.fab_add:

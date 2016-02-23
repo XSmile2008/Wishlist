@@ -7,13 +7,14 @@ import android.support.v7.app.AlertDialog;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.LoginActivity;
 import com.company.wishlist.util.FirebaseUtil;
+import com.company.wishlist.util.social.FacebookUtil;
 import com.firebase.client.AuthData;
 import com.firebase.client.FirebaseError;
 
 /**
  * Created by v.odahovskiy on 12.01.2016.
  */
-public abstract class FirebaseActivity extends BaseActivity implements FirebaseUtil.IFirebaseConnection {
+public abstract class FirebaseActivity extends InternetActivity implements FirebaseUtil.IFirebaseConnection {
 
     public static final String RELOAD_DATA = "RELOAD_DATA";
 
@@ -31,7 +32,8 @@ public abstract class FirebaseActivity extends BaseActivity implements FirebaseU
         } else {
             if (firebaseUtil.isDisconnected()) {
                 firebaseUtil.unauth();
-                processFacebookLogin();
+                FacebookUtil.processFacebookLogin(getApplicationContext());
+                finish();
             }
         }
     }
@@ -58,7 +60,8 @@ public abstract class FirebaseActivity extends BaseActivity implements FirebaseU
     public void logOut() {
         if (firebaseUtil.isAuthenticated()) {
             firebaseUtil.unauth();
-            processFacebookLogout();
+            FacebookUtil.processFacebookLogout(getApplicationContext());
+            finish();
         }
     }
 

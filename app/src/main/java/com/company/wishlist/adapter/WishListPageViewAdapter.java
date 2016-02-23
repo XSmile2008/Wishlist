@@ -1,11 +1,8 @@
 package com.company.wishlist.adapter;
 
-import android.content.Context;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.ViewGroup;
 
 import com.company.wishlist.fragment.WishListFragment;
 
@@ -23,8 +20,8 @@ public class WishListPageViewAdapter extends FragmentStatePagerAdapter {
 
     private List<Fragment> fragments = new ArrayList<>(tabs.length);
 
-    public WishListPageViewAdapter(Context context, String friendId) {
-        super(((AppCompatActivity) context).getSupportFragmentManager());
+    public WishListPageViewAdapter(FragmentManager fm, String friendId) {
+        super(fm);
         fragments.add(WishListFragment.newInstance(WishListFragment.WISH_LIST_MODE, friendId));
         fragments.add(WishListFragment.newInstance(WishListFragment.GIFT_LIST_MODE, friendId));
     }
@@ -44,7 +41,4 @@ public class WishListPageViewAdapter extends FragmentStatePagerAdapter {
         return tabs[position];
     }
 
-    public List<Fragment> getFragments() {
-        return fragments;
-    }
 }

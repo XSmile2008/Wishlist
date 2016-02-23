@@ -148,11 +148,6 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         Log.d(LOG_TAG, Arrays.toString(fragments.toArray()));
     }
 
-    @Override
-    protected int getLayoutResourceId() {
-        return R.layout.activity_main;
-    }
-
     private void showMyWishList() {
         getSupportActionBar().setTitle(getResources().getString(R.string.my_wish_list));
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_wish_list);

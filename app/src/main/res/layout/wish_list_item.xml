@@ -58,7 +58,7 @@
                 android:src="@drawable/ic_clear_grey_600_24dp" />
 
             <ImageButton
-                android:id="@+id/image_button_delete"
+                android:id="@+id/image_button_remove"
                 style="@style/AppTheme.ImageButton"
                 android:layout_alignParentRight="true"
                 android:layout_below="@+id/footer_divider"
@@ -69,7 +69,7 @@
                 android:id="@+id/image_button_edit"
                 style="@style/AppTheme.ImageButton"
                 android:layout_below="@+id/footer_divider"
-                android:layout_toLeftOf="@id/image_button_delete"
+                android:layout_toLeftOf="@id/image_button_remove"
                 android:layout_marginLeft="8dp"
                 android:src="@drawable/ic_mode_edit_grey_600_24dp" />
 

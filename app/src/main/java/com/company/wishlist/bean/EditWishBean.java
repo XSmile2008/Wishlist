@@ -27,7 +27,8 @@ public class EditWishBean extends Wish{
     }
 
     @JsonIgnore
-    public Map<String, Object> getMapToUpdate() {
+    @Override
+    public Map<String, Object> toMap() {
         Map<String, Object> result = new HashMap<>();
         if (isDifferent(getPicture(), wish.getPicture())) {
             result.put("picture", getPicture());

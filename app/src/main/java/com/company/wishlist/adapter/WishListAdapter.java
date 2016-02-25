@@ -1,7 +1,6 @@
 package com.company.wishlist.adapter;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,9 +16,10 @@ import com.company.wishlist.R;
 import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
+import com.company.wishlist.interfaces.IWishItemAdapter;
+import com.company.wishlist.model.Reserved;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
-import com.company.wishlist.util.DialogUtil;
 import com.company.wishlist.util.FirebaseUtil;
 import com.company.wishlist.util.LocalStorage;
 import com.company.wishlist.util.Utilities;
@@ -39,7 +39,7 @@ import butterknife.OnClick;
 /**
  * Created by vladstarikov on 08.01.16.
  */
-public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder> implements IOnFriendSelectedListener {
+public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder> implements IOnFriendSelectedListener, IWishItemAdapter {
 
     private String LOG_TAG = getClass().getSimpleName();
 
@@ -50,6 +50,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     private FirebaseUtil firebaseUtil;
     private WishEventListener listenersWish;
     private List<Query> queriesWish = new ArrayList<>();
+    private Wish wishBackUp;
 
 
     public WishListAdapter(Context context, int mode) {
@@ -91,6 +92,11 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         notifyDataSetChanged();
     }
 
+    /**
+     * Query that getting all wishList that addressed to some user,
+     * and depending at wishList type sort it by owner
+     * @param forUser - userId
+     */
     private void getWishLists(final String forUser) {
         Log.e(LOG_TAG, "GET wishes for user " + forUser);
         firebaseUtil.getFirebaseRoot()
@@ -124,6 +130,10 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
                 });
     }
 
+    /**
+     * Query that getting wishes from wishlist that have same wishListId
+     * @param wishListId - id of wishList from that we getting wishes
+     */
     private void getWishes(final String wishListId) {
         Log.d(LOG_TAG, "punyan =" + wishListId);
         Query query = firebaseUtil.getFirebaseRoot()
@@ -135,7 +145,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     }
 
     @Deprecated
-    int findWishIndexById(String id) {
+    private int findWishIndexById(String id) {
         for (int i = 0; i < wishes.size(); i++) {
             if (wishes.get(i).getId().equals(id))
                 return i;
@@ -143,11 +153,35 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         return -1;
     }
 
+    @Override
+    public void removeWish(int position) {
+        Toast.makeText(context, "item " + position + " removed", Toast.LENGTH_SHORT).show();
+        wishBackUp = wishes.get(position);
+        wishes.get(position).remove();
+    }
+
+    @Override
+    public void reserveWish(int position) {
+        Toast.makeText(context, "item " + position + " reserved", Toast.LENGTH_SHORT).show();
+        if (wishes.get(position).isReserved()) wishes.get(position).unreserve();
+        else {
+            wishes.get(position).reserve(FirebaseUtil.getCurrentUser().getId(), 1L);
+        }
+    }
+
+    @Override
+    public void restoreWish() {
+        Toast.makeText(context, "restore", Toast.LENGTH_SHORT).show();
+        wishBackUp.push();
+
+    }
+
     private class WishEventListener implements ChildEventListener {
 
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String prevKey) {
             Wish wish = dataSnapshot.getValue(Wish.class);
+            wish.setReserved(dataSnapshot.child("reserved").getValue(Reserved.class));
             wish.setId(dataSnapshot.getKey());
             wishes.add(wish);
             notifyDataSetChanged();
@@ -157,6 +191,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String prevKey) {
             Wish wish = dataSnapshot.getValue(Wish.class);
+            wish.setReserved(dataSnapshot.child("reserved").getValue(Reserved.class));
             wish.setId(dataSnapshot.getKey());
             wishes.set(findWishIndexById(wish.getId()), wish);
             Log.d(LOG_TAG, "Wish.onChildChanged()" + wish.toString());
@@ -165,8 +200,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
         @Override
         public void onChildRemoved(DataSnapshot dataSnapshot) {
-            Wish wish = dataSnapshot.getValue(Wish.class);
-            wish.setId(dataSnapshot.getKey());
             wishes.remove(findWishIndexById(dataSnapshot.getKey()));
             notifyDataSetChanged();
             Log.d(LOG_TAG, "Wish.onChildRemoved()" + dataSnapshot.getValue(Wish.class).toString());
@@ -200,7 +233,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         @Bind(R.id.image_button_close) ImageButton imageButtonClose;
         @Bind(R.id.image_button_reserve) ImageButton imageButtonReserve;
         @Bind(R.id.image_button_edit) ImageButton imageButtonEdit;
-        @Bind(R.id.image_button_delete) ImageButton imageButtonDelete;
+        @Bind(R.id.image_button_remove) ImageButton imageButtonDelete;
 
         public Holder(View itemView) {
             super(itemView);
@@ -233,11 +266,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             notifyItemChanged(getAdapterPosition());
         }
 
-        @OnClick(R.id.image_button_reserve)
-        public void onClickReserve() {
-            Toast.makeText(context, "item " + getAdapterPosition() + " reserved", Toast.LENGTH_SHORT).show();
-        }
-
         @OnClick(R.id.image_button_edit)
         public void onClickEdit() {
             Toast.makeText(context, "item " + getAdapterPosition() + " edit", Toast.LENGTH_SHORT).show();
@@ -245,17 +273,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             LocalStorage.getInstance().setWish(wishes.get(getAdapterPosition()));
             intent.setAction(WishEditActivity.ACTION_EDIT);
             context.startActivity(intent);
-        }
-
-        @OnClick(R.id.image_button_delete)
-        public void onClickDelete() {
-            DialogUtil.alertShow(context.getString(R.string.app_name), context.getString(R.string.remove_wish_dialog_text), context, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    firebaseUtil.getFirebaseRoot().child(FirebaseUtil.WISH_TABLE).child(wishes.get(getAdapterPosition()).getId()).removeValue();
-                    //notifyDataSetChanged();
-                }
-            });
-            Toast.makeText(context, "item " + getAdapterPosition() + " deleted", Toast.LENGTH_SHORT).show();
         }
 
     }

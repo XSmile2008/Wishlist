@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,11 +16,13 @@ import com.company.wishlist.R;
 import com.company.wishlist.activity.TopWishActivity;
 import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.adapter.FriendListAdapter;
+import com.company.wishlist.adapter.WishItemTouchHelper;
 import com.company.wishlist.adapter.WishListAdapter;
 import com.company.wishlist.events.FriendSelectedEvent;
 import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.FirebaseUtil;
 import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.github.clans.fab.FloatingActionMenu;
@@ -43,7 +46,6 @@ public class WishListFragment extends DebugFragment {
     public static final String MODE = "mode";
 
     private WishListAdapter adapter;
-    private FirebaseUtil firebaseUtil;
     private String wishListId;
     private int mode;
 
@@ -56,12 +58,6 @@ public class WishListFragment extends DebugFragment {
         args.putString(FriendListAdapter.FRIEND_ID, friendId);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        firebaseUtil = new FirebaseUtil(getContext());
     }
 
     @Override
@@ -95,6 +91,9 @@ public class WishListFragment extends DebugFragment {
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+
+        new ItemTouchHelper(new WishItemTouchHelper(adapter, view)).attachToRecyclerView(recyclerView);
+
         onFriendSelectedEvent(new FriendSelectedEvent(friendId));
 
         if (mode == WISH_LIST_MODE) mFab.setVisibility(View.GONE);
@@ -118,10 +117,8 @@ public class WishListFragment extends DebugFragment {
     @OnClick({R.id.fab, R.id.fab_add, R.id.fab_choose})
     public void onClick(View v) {
         mFab.toggle(true);
+        mFab.setClickable(false);
         switch (v.getId()) {
-            case R.id.fab:
-                mFab.setClickable(false);
-                break;
             case R.id.fab_add:
                 startActivity(new Intent(getContext(), WishEditActivity.class)
                         .setAction(WishEditActivity.ACTION_CREATE)
@@ -143,9 +140,9 @@ public class WishListFragment extends DebugFragment {
             case WISH_LIST_MODE:
                 adapter.onFriendSelected(friendId); return;
             case MY_WISH_LIST_MODE:
-                if (!event.getFriendId().equals(firebaseUtil.getCurrentUser().getId())) return;
+                if (!event.getFriendId().equals(FirebaseUtil.getCurrentUser().getId())) return;
             case GIFT_LIST_MODE:
-                firebaseUtil.getFirebaseRoot().child(FirebaseUtil.WISH_LIST_TABLE)
+                new Firebase(FirebaseUtil.FIREBASE_URL).child(FirebaseUtil.WISH_LIST_TABLE)
                         .orderByChild("forUser")
                         .equalTo(friendId)
                         .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -153,13 +150,13 @@ public class WishListFragment extends DebugFragment {
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 Log.d(LOG_TAG, getId() + " - " + fragment.hashCode() + ".onDataChange(" + dataSnapshot + ")");
                                 for (DataSnapshot wishListDS : dataSnapshot.getChildren()) {
-                                    if (wishListDS.getValue(WishList.class).getOwner().equals(firebaseUtil.getCurrentUser().getId())) {
+                                    if (wishListDS.getValue(WishList.class).getOwner().equals(FirebaseUtil.getCurrentUser().getId())) {
                                         wishListId = wishListDS.getKey();
                                         adapter.onFriendSelected(friendId);
                                         return;
                                     }
                                 }
-                                WishList wishList = new WishList(dataSnapshot.getRef().push().getKey(), firebaseUtil.getCurrentUser().getId(), friendId);
+                                WishList wishList = new WishList(dataSnapshot.getRef().push().getKey(), FirebaseUtil.getCurrentUser().getId(), friendId);
                                 dataSnapshot.getRef().child(wishList.getId()).setValue(wishList);
                                 wishListId = wishList.getId();
                                 adapter.onFriendSelected(friendId);

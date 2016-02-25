@@ -17,6 +17,8 @@ import com.firebase.client.FirebaseError;
  */
 public class FirebaseUtil implements Firebase.AuthResultHandler {
 
+
+    public static String FIREBASE_URL;//TODO:
     public static final String USER_TABLE = User.class.getSimpleName();
     public static final String WISH_TABLE = Wish.class.getSimpleName();
     public static final String WISH_LIST_TABLE = WishList.class.getSimpleName();
@@ -33,11 +35,12 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
     private Context context;//is IFirebaseConnection so you cant cast it
     private Firebase firebaseRoot;
     private AuthData authData;
-    private User user;
+    private static User user; //TODO: can it be static? We have one user?
 
     public FirebaseUtil(Context context) {
         this.context = context;
         Firebase.setAndroidContext(context);
+        FIREBASE_URL = context.getString(R.string.firebase_url);
         firebaseRoot = new Firebase(context.getString(R.string.firebase_url));
         refreshAuth();
     }
@@ -87,7 +90,7 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
         return !isAuthenticated() || isTokenExpired();
     }
 
-    public User getCurrentUser() {
+    public static User getCurrentUser() {
         return user;
     }
 

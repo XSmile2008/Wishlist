@@ -160,14 +160,13 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
             editWishBean = new EditWishBean(new Wish());
             editWishBean.setWishListId(getIntent().getStringExtra(WishListFragment.WISH_LIST_ID));//TODO:
         } else if (getIntent().getAction().equals(ACTION_EDIT)) {
-            editWishBean = new EditWishBean(LocalStorage.getInstance().getWish());
+            editWishBean = new EditWishBean(LocalStorage.getInstance().getWish());//TODO: remove singleton use firebase cache
         } else if(getIntent().getAction().equals(ACTION_TAKE_FROM_TOP)) {
             editWishBean = new EditWishBean(LocalStorage.getInstance().getWish());
             editWishBean.setId(null);
             editWishBean.setWishListId(getIntent().getStringExtra(WishListFragment.WISH_LIST_ID));//TODO:
         }
-
-        wishesRef = firebaseUtil.getFirebaseRoot().child(FirebaseUtil.WISH_TABLE);
+        wishesRef = new Firebase(FirebaseUtil.FIREBASE_URL).child(FirebaseUtil.WISH_TABLE);
     }
 
     private void initView() {
@@ -190,13 +189,8 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         } else {
             DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.unreserve), this, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    wishesRef.child(editWishBean.getId()).child("reserved").removeValue(new Firebase.CompletionListener() {
-                        @Override
-                        public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                            Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " unreserved", Toast.LENGTH_SHORT).show();
-                            editWishBean.setReserved(null);
-                        }
-                    });
+                    editWishBean.unreserve();
+                    Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " unreserved", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -205,7 +199,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     private void deleteWish() {
         DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.remove_wish_dialog_text), this, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                wishesRef.child(editWishBean.getId()).removeValue();
+                editWishBean.remove();
                 Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " deleted", Toast.LENGTH_SHORT).show();
                 finish();
             }
@@ -216,9 +210,9 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         editWishBean.setComment(editTextComment.getText().toString());
         editWishBean.setTitle(editTextTitle.getText().toString());
         if (getIntent().getAction().equals(ACTION_CREATE) || getIntent().getAction().equals(ACTION_TAKE_FROM_TOP)) {
-            wishesRef.child(wishesRef.push().getKey()).setValue(editWishBean);
+            editWishBean.push();
         } else if (getIntent().getAction().equals(ACTION_EDIT)) {
-            wishesRef.child(editWishBean.getId()).updateChildren(editWishBean.getMapToUpdate());
+            wishesRef.child(editWishBean.getId()).updateChildren(editWishBean.toMap());
         }
         Toast.makeText(this, editWishBean.getTitle(), Toast.LENGTH_SHORT).show();
     }
@@ -298,7 +292,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     @Override
     public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
         final long reservationDate = dialog.getSelectedDay().getDateInMillis();
-        final Reserved reserved = new Reserved(firebaseUtil.getCurrentUser().getId(), reservationDate);
+        final Reserved reserved = new Reserved(FirebaseUtil.getCurrentUser().getId(), reservationDate);
         wishesRef.child(editWishBean.getId()).child("reserved").setValue(reserved, new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {

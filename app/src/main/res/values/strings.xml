@@ -32,4 +32,6 @@
     <string name="formatted_date">Your reservation for: %1$s</string>
 
     <string name="textViewFriendsText">Friends:</string>
+    <string name="action_reserve_text">Reserve</string>
+    <string name="action_remove_text">Remove</string>
 </resources>

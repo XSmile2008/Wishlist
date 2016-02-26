@@ -35,7 +35,7 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
     private Context context;//is IFirebaseConnection so you cant cast it
     private Firebase firebaseRoot;
     private AuthData authData;
-    private static User user; //TODO: can it be static? We have one user?
+    private static User user; //TODO: user is null when start without internet, need to resolve why internet activity not starting before this field will be used
 
     public FirebaseUtil(Context context) {
         this.context = context;

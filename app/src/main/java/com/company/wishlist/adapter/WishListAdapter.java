@@ -2,12 +2,12 @@ package com.company.wishlist.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +25,7 @@ import com.company.wishlist.util.LocalStorage;
 import com.company.wishlist.util.Utilities;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
@@ -34,7 +35,6 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 /**
  * Created by vladstarikov on 08.01.16.
@@ -45,19 +45,20 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
     private Context context;
     private List<Wish> wishes;
-    private int selectedItem = -1;
-    private int mode;
-    private FirebaseUtil firebaseUtil;
+    private int selectedItem = -1;//TODO: remove
+    private int mode;//WISH_LIST_MODE or GIFT_LIST_MODE
     private WishEventListener listenersWish;
     private List<Query> queriesWish = new ArrayList<>();
     private Wish wishBackUp;
 
-
+    /**
+     * @param context context that will be used in this adapter
+     * @param mode mode of this list. May be WISH_LIST_MODE or GIFT_LIST_MODE
+     */
     public WishListAdapter(Context context, int mode) {
         this.context = context;
         this.mode = mode;
         this.wishes = new ArrayList<>();
-        this.firebaseUtil = new FirebaseUtil(context);
         this.listenersWish = new WishEventListener();
     }
 
@@ -75,7 +76,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         }
         holder.textViewTitle.setText(wishes.get(position).getTitle());
         holder.textViewComment.setText(wishes.get(position).getComment());
-        holder.setMode((selectedItem == position) ? Holder.DETAIL_MODE : Holder.NORMAl_MODE);
     }
 
     @Override
@@ -83,72 +83,10 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         return wishes.size();
     }
 
-    @Override
-    public void onFriendSelected(String id) {
-        Log.d(LOG_TAG, "onFriendSelected(" + id + ")");
-        wishes.clear();
-        for (Query query : queriesWish) query.removeEventListener(listenersWish);//remove all unused listeners
-        getWishLists(id);
-        notifyDataSetChanged();
-    }
-
-    /**
-     * Query that getting all wishList that addressed to some user,
-     * and depending at wishList type sort it by owner
-     * @param forUser - userId
-     */
-    private void getWishLists(final String forUser) {
-        Log.e(LOG_TAG, "GET wishes for user " + forUser);
-        firebaseUtil.getFirebaseRoot()
-                .child(FirebaseUtil.WISH_LIST_TABLE)
-                .orderByChild("forUser")
-                .equalTo(forUser)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Log.d(LOG_TAG, "WishList.onChildAdded" + dataSnapshot);
-                        for (DataSnapshot wishListDS : dataSnapshot.getChildren()) {
-                            WishList wishList = wishListDS.getValue(WishList.class);
-                            wishList.setId(wishListDS.getKey());
-                            switch (mode) {
-                                case WishListFragment.WISH_LIST_MODE:
-                                    if (!wishList.getOwner().equals(firebaseUtil.getCurrentUser().getId()))
-                                        getWishes(wishList.getId());
-                                    break;
-                                case WishListFragment.GIFT_LIST_MODE:
-                                    if (wishList.getOwner().equals(firebaseUtil.getCurrentUser().getId()))
-                                        getWishes(wishList.getId());
-                                    break;
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(FirebaseError firebaseError) {
-                        Log.d("wish_list.onCanceled()", firebaseError.toString());
-                    }
-                });
-    }
-
-    /**
-     * Query that getting wishes from wishlist that have same wishListId
-     * @param wishListId - id of wishList from that we getting wishes
-     */
-    private void getWishes(final String wishListId) {
-        Log.d(LOG_TAG, "punyan =" + wishListId);
-        Query query = firebaseUtil.getFirebaseRoot()
-                .child(FirebaseUtil.WISH_TABLE)
-                .orderByChild("wishListId")
-                .equalTo(wishListId);
-        query.addChildEventListener(listenersWish);
-        queriesWish.add(query);
-    }
-
     @Deprecated
     private int findWishIndexById(String id) {
         for (int i = 0; i < wishes.size(); i++) {
-            if (wishes.get(i).getId().equals(id))
-                return i;
+            if (wishes.get(i).getId().equals(id)) return i;
         }
         return -1;
     }
@@ -174,6 +112,67 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         Toast.makeText(context, "restore", Toast.LENGTH_SHORT).show();
         wishBackUp.push();
 
+    }
+
+    @Override
+    public void onFriendSelected(String id) {
+        Log.d(LOG_TAG, "onFriendSelected(" + id + ")");
+        wishes.clear();
+        for (Query query : queriesWish) query.removeEventListener(listenersWish);//remove all unused listeners
+        getWishLists(id);
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Query that getting all wishList that addressed to some user,
+     * and depending at wishList type sort it by owner
+     * @param forUser - userId
+     */
+    private void getWishLists(final String forUser) {
+        Log.e(LOG_TAG, "GET wishes for user " + forUser);
+        new Firebase(FirebaseUtil.FIREBASE_URL)
+                .child(FirebaseUtil.WISH_LIST_TABLE)
+                .orderByChild("forUser")
+                .equalTo(forUser)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Log.d(LOG_TAG, "WishList.onChildAdded" + dataSnapshot);
+                        for (DataSnapshot wishListDS : dataSnapshot.getChildren()) {
+                            WishList wishList = wishListDS.getValue(WishList.class);
+                            wishList.setId(wishListDS.getKey());
+                            switch (mode) {
+                                case WishListFragment.WISH_LIST_MODE:
+                                    if (!wishList.getOwner().equals(FirebaseUtil.getCurrentUser().getId()))
+                                        getWishes(wishList.getId());
+                                    break;
+                                case WishListFragment.GIFT_LIST_MODE:
+                                    if (wishList.getOwner().equals(FirebaseUtil.getCurrentUser().getId()))
+                                        getWishes(wishList.getId());
+                                    break;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
+                        Log.d("wish_list.onCanceled()", firebaseError.toString());
+                    }
+                });
+    }
+
+    /**
+     * Query that getting wishes from wishlist that have same wishListId
+     * @param wishListId - id of wishList from that we getting wishes
+     */
+    private void getWishes(final String wishListId) {
+        Log.d(LOG_TAG, "punyan =" + wishListId);
+        Query query = new Firebase(FirebaseUtil.FIREBASE_URL)
+                .child(FirebaseUtil.WISH_TABLE)
+                .orderByChild("wishListId")
+                .equalTo(wishListId);
+        query.addChildEventListener(listenersWish);
+        queriesWish.add(query);
     }
 
     private class WishEventListener implements ChildEventListener {
@@ -219,55 +218,34 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
     public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        public static final int NORMAl_MODE = 0;
-        public static final int DETAIL_MODE = 1;
-
-        //Header
-        @Bind(R.id.layout_header) ViewGroup layoutHeader;
+        //CardView
+        @Bind(R.id.card_view) CardView card_view;
         @Bind(R.id.image_view) ImageView imageView;
         @Bind(R.id.text_view_title) TextView textViewTitle;
         @Bind(R.id.text_view_comment) TextView textViewComment;
 
-        //Footer
-        @Bind(R.id.layout_footer) ViewGroup layoutFooter;
-        @Bind(R.id.image_button_close) ImageButton imageButtonClose;
-        @Bind(R.id.image_button_reserve) ImageButton imageButtonReserve;
-        @Bind(R.id.image_button_edit) ImageButton imageButtonEdit;
-        @Bind(R.id.image_button_remove) ImageButton imageButtonDelete;
+        //Background
+        @Bind(R.id.background) ViewGroup background;
+        @Bind(R.id.image_view_action) ImageView imageViewAction;
+        @Bind(R.id.text_view_action) TextView textViewAction;
+
 
         public Holder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
-            if (mode == WishListFragment.WISH_LIST_MODE) {
-                imageButtonEdit.setVisibility(View.GONE);
-                imageButtonDelete.setVisibility(View.GONE);
-            }
-        }
-
-        public void setMode(int mode) {
-            layoutFooter.setVisibility(mode == DETAIL_MODE ? View.VISIBLE : View.GONE);
-            textViewComment.setSingleLine(mode == NORMAl_MODE);
         }
 
         @Override
         public void onClick(View v) {
+            //TODO: remove this
             int selectedItemOld = selectedItem;
             selectedItem = getAdapterPosition();
             if (selectedItem != selectedItemOld) {
                 notifyItemChanged(selectedItemOld);
                 notifyItemChanged(getAdapterPosition());
             }
-        }
 
-        @OnClick(R.id.image_button_close)
-        public void onClickClose() {
-            selectedItem = -1;
-            notifyItemChanged(getAdapterPosition());
-        }
-
-        @OnClick(R.id.image_button_edit)
-        public void onClickEdit() {
             Toast.makeText(context, "item " + getAdapterPosition() + " edit", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(context, WishEditActivity.class);
             LocalStorage.getInstance().setWish(wishes.get(getAdapterPosition()));

@@ -54,8 +54,7 @@ public class TopWishListAdapter extends RecyclerView.Adapter<TopWishListAdapter.
     }
 
     private void getWishes() {
-        FirebaseUtil firebaseUtil = new FirebaseUtil(context);
-        Firebase firebaseRoot = firebaseUtil.getFirebaseRoot();
+        Firebase firebaseRoot = new Firebase(FirebaseUtil.FIREBASE_URL);
         //todo write nice query to get random wishes
         firebaseRoot.child(FirebaseUtil.WISH_TABLE).addValueEventListener(new ValueEventListener() {
             @Override

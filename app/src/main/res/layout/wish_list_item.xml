@@ -1,30 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/cardview_vertical_margin"
-    android:layout_marginLeft="@dimen/cardview_horizontal_margin"
-    android:layout_marginRight="@dimen/cardview_horizontal_margin"
-    android:layout_marginTop="@dimen/cardview_vertical_margin"
-    android:elevation="@dimen/cardview_default_elevation">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/background"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/default_margin_large">
+
+        <ImageView
+            android:id="@+id/image_view_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/text_view_action"
+            style="@style/MediumText"
+            android:layout_marginLeft="@dimen/default_margin_medium" />
+
+    </LinearLayout>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="@dimen/cardview_padding">
+        android:layout_marginBottom="@dimen/card_view_vertical_margin"
+        android:layout_marginLeft="@dimen/card_view_horizontal_margin"
+        android:layout_marginRight="@dimen/card_view_horizontal_margin"
+        android:layout_marginTop="@dimen/card_view_vertical_margin"
+        android:elevation="@dimen/card_view_default_elevation">
 
-        <!-- Header section-->
         <RelativeLayout
             android:id="@+id/layout_header"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:padding="@dimen/card_view_padding">
 
             <ImageView
                 android:id="@+id/image_view"
                 style="@style/AppTheme.CircleImageView"
-                android:layout_marginRight="@dimen/cardview_horizontal_margin" />
+                android:layout_marginRight="@dimen/card_view_horizontal_margin" />
 
             <TextView
                 android:id="@+id/text_view_title"
@@ -40,50 +57,6 @@
 
         </RelativeLayout>
 
-        <!-- Footer section-->
-        <RelativeLayout
-            android:id="@+id/layout_footer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+    </android.support.v7.widget.CardView>
 
-            <ImageView
-                android:id="@+id/footer_divider"
-                style="@style/AppTheme.CardViewDivider" />
-
-            <ImageButton
-                android:id="@+id/image_button_close"
-                style="@style/AppTheme.ImageButton"
-                android:layout_alignParentLeft="true"
-                android:layout_below="@+id/footer_divider"
-                android:src="@drawable/ic_clear_grey_600_24dp" />
-
-            <ImageButton
-                android:id="@+id/image_button_remove"
-                style="@style/AppTheme.ImageButton"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/footer_divider"
-                android:layout_marginLeft="8dp"
-                android:src="@drawable/ic_delete_grey_600_24dp" />
-
-            <ImageButton
-                android:id="@+id/image_button_edit"
-                style="@style/AppTheme.ImageButton"
-                android:layout_below="@+id/footer_divider"
-                android:layout_toLeftOf="@id/image_button_remove"
-                android:layout_marginLeft="8dp"
-                android:src="@drawable/ic_mode_edit_grey_600_24dp" />
-
-            <ImageButton
-                android:id="@+id/image_button_reserve"
-                style="@style/AppTheme.ImageButton"
-                android:layout_below="@+id/footer_divider"
-                android:layout_toLeftOf="@id/image_button_edit"
-                android:layout_alignWithParentIfMissing="true"
-                android:layout_marginLeft="8dp"
-                android:src="@drawable/ic_favorite_grey_600_24dp" />
-
-        </RelativeLayout>
-
-    </LinearLayout>
-
-</android.support.v7.widget.CardView>
+</RelativeLayout>

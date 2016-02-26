@@ -4,9 +4,9 @@
     android:layout_height="wrap_content"
     android:background="@drawable/side_nav_bar"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/cardview_padding"
-    android:paddingLeft="@dimen/cardview_padding"
-    android:paddingRight="@dimen/cardview_padding"
+    android:paddingBottom="@dimen/card_view_padding"
+    android:paddingLeft="@dimen/card_view_padding"
+    android:paddingRight="@dimen/card_view_padding"
     android:paddingTop="32dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
@@ -27,7 +27,7 @@
             android:id="@+id/profile_user_name_tv"
             style="@style/MediumText"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="@dimen/cardview_horizontal_margin"
+            android:layout_marginLeft="@dimen/card_view_horizontal_margin"
             android:layout_toRightOf="@+id/profile_user_avatar_iw" />
 
         <ImageButton

@@ -87,8 +87,6 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     @Bind(R.id.insta_text)
     TextView instaText;
 
-
-    private FirebaseUtil firebaseUtil;
     private EditWishBean editWishBean;
     private Validator validator;
     private CalendarDatePickerDialogFragment reservedDateDialog;
@@ -100,8 +98,6 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wish_edit);
         ButterKnife.bind(this);
-
-        this.firebaseUtil = new FirebaseUtil(this);
 
         //Setup ActionBar
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));

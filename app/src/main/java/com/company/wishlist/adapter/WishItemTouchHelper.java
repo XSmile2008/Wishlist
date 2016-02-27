@@ -2,7 +2,7 @@ package com.company.wishlist.adapter;
 
 import android.graphics.Canvas;
 import android.support.design.widget.Snackbar;
-import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
@@ -23,9 +23,9 @@ public class WishItemTouchHelper extends ItemTouchHelper.Callback {
     private IWishItemAdapter wishItemAdapter;
     private View rootView;//need for snackBar
 
-    public WishItemTouchHelper(IWishItemAdapter wishItemAdapter, View rootView) {
-        this.wishItemAdapter = wishItemAdapter;
-        this.rootView = rootView;
+    public WishItemTouchHelper(RecyclerView recyclerView) {
+        this.wishItemAdapter = (IWishItemAdapter) recyclerView.getAdapter();
+        this.rootView = recyclerView;
     }
 
     @Override
@@ -40,7 +40,6 @@ public class WishItemTouchHelper extends ItemTouchHelper.Callback {
 
     @Override
     public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-        //TODO: Replace findViewById by casting to WishListAdapter.Holder
         WishListAdapter.Holder wishHolder = (WishListAdapter.Holder) viewHolder;
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
             int margin = viewHolder.itemView.getContext().getResources().getDimensionPixelSize(R.dimen.default_margin_large);
@@ -62,7 +61,8 @@ public class WishItemTouchHelper extends ItemTouchHelper.Callback {
             double size = viewHolder.itemView.getWidth() * alphaCoefficient;
             float alpha = (float) (Math.abs(dX) / size);
             wishHolder.background.setAlpha(alpha);
-            wishHolder.card_view.setTranslationX(dX);
+            wishHolder.cardView.setTranslationX(dX);
+            Log.e("onChildDraw", String.valueOf(wishHolder.cardView.getTranslationX()));
         } else {
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
         }
@@ -70,6 +70,10 @@ public class WishItemTouchHelper extends ItemTouchHelper.Callback {
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+        CardView cardView = ((WishListAdapter.Holder) viewHolder).cardView;
+        Log.e("onSwiped", String.valueOf(cardView.getTranslationX()));
+        cardView.setTranslationX(0);
+        Log.e("onSwiped2", String.valueOf(cardView.getTranslationX()));
         switch (direction) {
             case ItemTouchHelper.END:
                 wishItemAdapter.reserveWish(viewHolder.getAdapterPosition());
@@ -86,5 +90,7 @@ public class WishItemTouchHelper extends ItemTouchHelper.Callback {
                 break;
         }
     }
+
+
 
 }

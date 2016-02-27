@@ -82,11 +82,14 @@ public class Wish implements Serializable{
 
     /**
      * push new item to database and create unique ID
+     * @return generated id for this Wish
      */
     @JsonIgnore
-    public void push() {
+    public String push() {
         Firebase wishTable = new Firebase(FirebaseUtil.FIREBASE_URL).child(FirebaseUtil.WISH_TABLE);
-        wishTable.child(wishTable.push().getKey()).setValue(this);
+        String id = wishTable.push().getKey();//TODO: may be will be better if set generated id to this.id
+        wishTable.child(id).setValue(this);
+        return id;
     }
 
     /**

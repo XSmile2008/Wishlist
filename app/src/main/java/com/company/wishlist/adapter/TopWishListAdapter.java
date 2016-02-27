@@ -53,6 +53,21 @@ public class TopWishListAdapter extends RecyclerView.Adapter<TopWishListAdapter.
         getWishes();
     }
 
+    @Override
+    public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.top_wish_list_item, parent, false));
+    }
+
+    @Override
+    public void onBindViewHolder(Holder holder, int position) {
+        holder.onBind(wishes.get(position));
+    }
+
+    @Override
+    public int getItemCount() {
+        return wishes.size();
+    }
+
     private void getWishes() {
         Firebase firebaseRoot = new Firebase(FirebaseUtil.FIREBASE_URL);
         //todo write nice query to get random wishes
@@ -71,32 +86,8 @@ public class TopWishListAdapter extends RecyclerView.Adapter<TopWishListAdapter.
         notifyDataSetChanged();
     }
 
-
-    @Override
-    public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.top_wish_list_item, parent, false));
-    }
-
-    @Override
-    public void onBindViewHolder(Holder holder, int position) {
-        if (wishes.get(position).getPicture() == null) {
-            holder.imageView.setImageResource(R.drawable.gift_icon);
-        } else {
-            holder.imageView.setImageBitmap(Utilities.decodeThumbnail(wishes.get(position).getPicture()));
-        }
-        holder.textViewTitle.setText(wishes.get(position).getTitle());
-        holder.textViewComment.setText(wishes.get(position).getComment());
-    }
-
-    @Override
-    public int getItemCount() {
-        return wishes.size();
-    }
-
     public class Holder extends RecyclerView.ViewHolder {
 
-        //Header
-        @Bind(R.id.layout_header) ViewGroup layoutHeader;
         @Bind(R.id.image_view) ImageView imageView;
         @Bind(R.id.text_view_title) TextView textViewTitle;
         @Bind(R.id.text_view_comment) TextView textViewComment;
@@ -104,6 +95,13 @@ public class TopWishListAdapter extends RecyclerView.Adapter<TopWishListAdapter.
         public Holder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+        }
+
+        public void onBind(Wish wish) {
+            if (wish.getPicture() == null) imageView.setImageResource(R.drawable.gift_icon);//TODO: circle image
+            else imageView.setImageBitmap(Utilities.decodeThumbnail(wish.getPicture()));
+            textViewTitle.setText(wish.getTitle());
+            textViewComment.setText(wish.getComment());
         }
 
         @OnClick(R.id.image_button_add)

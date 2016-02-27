@@ -92,7 +92,7 @@ public class WishListFragment extends DebugFragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
-        new ItemTouchHelper(new WishItemTouchHelper(adapter, view)).attachToRecyclerView(recyclerView);
+        new ItemTouchHelper(new WishItemTouchHelper(recyclerView)).attachToRecyclerView(recyclerView);
 
         onFriendSelectedEvent(new FriendSelectedEvent(friendId));
 

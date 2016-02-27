@@ -69,13 +69,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
     @Override
     public void onBindViewHolder(Holder holder, int position) {
-        if (wishes.get(position).getPicture() == null) {
-            holder.imageView.setImageResource(R.drawable.gift_icon);
-        } else {
-            holder.imageView.setImageBitmap(Utilities.decodeThumbnail(wishes.get(position).getPicture()));
-        }
-        holder.textViewTitle.setText(wishes.get(position).getTitle());
-        holder.textViewComment.setText(wishes.get(position).getComment());
+        holder.onBind(wishes.get(position));
     }
 
     @Override
@@ -111,7 +105,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     public void restoreWish() {
         Toast.makeText(context, "restore", Toast.LENGTH_SHORT).show();
         wishBackUp.push();
-
     }
 
     @Override
@@ -124,7 +117,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     }
 
     /**
-     * Query that getting all wishList that addressed to some user,
+     * Query that get all wishLists that addressed to forUser,
      * and depending at wishList type sort it by owner
      * @param forUser - userId
      */
@@ -162,7 +155,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     }
 
     /**
-     * Query that getting wishes from wishlist that have same wishListId
+     * Query that getting wishes from wish list that have same wishListId
      * @param wishListId - id of wishList from that we getting wishes
      */
     private void getWishes(final String wishListId) {
@@ -219,7 +212,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         //CardView
-        @Bind(R.id.card_view) CardView card_view;
+        @Bind(R.id.card_view) CardView cardView;
         @Bind(R.id.image_view) ImageView imageView;
         @Bind(R.id.text_view_title) TextView textViewTitle;
         @Bind(R.id.text_view_comment) TextView textViewComment;
@@ -229,11 +222,17 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         @Bind(R.id.image_view_action) ImageView imageViewAction;
         @Bind(R.id.text_view_action) TextView textViewAction;
 
-
         public Holder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
+        }
+
+        public void onBind(Wish wish) {
+            if (wish.getPicture() == null) imageView.setImageResource(R.drawable.gift_icon);//TODO: circle image
+            else imageView.setImageBitmap(Utilities.decodeThumbnail(wish.getPicture()));
+            textViewTitle.setText(wish.getTitle());
+            textViewComment.setText(wish.getComment());
         }
 
         @Override
@@ -247,8 +246,8 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             }
 
             Toast.makeText(context, "item " + getAdapterPosition() + " edit", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(context, WishEditActivity.class);
             LocalStorage.getInstance().setWish(wishes.get(getAdapterPosition()));
+            Intent intent = new Intent(context, WishEditActivity.class);
             intent.setAction(WishEditActivity.ACTION_EDIT);
             context.startActivity(intent);
         }

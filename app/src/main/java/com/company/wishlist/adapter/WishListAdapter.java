@@ -2,12 +2,14 @@ package com.company.wishlist.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,11 +46,10 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     private String LOG_TAG = getClass().getSimpleName();
 
     private Context context;
-    private List<Wish> wishes;
-    private int selectedItem = -1;//TODO: remove
     private int mode;//WISH_LIST_MODE or GIFT_LIST_MODE
     private WishEventListener listenersWish;
     private List<Query> queriesWish = new ArrayList<>();
+    private List<Wish> wishes;
     private Wish wishBackUp;
 
     /**
@@ -77,6 +78,10 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         return wishes.size();
     }
 
+    public int getMode() {
+        return mode;
+    }
+
     @Deprecated
     private int findWishIndexById(String id) {
         for (int i = 0; i < wishes.size(); i++) {
@@ -96,9 +101,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     public void reserveWish(int position) {
         Toast.makeText(context, "item " + position + " reserved", Toast.LENGTH_SHORT).show();
         if (wishes.get(position).isReserved()) wishes.get(position).unreserve();
-        else {
-            wishes.get(position).reserve(FirebaseUtil.getCurrentUser().getId(), 1L);
-        }
+        else wishes.get(position).reserve(FirebaseUtil.getCurrentUser().getId(), 1L);
     }
 
     @Override
@@ -237,14 +240,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
         @Override
         public void onClick(View v) {
-            //TODO: remove this
-            int selectedItemOld = selectedItem;
-            selectedItem = getAdapterPosition();
-            if (selectedItem != selectedItemOld) {
-                notifyItemChanged(selectedItemOld);
-                notifyItemChanged(getAdapterPosition());
-            }
-
+            //ViewCompat.animate(cardView).setDuration(1000).translationX(1080).start();
             Toast.makeText(context, "item " + getAdapterPosition() + " edit", Toast.LENGTH_SHORT).show();
             LocalStorage.getInstance().setWish(wishes.get(getAdapterPosition()));
             Intent intent = new Intent(context, WishEditActivity.class);

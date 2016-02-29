@@ -24,6 +24,7 @@ public class EditWishBean extends Wish{
         this.setComment(wish.getComment());
         this.setWishListId(wish.getWishListId());
         this.setReservation(wish.getReservation());
+        this.setActive(wish.isActive());
     }
 
     @JsonIgnore
@@ -39,6 +40,7 @@ public class EditWishBean extends Wish{
         if (isDifferent(getComment(), wish.getComment())) {
             result.put("comment", getComment());
         }
+        result.put("active", isActive());//todo if save its always true i think.. or no?
         return result;
     }
 

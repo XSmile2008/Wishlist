@@ -19,11 +19,14 @@ public class Wish implements Serializable{
     String title;
     String comment;
     String picture;
+    Boolean active;
     @Nullable Boolean received;
     @Nullable
     Reservation reservation;
 
-    public Wish(){}
+    public Wish(){
+        active = true;
+    }
 
     public String getId() {
         return id;
@@ -101,8 +104,10 @@ public class Wish implements Serializable{
         String id = wishTable.push().getKey();//TODO: may be will be better if set generated id to this.id
         if (reservation == null) {
             wishTable.child(id).setValue(this, listener);
+            wishTable.child(id).child("active").setValue(isActive());
         } else {
             wishTable.child(id).setValue(this);
+            wishTable.child(id).child("active").setValue(isActive());//todo
             wishTable.child(id).child("reservation").setValue(reservation, listener);
         }
         return id;
@@ -113,7 +118,17 @@ public class Wish implements Serializable{
      */
     @JsonIgnore
     public void remove() {
-        this.remove(null);
+        // this.remove(null);
+        this.active = false;
+        new Firebase(FirebaseUtil.FIREBASE_URL).child(FirebaseUtil.WISH_TABLE).child(id).child("active").setValue(active);
+    }
+
+    @JsonIgnore
+    public void undo(){
+        if (!active){
+            active = true;
+            new Firebase(FirebaseUtil.FIREBASE_URL).child(FirebaseUtil.WISH_TABLE).child(id).child("active").setValue(active);
+        }
     }
 
     /**
@@ -179,7 +194,28 @@ public class Wish implements Serializable{
         if (picture != null) hashMap.put("picture", comment);
         if (received != null) hashMap.put("received", received);
         if (reservation != null) hashMap.put("reservation", reservation);
+        hashMap.put("active", this.active);
         return hashMap;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Wish)) return false;
+
+        Wish wish = (Wish) o;
+
+        if (title != null ? !title.equals(wish.title) : wish.title != null) return false;
+        return !(picture != null ? !picture.equals(wish.picture) : wish.picture != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = title != null ? title.hashCode() : 0;
+        result = 31 * result + (picture != null ? picture.hashCode() : 0);
+        return result;
     }
 
     @Override
@@ -187,4 +223,12 @@ public class Wish implements Serializable{
         return this.getClass().getSimpleName() + ": id = " + id + ", title = " + title + ", comment = " + comment + ", received = " + received + ", reservation = " + reservation;
     }
 
+    @JsonIgnore
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 }

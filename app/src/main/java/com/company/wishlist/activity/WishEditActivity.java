@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -48,6 +50,7 @@ import org.jinstagram.entity.common.Images;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -77,9 +80,12 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     @Length(min = 2)
     EditText editTextComment;
 
-    @Bind(R.id.insta_images_btn) ImageButton instaImgBtn;
-    @Bind(R.id.insta_layout) LinearLayout instaLayout;
-    @Bind(R.id.insta_text) TextView instaText;
+    @Bind(R.id.insta_images_btn)
+    ImageButton instaImgBtn;
+    @Bind(R.id.insta_layout)
+    LinearLayout instaLayout;
+    @Bind(R.id.insta_text)
+    TextView instaText;
 
     private EditWishBean editWishBean;
     private Validator validator;
@@ -156,6 +162,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     public void initWishEdit() {
         if (getIntent().getAction().equals(ACTION_CREATE)) {
             editWishBean = new EditWishBean(new Wish());
+            editWishBean.setActive(true);
             editWishBean.setWishListId(getIntent().getStringExtra(WishListFragment.WISH_LIST_ID));
         } else if (getIntent().getAction().equals(ACTION_EDIT)) {
             editWishBean = new EditWishBean(LocalStorage.getInstance().getWish());
@@ -202,13 +209,55 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     }
 
     private void deleteWish() {
-        DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.remove_wish_dialog_text), this, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                editWishBean.remove();
-                Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " deleted", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        });
+        if (isWishSaved()) {
+            DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.remove_wish_dialog_text), this, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    editWishBean.remove();
+
+                    final boolean[] close = {true};
+
+                    String message = String.format(getString(R.string.wish_deleted_msg), editWishBean.getTitle());
+                    Snackbar snackbar = Snackbar
+                            .make(findViewById(R.id.coordinator_layout_wish_edit), message, Snackbar.LENGTH_LONG)
+                            .setAction("UNDO", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    close[0] = false;
+                                    editWishBean.undo();
+                                    String message = String.format(getString(R.string.wish_restored_msg), editWishBean.getTitle());
+                                    Snackbar.make(findViewById(R.id.coordinator_layout_wish_edit), message, Snackbar.LENGTH_SHORT).show();
+                                }
+                            })
+                            .setCallback(new Snackbar.Callback() {
+
+                                @Override
+                                public void onDismissed(Snackbar snackbar, int event) {
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (close[0]) {
+                                                WishEditActivity.this.finish();
+                                            }
+                                        }
+                                    }, 1000);
+                                }
+
+                                @Override
+                                public void onShown(Snackbar snackbar) {
+                                }
+                            });
+
+                    snackbar.show();
+                    //finish();
+                }
+            });
+        } else {
+            Snackbar.make(findViewById(R.id.coordinator_layout_wish_edit), getString(R.string.at_first_persist), Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    private boolean isWishSaved() {
+        return null != editWishBean.getId();
     }
 
     private void commitChanges() {

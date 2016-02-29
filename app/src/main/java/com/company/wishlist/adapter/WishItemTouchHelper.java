@@ -92,6 +92,7 @@ public class WishItemTouchHelper extends ItemTouchHelper.Callback {
         }
     }
 
+    //TODO: check if it works if no changes in database and notifyItemSetChanged() will be called
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
         CardView cardView = ((WishListAdapter.Holder) viewHolder).cardView;

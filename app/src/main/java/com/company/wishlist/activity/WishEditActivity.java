@@ -26,7 +26,6 @@ import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.adapter.InstaGridViewAdapter;
 import com.company.wishlist.bean.EditWishBean;
 import com.company.wishlist.fragment.WishListFragment;
-import com.company.wishlist.model.Reserved;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.util.CropCircleTransformation;
 import com.company.wishlist.util.DialogUtil;
@@ -57,7 +56,7 @@ import butterknife.OnClick;
 /**
  * Created by vladstarikov on 15.01.16.
  */
-public class WishEditActivity extends InternetActivity implements Validator.ValidationListener, CalendarDatePickerDialogFragment.OnDateSetListener {
+public class WishEditActivity extends InternetActivity implements Validator.ValidationListener {
 
     private static int RESULT_LOAD_IMAGE = 1;
     private static String DATE_DIALOG = "DATE_PICKER";
@@ -78,14 +77,9 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     @Length(min = 2)
     EditText editTextComment;
 
-    @Bind(R.id.insta_images_btn)
-    ImageButton instaImgBtn;
-
-    @Bind(R.id.insta_layout)
-    LinearLayout instaLayout;
-
-    @Bind(R.id.insta_text)
-    TextView instaText;
+    @Bind(R.id.insta_images_btn) ImageButton instaImgBtn;
+    @Bind(R.id.insta_layout) LinearLayout instaLayout;
+    @Bind(R.id.insta_text) TextView instaText;
 
     private EditWishBean editWishBean;
     private Validator validator;
@@ -112,7 +106,6 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
 
         //Init reserve date picker
         reservedDateDialog = new CalendarDatePickerDialogFragment();
-        reservedDateDialog.setOnDateSetListener(this);
         reservedDateDialog.setFirstDayOfWeek(Calendar.MONDAY);
         reservedDateDialog.setRetainInstance(true);
         reservedDateDialog.setThemeDark(true);
@@ -151,16 +144,25 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         return super.onOptionsItemSelected(item);
     }
 
+    /*TODO: remove singleton use firebase cache
+      - just put wish list or wish id into extra when calling this activity
+      - if it not creating new wish run DB query that pull Wish from Firebase cache,
+        and will be update views if wish changed, or close this activity if we delete wish.
+        At this moment we have several bugs without query listener.
+      - try to remove editWishBean
+      //TODO: alternative way
+      - we can add onComplete listeners to all edit queries
+     */
     public void initWishEdit() {
         if (getIntent().getAction().equals(ACTION_CREATE)) {
             editWishBean = new EditWishBean(new Wish());
-            editWishBean.setWishListId(getIntent().getStringExtra(WishListFragment.WISH_LIST_ID));//TODO:
+            editWishBean.setWishListId(getIntent().getStringExtra(WishListFragment.WISH_LIST_ID));
         } else if (getIntent().getAction().equals(ACTION_EDIT)) {
-            editWishBean = new EditWishBean(LocalStorage.getInstance().getWish());//TODO: remove singleton use firebase cache
-        } else if(getIntent().getAction().equals(ACTION_TAKE_FROM_TOP)) {
+            editWishBean = new EditWishBean(LocalStorage.getInstance().getWish());
+        } else if (getIntent().getAction().equals(ACTION_TAKE_FROM_TOP)) {
             editWishBean = new EditWishBean(LocalStorage.getInstance().getWish());
             editWishBean.setId(null);
-            editWishBean.setWishListId(getIntent().getStringExtra(WishListFragment.WISH_LIST_ID));//TODO:
+            editWishBean.setWishListId(getIntent().getStringExtra(WishListFragment.WISH_LIST_ID));
         }
         wishesRef = new Firebase(FirebaseUtil.FIREBASE_URL).child(FirebaseUtil.WISH_TABLE);
     }
@@ -181,6 +183,13 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
      */
     private void reserveWish() {
         if (!editWishBean.isReserved()) {
+            reservedDateDialog.setOnDateSetListener(new CalendarDatePickerDialogFragment.OnDateSetListener() {
+                @Override
+                public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
+                    editWishBean.reserve(FirebaseUtil.getCurrentUser().getId(), dialog.getSelectedDay().getDateInMillis());
+                    Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " reserved", Toast.LENGTH_SHORT).show();
+                }
+            });
             reservedDateDialog.show(getSupportFragmentManager(), DATE_DIALOG);
         } else {
             DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.unreserve), this, new DialogInterface.OnClickListener() {
@@ -249,6 +258,9 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
                 RESULT_LOAD_IMAGE);
     }
 
+    /**
+     * called when user choose image from device
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -285,16 +297,4 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         }
     }
 
-    @Override
-    public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
-        final long reservationDate = dialog.getSelectedDay().getDateInMillis();
-        final Reserved reserved = new Reserved(FirebaseUtil.getCurrentUser().getId(), reservationDate);
-        wishesRef.child(editWishBean.getId()).child("reserved").setValue(reserved, new Firebase.CompletionListener() {
-            @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                editWishBean.setReserved(null);
-                Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " reserved", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 }

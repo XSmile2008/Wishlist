@@ -20,7 +20,8 @@ public class Wish implements Serializable{
     String comment;
     String picture;
     @Nullable Boolean received;
-    @Nullable Reserved reserved;
+    @Nullable
+    Reservation reservation;
 
     public Wish(){}
 
@@ -72,12 +73,12 @@ public class Wish implements Serializable{
         this.received = received;
     }
 
-    public Reserved getReserved() {
-        return reserved;
+    public Reservation getReservation() {
+        return reservation;
     }
 
-    public void setReserved(Reserved reserved) {
-        this.reserved = reserved;
+    public void setReservation(Reservation reservation) {
+        this.reservation = reservation;
     }
 
     /**
@@ -86,40 +87,87 @@ public class Wish implements Serializable{
      */
     @JsonIgnore
     public String push() {
+        return this.push(null);
+    }
+
+    /**
+     * push new item to database and create unique ID
+     * @param listener onCompleteListener
+     * @return generated id for this Wish
+     */
+    @JsonIgnore
+    public String push(Firebase.CompletionListener listener) {
         Firebase wishTable = new Firebase(FirebaseUtil.FIREBASE_URL).child(FirebaseUtil.WISH_TABLE);
         String id = wishTable.push().getKey();//TODO: may be will be better if set generated id to this.id
-        wishTable.child(id).setValue(this);
+        if (reservation == null) {
+            wishTable.child(id).setValue(this, listener);
+        } else {
+            wishTable.child(id).setValue(this);
+            wishTable.child(id).child("reservation").setValue(reservation, listener);
+        }
         return id;
-    }
+    }//TODO: test if this also pushed nested fields like Reservation
 
     /**
      * Hard remove this item form database
      */
     @JsonIgnore
     public void remove() {
-        new Firebase(FirebaseUtil.FIREBASE_URL).child(FirebaseUtil.WISH_TABLE).child(id).removeValue();
+        this.remove(null);
     }
 
     /**
-     * reserve this wish in database
-     * @param userId - user thar reserve this wish
-     * @param dateInMillis - reservation date
+     * Hard remove this item form database
+     * @param listener onCompleteListener
      */
     @JsonIgnore
-    public void reserve(String userId, long dateInMillis) {
-        Firebase wishTable = new Firebase(FirebaseUtil.FIREBASE_URL).child(FirebaseUtil.WISH_TABLE);
-        wishTable.child(this.id).child("reserved").setValue(new Reserved(userId, dateInMillis));
+    public void remove(Firebase.CompletionListener listener) {
+        new Firebase(FirebaseUtil.FIREBASE_URL).child(FirebaseUtil.WISH_TABLE).child(id).removeValue(listener);
     }
 
+    /**
+     * Reserve this wish in database
+     * @param userId user thar reserve this wish
+     * @param date reservation date
+     */
     @JsonIgnore
-    public void unreserve() {//TODO: may be add CompletionListener
+    public void reserve(String userId, long date) {
+        this.reserve(userId, date, null);
+    }
+
+    /**
+     * Reserve this wish in database
+     * @param userId user thar reserve this wish
+     * @param date reservation date
+     * @param listener onCompleteListener
+     */
+    @JsonIgnore
+    public void reserve(String userId, long date, Firebase.CompletionListener listener) {
         Firebase wishTable = new Firebase(FirebaseUtil.FIREBASE_URL).child(FirebaseUtil.WISH_TABLE);
-        wishTable.child(id).child("reserved").removeValue();
+        wishTable.child(this.id).child("reservation").setValue(new Reservation(userId, date), listener);
+    }
+
+    /**
+     * Unreserve this wish in database
+     */
+    @JsonIgnore
+    public void unreserve() {
+        this.unreserve(null);
+    }
+
+    /**
+     * Unreserve this wish in database
+     * @param listener onCompleteListener
+     */
+    @JsonIgnore
+    public void unreserve(Firebase.CompletionListener listener) {
+        Firebase wishTable = new Firebase(FirebaseUtil.FIREBASE_URL).child(FirebaseUtil.WISH_TABLE);
+        wishTable.child(id).child("reservation").removeValue(listener);
     }
 
     @JsonIgnore
     public boolean isReserved() {
-        return null != reserved;
+        return null != reservation;
     }
 
     @JsonIgnore
@@ -130,13 +178,13 @@ public class Wish implements Serializable{
         if (comment != null) hashMap.put("comment", comment);
         if (picture != null) hashMap.put("picture", comment);
         if (received != null) hashMap.put("received", received);
-        if (reserved != null) hashMap.put("reserved", reserved);
+        if (reservation != null) hashMap.put("reservation", reservation);
         return hashMap;
     }
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + ": id = " + id + ", title = " + title + ", comment = " + comment + ", received = " + received + ", reserved = " + reserved;
+        return this.getClass().getSimpleName() + ": id = " + id + ", title = " + title + ", comment = " + comment + ", received = " + received + ", reservation = " + reservation;
     }
 
 }

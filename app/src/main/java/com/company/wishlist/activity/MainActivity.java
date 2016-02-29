@@ -153,7 +153,7 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         getSupportActionBar().setTitle(getResources().getString(R.string.my_wish_list));
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_wish_list);
         if (fragment == null) {
-            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, new FirebaseUtil(this).getCurrentUser().getId());
+            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, FirebaseUtil.getCurrentUser().getId());
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.container_wish_list, fragment)

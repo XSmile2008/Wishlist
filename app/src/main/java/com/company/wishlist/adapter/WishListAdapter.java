@@ -2,24 +2,24 @@ package com.company.wishlist.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.view.ViewCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.interfaces.IWishItemAdapter;
-import com.company.wishlist.model.Reserved;
+import com.company.wishlist.model.Reservation;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.FirebaseUtil;
@@ -33,6 +33,7 @@ import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.Bind;
@@ -98,10 +99,24 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     }
 
     @Override
-    public void reserveWish(int position) {
-        Toast.makeText(context, "item " + position + " reserved", Toast.LENGTH_SHORT).show();
-        if (wishes.get(position).isReserved()) wishes.get(position).unreserve();
-        else wishes.get(position).reserve(FirebaseUtil.getCurrentUser().getId(), 1L);
+    public void reserveWish(final int position) {
+        if (wishes.get(position).isReserved()) {
+            wishes.get(position).unreserve();
+            Toast.makeText(context, "item " + position + " unreserved", Toast.LENGTH_SHORT).show();
+        } else {
+            CalendarDatePickerDialogFragment reservedDateDialog = new CalendarDatePickerDialogFragment();
+            reservedDateDialog.setFirstDayOfWeek(Calendar.MONDAY);
+            reservedDateDialog.setRetainInstance(true);
+            reservedDateDialog.setThemeDark(true);
+            reservedDateDialog.setOnDateSetListener(new CalendarDatePickerDialogFragment.OnDateSetListener() {
+                @Override
+                public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
+                    wishes.get(position).reserve(FirebaseUtil.getCurrentUser().getId(), dialog.getSelectedDay().getDateInMillis());
+                    Toast.makeText(context, "item " + position + " reserved", Toast.LENGTH_SHORT).show();
+                }
+            });
+            reservedDateDialog.show(((AppCompatActivity) context).getSupportFragmentManager(), "DATE_PICKER");//TODO: check casting
+        }
     }
 
     @Override
@@ -176,7 +191,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String prevKey) {
             Wish wish = dataSnapshot.getValue(Wish.class);
-            wish.setReserved(dataSnapshot.child("reserved").getValue(Reserved.class));
+            wish.setReservation(dataSnapshot.child("reservation").getValue(Reservation.class));
             wish.setId(dataSnapshot.getKey());
             wishes.add(wish);
             notifyDataSetChanged();
@@ -186,7 +201,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String prevKey) {
             Wish wish = dataSnapshot.getValue(Wish.class);
-            wish.setReserved(dataSnapshot.child("reserved").getValue(Reserved.class));
+            wish.setReservation(dataSnapshot.child("reservation").getValue(Reservation.class));
             wish.setId(dataSnapshot.getKey());
             wishes.set(findWishIndexById(wish.getId()), wish);
             Log.d(LOG_TAG, "Wish.onChildChanged()" + wish.toString());

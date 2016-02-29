@@ -3,14 +3,14 @@ package com.company.wishlist.model;
 /**
  * Created by v.odahovskiy on 16.01.2016.
  */
-public class Reserved {
+public class Reservation {
 
     String byUser;
     String forDate;
 
-    public Reserved(){}
+    public Reservation(){}
 
-    public Reserved(String byUser, long forDateInMillis) {
+    public Reservation(String byUser, long forDateInMillis) {
         this.byUser = byUser;
         this.forDate = String.valueOf(forDateInMillis);
     }

@@ -98,6 +98,7 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
         return null != authData;
     }
 
+    @Deprecated
     public Firebase getFirebaseRoot() {
         return firebaseRoot;
     }

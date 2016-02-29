@@ -23,7 +23,7 @@ public class EditWishBean extends Wish{
         this.setTitle(wish.getTitle());
         this.setComment(wish.getComment());
         this.setWishListId(wish.getWishListId());
-        this.setReserved(wish.getReserved());
+        this.setReservation(wish.getReservation());
     }
 
     @JsonIgnore

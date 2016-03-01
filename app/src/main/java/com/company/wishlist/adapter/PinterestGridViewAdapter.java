@@ -29,6 +29,14 @@ public class PinterestGridViewAdapter extends BaseAdapter {
         mItems = imageUrls;
     }
 
+    public void addAll(List<String> items){
+        if (null != items && items.size() > 0){
+            mItems.clear();
+            mItems.addAll(items);
+            notifyDataSetChanged();
+        }
+    }
+
     @Override
     public int getCount() {
         return mItems.size();
@@ -47,24 +55,23 @@ public class PinterestGridViewAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        View view = convertView;
 
-        if (view == null) {
-            view = layoutInflater.inflate(R.layout.insta_list_item, parent, false);
+        if (convertView == null) {
+            LayoutInflater inflater = LayoutInflater.from(mContext);
+            convertView = inflater.inflate(R.layout.insta_list_item, parent, false);
 
             viewHolder = new ViewHolder();
-            viewHolder.ivIcon = (ImageView) view.findViewById(R.id.ivIcon);
-            view.setTag(viewHolder);
+            viewHolder.ivIcon = (ImageView) convertView.findViewById(R.id.ivIcon);
+            convertView.setTag(viewHolder);
         } else {
-            viewHolder = (ViewHolder) view.getTag();
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        String imageUrl = mItems.get(position);
+        String item = mItems.get(position);
         Glide.with(mContext)
-                .load(imageUrl)
+                .load(item)
                 .into(viewHolder.ivIcon);
-
-        return view;
+        return convertView;
     }
 
     private static class ViewHolder {

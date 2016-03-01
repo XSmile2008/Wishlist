@@ -10,23 +10,19 @@ import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.InternetActivity;
-import com.company.wishlist.adapter.PinterestGridViewAdapter;
 import com.company.wishlist.bean.EditWishBean;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.model.Wish;
@@ -35,14 +31,12 @@ import com.company.wishlist.util.DialogUtil;
 import com.company.wishlist.util.FirebaseUtil;
 import com.company.wishlist.util.LocalStorage;
 import com.company.wishlist.util.Utilities;
-import com.company.wishlist.util.pinterest.PinterestUtil;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Length;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
-import com.orhanobut.dialogplus.DialogPlus;
-import com.orhanobut.dialogplus.GridHolder;
-import com.orhanobut.dialogplus.OnItemClickListener;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -58,6 +52,7 @@ import butterknife.OnClick;
 public class WishEditActivity extends InternetActivity implements Validator.ValidationListener {
 
     private static int RESULT_LOAD_IMAGE = 1;
+    private static int RESULT_IMAGE_SELECT = 2;
     private static String DATE_DIALOG = "DATE_PICKER";
     public static String ACTION_EDIT = "com.company.wishlist.ACTION_EDIT";
     public static String ACTION_CREATE = "com.company.wishlist.ACTION_CREATE";
@@ -78,10 +73,10 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
 
     @Bind(R.id.insta_images_btn)
     ImageButton instaImgBtn;
+
     @Bind(R.id.insta_layout)
     LinearLayout instaLayout;
-    @Bind(R.id.insta_text)
-    TextView instaText;
+
 
     private EditWishBean editWishBean;
     private Validator validator;
@@ -228,42 +223,23 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         //String[] tags = editTextTitle.getText().toString().split("\\s+");
         final Context app = this;
 
-        Snackbar.make(findViewById(R.id.coordinator_layout_wish_edit), getString(R.string.loading_pints_dialog_message), Snackbar.LENGTH_LONG).show();
+        String query = editTextTitle.getText().toString().trim();
 
-        PinterestUtil.getImagesAsLinks(new PinterestUtil.PinterestOnLoadEvent() {
-
-            @Override
-            public void onSuccess(final List<String> urls) {
-
-              DialogPlus.newDialog(app)
-                        .setContentHolder(new GridHolder(4))
-                        .setAdapter(new PinterestGridViewAdapter(app, urls))
-
-                        .setOnItemClickListener(new OnItemClickListener() {
-                            @Override
-                            public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-                                Toast.makeText(app, String.valueOf(position), Toast.LENGTH_SHORT).show();
-                                //Snackbar.make(findViewById(R.id.coordinator_layout_wish_edit), String.format("Selected position %d, url is %s , in arr url by pos is %s", position, String.valueOf(item), urls.get(position)), Snackbar.LENGTH_LONG).show();
-
-                                Glide.with(app)
-                                        .load(urls.get(position))
-                                        .bitmapTransform(new CropCircleTransformation(Glide.get(getApplicationContext()).getBitmapPool()))
-                                        .into(imageView);
-                                editWishBean.setPicture(Utilities.encodeThumbnail(Utilities.getBitmapFromURL(urls.get(position))));
-                                dialog.dismiss();
-
-                            }
-                        })
-                        .setCancelable(true)
-                        .setExpanded(true)  // This will enable the expand feature, (similar to android L share dialog)
-                        .create().show();
-
-            }
-
-        }, editTextTitle.getText().toString());
+        String message = "Wish title should be not empty!";
+        if (StringUtils.isEmpty(query)) {
+            showSnake(message);
+        } else {
+            Intent intent = new Intent(this, ImageGridActivity.class);
+            intent.putExtra(ImageGridActivity.QUERY, editTextTitle.getText().toString());
+            startActivityForResult(intent, RESULT_IMAGE_SELECT);
+        }
     }
 
-    @OnClick(R.id.image_view)
+    private void showSnake(String message) {
+        Snackbar.make(findViewById(R.id.coordinator_layout_wish_edit), message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @OnClick(R.id.galery_image_btn)
     public void chooseWishImage(ImageView view) {
         startActivityForResult(
                 Intent.createChooser(
@@ -288,7 +264,18 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
                         .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
                         .into(imageView);
             } catch (IOException e) {
-                e.printStackTrace();
+                Snackbar.make(findViewById(R.id.coordinator_layout_wish_edit), e.getMessage(), Snackbar.LENGTH_SHORT);
+            }
+        } else if (requestCode == RESULT_IMAGE_SELECT && resultCode == RESULT_OK && null != data) {
+            String url = data.getStringExtra(ImageGridActivity.RESULT_DATA).trim();
+            if (StringUtils.isEmpty(url)) {
+                showSnake("Something went wrong..");
+            } else {
+                Glide.with(getApplicationContext())
+                        .load(url)
+                        .bitmapTransform(new CropCircleTransformation(Glide.get(getApplicationContext()).getBitmapPool()))
+                        .into(imageView);
+                editWishBean.setPicture(Utilities.encodeThumbnail(Utilities.getBitmapFromURL(url)));
             }
         }
     }

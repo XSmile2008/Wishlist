@@ -92,13 +92,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     }
 
     @Override
-    public void removeWish(int position) {
-        Toast.makeText(context, "item " + position + " removed", Toast.LENGTH_SHORT).show();
-        wishBackUp = wishes.get(position);
-        wishes.get(position).remove();
-    }
-
-    @Override
     public void reserveWish(final int position) {
         if (wishes.get(position).isReserved()) {
             wishes.get(position).unreserve();
@@ -120,9 +113,16 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     }
 
     @Override
+    public void removeWish(int position) {
+        Toast.makeText(context, "item " + position + " removed", Toast.LENGTH_SHORT).show();
+        wishBackUp = wishes.get(position);
+        wishBackUp.softRemove();
+    }
+
+    @Override
     public void restoreWish() {
         Toast.makeText(context, "restore", Toast.LENGTH_SHORT).show();
-        wishBackUp.push();
+        wishBackUp.softRestore();
     }
 
     @Override
@@ -141,8 +141,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
      */
     private void getWishLists(final String forUser) {
         Log.e(LOG_TAG, "GET wishes for user " + forUser);
-        new Firebase(FirebaseUtil.FIREBASE_URL)
-                .child(FirebaseUtil.WISH_LIST_TABLE)
+        WishList.getFirebaseRef()
                 .orderByChild("forUser")
                 .equalTo(forUser)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -178,8 +177,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
      */
     private void getWishes(final String wishListId) {
         Log.d(LOG_TAG, "punyan =" + wishListId);
-        Query query = new Firebase(FirebaseUtil.FIREBASE_URL)
-                .child(FirebaseUtil.WISH_TABLE)
+        Query query = Wish.getFirebaseRef()
                 .orderByChild("wishListId")
                 .equalTo(wishListId);
         query.addChildEventListener(listenersWish);
@@ -189,23 +187,32 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     private class WishEventListener implements ChildEventListener {
 
         @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String prevKey) {
+        public void onChildAdded(DataSnapshot dataSnapshot, String prevKey) {//TODO: check this
             Wish wish = dataSnapshot.getValue(Wish.class);
-            wish.setReservation(dataSnapshot.child("reservation").getValue(Reservation.class));
-            wish.setId(dataSnapshot.getKey());
-            wishes.add(wish);
-            notifyDataSetChanged();
+            if (!wish.isRemoved()) {
+                wish.setReservation(dataSnapshot.child("reservation").getValue(Reservation.class));
+                wish.setId(dataSnapshot.getKey());
+                wishes.add(wish);
+                notifyDataSetChanged();
+            }
             Log.d(LOG_TAG, "Wish.onChildAdded()" + wish.toString());
         }
 
         @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String prevKey) {
+        public void onChildChanged(DataSnapshot dataSnapshot, String prevKey) {//TODO: check this
             Wish wish = dataSnapshot.getValue(Wish.class);
-            wish.setReservation(dataSnapshot.child("reservation").getValue(Reservation.class));
             wish.setId(dataSnapshot.getKey());
-            wishes.set(findWishIndexById(wish.getId()), wish);
+            int index = findWishIndexById(wish.getId());
+            if (!wish.isRemoved()) {
+                wish.setReservation(dataSnapshot.child("reservation").getValue(Reservation.class));
+                if (index != -1) wishes.set(findWishIndexById(wish.getId()), wish);
+                else wishes.add(wish);
+                notifyDataSetChanged();
+            } else if (index != -1) {
+                wishes.remove(findWishIndexById(wish.getId()));
+                notifyDataSetChanged();
+            }
             Log.d(LOG_TAG, "Wish.onChildChanged()" + wish.toString());
-            notifyDataSetChanged();
         }
 
         @Override
@@ -222,7 +229,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
         @Override
         public void onCancelled(FirebaseError firebaseError) {
-            Log.d(LOG_TAG, "Wish.onChanceled()" + firebaseError.toString());
+            Log.d(LOG_TAG, "Wish.onCanceled()" + firebaseError.toString());
         }
 
     }

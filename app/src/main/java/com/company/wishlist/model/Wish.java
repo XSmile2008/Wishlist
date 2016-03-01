@@ -3,7 +3,6 @@ package com.company.wishlist.model;
 import com.company.wishlist.util.FirebaseUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.firebase.client.Firebase;
-import com.firebase.client.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -19,9 +18,9 @@ public class Wish implements Serializable{
     String title;
     String comment;
     String picture;
-    @Nullable Boolean received;
-    @Nullable
     Reservation reservation;
+    Boolean isReceived;
+    Boolean isRemoved;
 
     public Wish(){}
 
@@ -65,20 +64,33 @@ public class Wish implements Serializable{
         this.picture = picture;
     }
 
-    public Boolean getReceived() {
-        return received;
-    }
-
-    public void setReceived(Boolean received) {
-        this.received = received;
-    }
-
     public Reservation getReservation() {
         return reservation;
     }
 
     public void setReservation(Reservation reservation) {
         this.reservation = reservation;
+    }
+
+    public Boolean getIsReceived() {
+        return isReceived;
+    }
+
+    public void setIsReceived(Boolean isReceived) {
+        this.isReceived = isReceived;
+    }
+
+    public Boolean getIsRemoved() {
+        return isRemoved;
+    }
+
+    public void setIsRemoved(Boolean isRemoved) {
+        this.isRemoved = isRemoved;
+    }
+
+    @JsonIgnore
+    public static Firebase getFirebaseRef() {
+        return new Firebase(FirebaseUtil.FIREBASE_URL).child(Wish.class.getSimpleName());
     }
 
     /**
@@ -97,15 +109,15 @@ public class Wish implements Serializable{
      */
     @JsonIgnore
     public String push(Firebase.CompletionListener listener) {
-        Firebase wishTable = new Firebase(FirebaseUtil.FIREBASE_URL).child(FirebaseUtil.WISH_TABLE);
-        String id = wishTable.push().getKey();//TODO: may be will be better if set generated id to this.id
+        Firebase wishTable = getFirebaseRef();
+        this.id = wishTable.push().getKey();//TODO: may be will be better if set generated id to this.id
         if (reservation == null) {
             wishTable.child(id).setValue(this, listener);
         } else {
             wishTable.child(id).setValue(this);
             wishTable.child(id).child("reservation").setValue(reservation, listener);
         }
-        return id;
+        return this.id;
     }//TODO: test if this also pushed nested fields like Reservation
 
     /**
@@ -122,7 +134,42 @@ public class Wish implements Serializable{
      */
     @JsonIgnore
     public void remove(Firebase.CompletionListener listener) {
-        new Firebase(FirebaseUtil.FIREBASE_URL).child(FirebaseUtil.WISH_TABLE).child(id).removeValue(listener);
+        getFirebaseRef().child(id).removeValue(listener);
+    }
+
+    /**
+     * Soft remove this item form database
+     */
+    @JsonIgnore
+    public void softRemove() {
+        this.softRemove(null);
+    }
+
+    /**
+     * Soft remove this item form database
+     * @param listener onCompleteListener
+     */
+    @JsonIgnore
+    public void softRemove(Firebase.CompletionListener listener) {
+        this.isRemoved = true;
+        getFirebaseRef().child(id).child("isRemoved").setValue(true, listener);
+    }
+
+    /**
+     * Soft remove this item form database
+     */
+    @JsonIgnore
+    public void softRestore() {
+        this.softRestore(null);
+    }
+
+    /**
+     * Soft remove this item form database
+     * @param listener onCompleteListener
+     */
+    @JsonIgnore
+    public void softRestore(Firebase.CompletionListener listener) {
+        getFirebaseRef().child(id).child("isRemoved").removeValue(listener);
     }
 
     /**
@@ -143,8 +190,7 @@ public class Wish implements Serializable{
      */
     @JsonIgnore
     public void reserve(String userId, long date, Firebase.CompletionListener listener) {
-        Firebase wishTable = new Firebase(FirebaseUtil.FIREBASE_URL).child(FirebaseUtil.WISH_TABLE);
-        wishTable.child(this.id).child("reservation").setValue(new Reservation(userId, date), listener);
+        getFirebaseRef().child(this.id).child("reservation").setValue(new Reservation(userId, date), listener);
     }
 
     /**
@@ -161,13 +207,17 @@ public class Wish implements Serializable{
      */
     @JsonIgnore
     public void unreserve(Firebase.CompletionListener listener) {
-        Firebase wishTable = new Firebase(FirebaseUtil.FIREBASE_URL).child(FirebaseUtil.WISH_TABLE);
-        wishTable.child(id).child("reservation").removeValue(listener);
+        getFirebaseRef().child(id).child("reservation").removeValue(listener);
     }
 
     @JsonIgnore
     public boolean isReserved() {
         return null != reservation;
+    }
+
+    @JsonIgnore
+    public boolean isRemoved() {
+        return null != isRemoved;
     }
 
     @JsonIgnore
@@ -177,14 +227,14 @@ public class Wish implements Serializable{
         if (title != null) hashMap.put("title", title);
         if (comment != null) hashMap.put("comment", comment);
         if (picture != null) hashMap.put("picture", comment);
-        if (received != null) hashMap.put("received", received);
+        if (isReceived != null) hashMap.put("isReceived", isReceived);
         if (reservation != null) hashMap.put("reservation", reservation);
         return hashMap;
     }
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + ": id = " + id + ", title = " + title + ", comment = " + comment + ", received = " + received + ", reservation = " + reservation;
+        return this.getClass().getSimpleName() + ": id = " + id + ", title = " + title + ", comment = " + comment + ", reservation = " + reservation + ", isReceived = " + isReceived + ", isRemoved = " + isRemoved;
     }
 
 }

@@ -142,7 +142,7 @@ public class WishListFragment extends DebugFragment {
             case MY_WISH_LIST_MODE:
                 if (!event.getFriendId().equals(FirebaseUtil.getCurrentUser().getId())) return;
             case GIFT_LIST_MODE:
-                new Firebase(FirebaseUtil.FIREBASE_URL).child(FirebaseUtil.WISH_LIST_TABLE)
+                WishList.getFirebaseRef()
                         .orderByChild("forUser")
                         .equalTo(friendId)
                         .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -156,9 +156,8 @@ public class WishListFragment extends DebugFragment {
                                         return;
                                     }
                                 }
-                                WishList wishList = new WishList(dataSnapshot.getRef().push().getKey(), FirebaseUtil.getCurrentUser().getId(), friendId);
-                                dataSnapshot.getRef().child(wishList.getId()).setValue(wishList);
-                                wishListId = wishList.getId();
+                                WishList wishList = new WishList(FirebaseUtil.getCurrentUser().getId(), friendId);
+                                wishListId = wishList.push();
                                 adapter.onFriendSelected(friendId);
                             }
 

@@ -17,6 +17,7 @@ import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.Wish;
+import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.FirebaseUtil;
 import com.company.wishlist.util.LocalStorage;
 import com.company.wishlist.util.Utilities;
@@ -69,9 +70,7 @@ public class TopWishListAdapter extends RecyclerView.Adapter<TopWishListAdapter.
     }
 
     private void getWishes() {
-        Firebase firebaseRoot = new Firebase(FirebaseUtil.FIREBASE_URL);
-        //todo write nice query to get random wishes
-        firebaseRoot.child(FirebaseUtil.WISH_TABLE).addValueEventListener(new ValueEventListener() {
+        WishList.getFirebaseRef().addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
@@ -81,7 +80,8 @@ public class TopWishListAdapter extends RecyclerView.Adapter<TopWishListAdapter.
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {}
+            public void onCancelled(FirebaseError firebaseError) {
+            }
         });
         notifyDataSetChanged();
     }

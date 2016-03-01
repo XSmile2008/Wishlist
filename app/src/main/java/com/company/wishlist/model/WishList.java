@@ -1,6 +1,8 @@
 package com.company.wishlist.model;
 
+import com.company.wishlist.util.FirebaseUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.firebase.client.Firebase;
 
 /**
  * Created by vladstarikov on 07.01.16.
@@ -13,8 +15,7 @@ public class WishList {
 
     public WishList(){}
 
-    public WishList(String id, String owner, String forUser) {
-        this.id = id;
+    public WishList(String owner, String forUser) {
         this.owner = owner;
         this.forUser = forUser;
     }
@@ -41,5 +42,23 @@ public class WishList {
 
     public void setForUser(String forUser) {
         this.forUser = forUser;
+    }
+
+    @JsonIgnore
+    public static Firebase getFirebaseRef() {
+        return new Firebase(FirebaseUtil.FIREBASE_URL).child(WishList.class.getSimpleName());
+    }
+
+    @JsonIgnore
+    public String push() {
+        return push(null);
+    }
+
+    @JsonIgnore
+    public String push(Firebase.CompletionListener listener) {
+        Firebase wishListTable = getFirebaseRef();
+        this.id = wishListTable.push().getKey();
+        wishListTable.child(this.id).setValue(this, listener);
+        return this.id;
     }
 }

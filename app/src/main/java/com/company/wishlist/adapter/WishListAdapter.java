@@ -52,10 +52,14 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     private Context context;
     private View rootView;
     private int mode;//WISH_LIST_MODE or GIFT_LIST_MODE
+
     private WishEventListener listenersWish;
     private List<Query> queriesWish = new ArrayList<>();
+
     private List<Wish> wishes;
+
     private Wish wishBackUp;
+    private int wishBackUpPos;//TODO: check it
 
     /**
      * @param context context that will be used in this adapter
@@ -116,6 +120,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     @Override
     public void removeWish(int position) {
         Toast.makeText(context, "item " + position + " removed", Toast.LENGTH_SHORT).show();
+        wishBackUpPos = position;
         wishBackUp = wishes.get(position);
         wishBackUp.softRemove();
         Snackbar.make(rootView, R.string.message_wish_removed, Snackbar.LENGTH_LONG)
@@ -131,6 +136,8 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     @Override
     public void restoreWish() {
         Toast.makeText(context, "restore", Toast.LENGTH_SHORT).show();
+        wishes.add(wishBackUpPos, wishBackUp);
+        notifyDataSetChanged();
         wishBackUp.softRestore();
     }
 
@@ -251,7 +258,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         @Bind(R.id.swipe_layout) SwipeLayout swipeLayout;
 
         //CardView
-        @Bind(R.id.card_view) CardView cardView;
         @Bind(R.id.image_view) ImageView imageView;
         @Bind(R.id.text_view_title) TextView textViewTitle;
         @Bind(R.id.text_view_comment) TextView textViewComment;

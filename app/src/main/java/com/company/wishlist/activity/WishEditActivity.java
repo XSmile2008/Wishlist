@@ -188,7 +188,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
             });
             reservedDateDialog.show(getSupportFragmentManager(), DATE_DIALOG);
         } else {
-            DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.unreserve), this, new DialogInterface.OnClickListener() {
+            DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.message_unreserve), this, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     editWishBean.unreserve();
                     Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " unreserved", Toast.LENGTH_SHORT).show();

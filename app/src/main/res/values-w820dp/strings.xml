@@ -2,5 +2,5 @@
 <resources>
     <string name="prefsLogoutButton">prefsLogoutButton</string>
     <string name="formatted_date">Your reservation for: %1$s</string>
-    <string name="unreserve">Are you shure to unreserve wish?</string>
+    <string name="message_unreserve">Are you shure to unreserve wish?</string>
 </resources>

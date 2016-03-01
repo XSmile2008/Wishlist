@@ -2,6 +2,7 @@ package com.company.wishlist.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -25,9 +26,10 @@ import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.FirebaseUtil;
 import com.company.wishlist.util.LocalStorage;
 import com.company.wishlist.util.Utilities;
+import com.daimajia.swipe.SimpleSwipeListener;
+import com.daimajia.swipe.SwipeLayout;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
@@ -38,6 +40,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by vladstarikov on 08.01.16.
@@ -47,6 +50,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     private String LOG_TAG = getClass().getSimpleName();
 
     private Context context;
+    private View rootView;
     private int mode;//WISH_LIST_MODE or GIFT_LIST_MODE
     private WishEventListener listenersWish;
     private List<Query> queriesWish = new ArrayList<>();
@@ -57,8 +61,9 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
      * @param context context that will be used in this adapter
      * @param mode mode of this list. May be WISH_LIST_MODE or GIFT_LIST_MODE
      */
-    public WishListAdapter(Context context, int mode) {
+    public WishListAdapter(Context context, View rootView, int mode) {
         this.context = context;
+        this.rootView = rootView;
         this.mode = mode;
         this.wishes = new ArrayList<>();
         this.listenersWish = new WishEventListener();
@@ -77,10 +82,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     @Override
     public int getItemCount() {
         return wishes.size();
-    }
-
-    public int getMode() {
-        return mode;
     }
 
     @Deprecated
@@ -117,6 +118,14 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         Toast.makeText(context, "item " + position + " removed", Toast.LENGTH_SHORT).show();
         wishBackUp = wishes.get(position);
         wishBackUp.softRemove();
+        Snackbar.make(rootView, R.string.message_wish_removed, Snackbar.LENGTH_LONG)
+                .setAction(R.string.undo, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        restoreWish();
+                    }
+                })
+                .show();
     }
 
     @Override
@@ -187,7 +196,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     private class WishEventListener implements ChildEventListener {
 
         @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String prevKey) {//TODO: check this
+        public void onChildAdded(DataSnapshot dataSnapshot, String prevKey) {
             Wish wish = dataSnapshot.getValue(Wish.class);
             if (!wish.isRemoved()) {
                 wish.setReservation(dataSnapshot.child("reservation").getValue(Reservation.class));
@@ -199,7 +208,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         }
 
         @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String prevKey) {//TODO: check this
+        public void onChildChanged(DataSnapshot dataSnapshot, String prevKey) {
             Wish wish = dataSnapshot.getValue(Wish.class);
             wish.setId(dataSnapshot.getKey());
             int index = findWishIndexById(wish.getId());
@@ -207,7 +216,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
                 wish.setReservation(dataSnapshot.child("reservation").getValue(Reservation.class));
                 if (index != -1) wishes.set(index, wish);
                 else wishes.add(wish);
-                notifyItemChanged(index);//TODO: check it
+                notifyItemChanged(index);
             } else if (index != -1) {
                 wishes.remove(index);
                 notifyDataSetChanged();
@@ -237,7 +246,9 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
     }
 
-    public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class Holder extends RecyclerView.ViewHolder {
+
+        @Bind(R.id.swipe_layout) SwipeLayout swipeLayout;
 
         //CardView
         @Bind(R.id.card_view) CardView cardView;
@@ -246,14 +257,34 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         @Bind(R.id.text_view_comment) TextView textViewComment;
 
         //Background
-        @Bind(R.id.background) ViewGroup background;
-        @Bind(R.id.image_view_action) ImageView imageViewAction;
-        @Bind(R.id.text_view_action) TextView textViewAction;
+        @Bind(R.id.bottom_view_remove) ViewGroup bottomViewRemove;
+        @Bind(R.id.bottom_view_reserve) ViewGroup bottomViewReserve;
+        @Bind(R.id.text_view_reserve) TextView textViewReserve;
 
         public Holder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(this);
+            swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
+            swipeLayout.addDrag(SwipeLayout.DragEdge.Right, bottomViewReserve);
+            if (mode == WishListFragment.GIFT_LIST_MODE) swipeLayout.addDrag(SwipeLayout.DragEdge.Left, bottomViewRemove);
+            swipeLayout.addSwipeListener(new SimpleSwipeListener() {
+                @Override
+                public void onOpen(SwipeLayout layout) {
+                    if (layout.getDragEdge() == SwipeLayout.DragEdge.Left) removeWish(getAdapterPosition());
+                }
+
+                @Override
+                public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
+                    float alpha = Math.abs((float) leftOffset / (float) bottomViewReserve.getWidth());//TODO:
+                    layout.getCurrentBottomView().setAlpha(alpha);
+                }
+
+                @Override
+                public void onStartOpen(SwipeLayout layout) {
+                    if (layout.getDragEdge() == SwipeLayout.DragEdge.Right)
+                        textViewReserve.setText(wishes.get(getAdapterPosition()).isReserved() ? R.string.action_unreserve : R.string.action_reserve);
+                }
+            });
         }
 
         public void onBind(Wish wish) {
@@ -263,14 +294,21 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             textViewComment.setText(wish.getComment());
         }
 
-        @Override
+        @OnClick({R.id.card_view, R.id.bottom_view_reserve})
         public void onClick(View v) {
-            //ViewCompat.animate(cardView).setDuration(1000).translationX(1080).start();
-            Toast.makeText(context, "item " + getAdapterPosition() + " edit", Toast.LENGTH_SHORT).show();
-            LocalStorage.getInstance().setWish(wishes.get(getAdapterPosition()));
-            Intent intent = new Intent(context, WishEditActivity.class);
-            intent.setAction(WishEditActivity.ACTION_EDIT);
-            context.startActivity(intent);
+            swipeLayout.close();
+            switch (v.getId()) {
+                case R.id.card_view:
+                    Toast.makeText(context, "item " + getAdapterPosition() + " edit", Toast.LENGTH_SHORT).show();
+                    LocalStorage.getInstance().setWish(wishes.get(getAdapterPosition()));
+                    Intent intent = new Intent(context, WishEditActivity.class);
+                    intent.setAction(WishEditActivity.ACTION_EDIT);
+                    context.startActivity(intent);
+                    break;
+                case R.id.bottom_view_reserve:
+                    reserveWish(getAdapterPosition());
+                    break;
+            }
         }
 
     }

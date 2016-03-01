@@ -20,24 +20,31 @@
     <string name="facebook_permissions">public_profile, email, user_birthday, user_friends</string>
     <string name="prefsLogoutButton">prefsLogoutButton</string>
     <string name="title_activity_main2">Main2Activity</string>
-    <string name="remove_wish_dialog_text">Are you sure you want to remove this wish?</string>
 
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="undo">Undo</string>
 
     <string name="choose_image">Choose an image</string>
     <string name="choose_image_error_text">Problem with taking a picture</string>
+
+    <string name="remove_wish_dialog_text">Are you sure you want to remove this wish?</string>
+
     <string name="reservation_date_picker_title">Select date for reservation</string>
-    <string name="unreserve">Are you shure to unreserve wish?</string>
+
     <string name="formatted_date">Your reservation for: %1$s</string>
 
     <string name="textViewFriendsText">Friends:</string>
-    <string name="action_reserve_text">Reserve</string>
-    <string name="action_remove_text">Remove</string>
+
+    <string name="action_remove">Remove</string>
+    <string name="action_reserve">Reserve</string>
+    <string name="action_unreserve">Unreserve</string>
+
+    <string name="message_unreserve">Are you shure to unreserve wish?</string>
+    <string name="message_wish_removed">Wish  %1$s deleted! </string>
+    <string name="message_wish_restored">Wish  %1$s restored! </string>
 
     <string name="load_wish_progress_dialog_message">Loading wishes..</string>
     <string name="at_first_persist">At first persist</string>
-    <string name="wish_deleted_msg">Wish  %1$s deleted! </string>
-    <string name="wish_restored_msg">Wish  %1$s restored! </string>
 
 </resources>

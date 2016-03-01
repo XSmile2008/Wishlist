@@ -122,14 +122,6 @@ public class Wish implements Serializable{
 
     /**
      * Hard remove this item form database
-     */
-    @JsonIgnore
-    public void remove() {
-        this.remove(null);
-    }
-
-    /**
-     * Hard remove this item form database
      * @param listener onCompleteListener
      */
     @JsonIgnore
@@ -230,6 +222,26 @@ public class Wish implements Serializable{
         if (isReceived != null) hashMap.put("isReceived", isReceived);
         if (reservation != null) hashMap.put("reservation", reservation);
         return hashMap;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Wish)) return false;
+
+        Wish wish = (Wish) o;
+
+        if (title != null ? !title.equals(wish.title) : wish.title != null) return false;
+        return !(picture != null ? !picture.equals(wish.picture) : wish.picture != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = title != null ? title.hashCode() : 0;
+        result = 31 * result + (picture != null ? picture.hashCode() : 0);
+        return result;
     }
 
     @Override

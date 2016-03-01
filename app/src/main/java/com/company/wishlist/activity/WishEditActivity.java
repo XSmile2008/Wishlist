@@ -33,8 +33,6 @@ import com.company.wishlist.util.FirebaseUtil;
 import com.company.wishlist.util.LocalStorage;
 import com.company.wishlist.util.Utilities;
 import com.company.wishlist.util.social.InstagramUtil;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Length;
@@ -207,6 +205,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
                 finish();
             }
         });
+        //TODO: need to show SnackBar on main activity, like after swipe to remove, may be start this activity for result and return something like "removed" flag and than show SnackBar?
     }
 
     private void commitChanges() {

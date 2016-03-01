@@ -34,4 +34,10 @@
     <string name="textViewFriendsText">Friends:</string>
     <string name="action_reserve_text">Reserve</string>
     <string name="action_remove_text">Remove</string>
+
+    <string name="load_wish_progress_dialog_message">Loading wishes..</string>
+    <string name="at_first_persist">At first persist</string>
+    <string name="wish_deleted_msg">Wish  %1$s deleted! </string>
+    <string name="wish_restored_msg">Wish  %1$s restored! </string>
+
 </resources>

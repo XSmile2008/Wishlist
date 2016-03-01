@@ -205,11 +205,11 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             int index = findWishIndexById(wish.getId());
             if (!wish.isRemoved()) {
                 wish.setReservation(dataSnapshot.child("reservation").getValue(Reservation.class));
-                if (index != -1) wishes.set(findWishIndexById(wish.getId()), wish);
+                if (index != -1) wishes.set(index, wish);
                 else wishes.add(wish);
-                notifyDataSetChanged();
+                notifyItemChanged(index);//TODO: check it
             } else if (index != -1) {
-                wishes.remove(findWishIndexById(wish.getId()));
+                wishes.remove(index);
                 notifyDataSetChanged();
             }
             Log.d(LOG_TAG, "Wish.onChildChanged()" + wish.toString());
@@ -217,8 +217,11 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
         @Override
         public void onChildRemoved(DataSnapshot dataSnapshot) {
-            wishes.remove(findWishIndexById(dataSnapshot.getKey()));
-            notifyDataSetChanged();
+            int index = findWishIndexById(dataSnapshot.getKey());
+            if (index != -1) {
+                wishes.remove(index);
+                notifyDataSetChanged();
+            }
             Log.d(LOG_TAG, "Wish.onChildRemoved()" + dataSnapshot.getValue(Wish.class).toString());
         }
 

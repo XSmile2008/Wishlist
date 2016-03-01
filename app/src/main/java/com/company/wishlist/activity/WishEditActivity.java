@@ -1,17 +1,20 @@
 package com.company.wishlist.activity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -23,7 +26,7 @@ import com.bumptech.glide.Glide;
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.InternetActivity;
-import com.company.wishlist.adapter.InstaGridViewAdapter;
+import com.company.wishlist.adapter.PinterestGridViewAdapter;
 import com.company.wishlist.bean.EditWishBean;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.model.Wish;
@@ -32,7 +35,7 @@ import com.company.wishlist.util.DialogUtil;
 import com.company.wishlist.util.FirebaseUtil;
 import com.company.wishlist.util.LocalStorage;
 import com.company.wishlist.util.Utilities;
-import com.company.wishlist.util.social.InstagramUtil;
+import com.company.wishlist.util.pinterest.PinterestUtil;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Length;
@@ -40,8 +43,6 @@ import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.GridHolder;
 import com.orhanobut.dialogplus.OnItemClickListener;
-
-import org.jinstagram.entity.common.Images;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -75,9 +76,12 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     @Length(min = 2)
     EditText editTextComment;
 
-    @Bind(R.id.insta_images_btn) ImageButton instaImgBtn;
-    @Bind(R.id.insta_layout) LinearLayout instaLayout;
-    @Bind(R.id.insta_text) TextView instaText;
+    @Bind(R.id.insta_images_btn)
+    ImageButton instaImgBtn;
+    @Bind(R.id.insta_layout)
+    LinearLayout instaLayout;
+    @Bind(R.id.insta_text)
+    TextView instaText;
 
     private EditWishBean editWishBean;
     private Validator validator;
@@ -221,29 +225,42 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
 
     @OnClick(R.id.insta_images_btn)
     public void showInstaImagesDialog(View view) {
-        String[] tags = editTextTitle.getText().toString().split("\\s+");
+        //String[] tags = editTextTitle.getText().toString().split("\\s+");
+        final Context app = this;
 
-        DialogPlus dialog = DialogPlus.newDialog(this)
-                .setAdapter(new InstaGridViewAdapter(this, InstagramUtil.getInstance().getPicturesByTag(tags)))
-                .setOnItemClickListener(new OnItemClickListener() {
-                    @Override
-                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-                        Images image = (Images) item;
-                        Glide.with(getApplicationContext())
-                                .load(image.getLowResolution().getImageUrl())
-                                .bitmapTransform(new CropCircleTransformation(Glide.get(getApplicationContext()).getBitmapPool()))
-                                .into(imageView);
-                        editWishBean.setPicture(Utilities.encodeThumbnail(Utilities.getBitmapFromURL(image.getLowResolution().getImageUrl())));
-                        dialog.dismiss();
+        Snackbar.make(findViewById(R.id.coordinator_layout_wish_edit), getString(R.string.loading_pints_dialog_message), Snackbar.LENGTH_LONG).show();
 
-                    }
-                })
-                .setCancelable(true)
-                .setContentHolder(new GridHolder(4))
-                .setGravity(Gravity.BOTTOM)
-                .setExpanded(true)  // This will enable the expand feature, (similar to android L share dialog)
-                .create();
-        dialog.show();
+        PinterestUtil.getImagesAsLinks(new PinterestUtil.PinterestOnLoadEvent() {
+
+            @Override
+            public void onSuccess(final List<String> urls) {
+
+              DialogPlus.newDialog(app)
+                        .setContentHolder(new GridHolder(4))
+                        .setAdapter(new PinterestGridViewAdapter(app, urls))
+
+                        .setOnItemClickListener(new OnItemClickListener() {
+                            @Override
+                            public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
+                                Toast.makeText(app, String.valueOf(position), Toast.LENGTH_SHORT).show();
+                                //Snackbar.make(findViewById(R.id.coordinator_layout_wish_edit), String.format("Selected position %d, url is %s , in arr url by pos is %s", position, String.valueOf(item), urls.get(position)), Snackbar.LENGTH_LONG).show();
+
+                                Glide.with(app)
+                                        .load(urls.get(position))
+                                        .bitmapTransform(new CropCircleTransformation(Glide.get(getApplicationContext()).getBitmapPool()))
+                                        .into(imageView);
+                                editWishBean.setPicture(Utilities.encodeThumbnail(Utilities.getBitmapFromURL(urls.get(position))));
+                                dialog.dismiss();
+
+                            }
+                        })
+                        .setCancelable(true)
+                        .setExpanded(true)  // This will enable the expand feature, (similar to android L share dialog)
+                        .create().show();
+
+            }
+
+        }, editTextTitle.getText().toString());
     }
 
     @OnClick(R.id.image_view)

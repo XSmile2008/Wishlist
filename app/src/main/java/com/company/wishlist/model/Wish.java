@@ -8,9 +8,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by vladstarikov on 07.01.16.
- */
 public class Wish implements Serializable{
 
     @JsonIgnore String id;

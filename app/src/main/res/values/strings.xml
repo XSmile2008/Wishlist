@@ -40,4 +40,5 @@
     <string name="wish_deleted_msg">Wish  %1$s deleted! </string>
     <string name="wish_restored_msg">Wish  %1$s restored! </string>
 
+    <string name="loading_pints_dialog_message">Loading pics...</string>
 </resources>

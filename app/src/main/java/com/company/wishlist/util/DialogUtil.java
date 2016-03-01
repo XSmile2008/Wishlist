@@ -1,5 +1,6 @@
 package com.company.wishlist.util;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
@@ -35,5 +36,13 @@ public class DialogUtil {
                 .setPositiveButton(context.getString(R.string.yes), onClickListener)
                 .setNegativeButton(context.getString(R.string.no), null)
                 .show();
+    }
+
+    public static ProgressDialog progressDialog(String title, String message, Context context){
+        ProgressDialog dialog = new ProgressDialog(context);
+        dialog.setTitle(title);
+        dialog.setMessage(message);
+        dialog.setCancelable(false);
+        return dialog;
     }
 }

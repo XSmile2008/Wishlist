@@ -17,6 +17,7 @@ import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.Wish;
+import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.FirebaseUtil;
 import com.company.wishlist.util.LocalStorage;
 import com.company.wishlist.util.Utilities;
@@ -29,28 +30,31 @@ import com.firebase.client.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-/**
- * Created by vladstarikov on 08.01.16.
- */
+
 public class TopWishListAdapter extends RecyclerView.Adapter<TopWishListAdapter.Holder> {
 
     private Context context;
-    private List<Wish> wishes;
+    private Set<Wish> wishes;
     private String wishListId;
 
     public TopWishListAdapter(Context context, String wishListId) {
         this.context = context;
-        this.wishes = new ArrayList<>();
+        this.wishes = new HashSet<>();
         this.wishListId = wishListId;
-        getWishes();
+    }
+
+    private Wish getByIndex(int index) {
+        return (Wish) wishes.toArray()[index];
     }
 
     @Override
@@ -60,7 +64,7 @@ public class TopWishListAdapter extends RecyclerView.Adapter<TopWishListAdapter.
 
     @Override
     public void onBindViewHolder(Holder holder, int position) {
-        holder.onBind(wishes.get(position));
+        holder.onBind(getByIndex(position));
     }
 
     @Override
@@ -68,21 +72,9 @@ public class TopWishListAdapter extends RecyclerView.Adapter<TopWishListAdapter.
         return wishes.size();
     }
 
-    private void getWishes() {
-        Firebase firebaseRoot = new Firebase(FirebaseUtil.FIREBASE_URL);
-        //todo write nice query to get random wishes
-        firebaseRoot.child(FirebaseUtil.WISH_TABLE).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    wishes.add(postSnapshot.getValue(Wish.class));
-                }
-                Collections.shuffle(wishes);
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {}
-        });
+    public void addAll(List<Wish> wishes) {
+        this.wishes.clear();
+        this.wishes.addAll(wishes);
         notifyDataSetChanged();
     }
 
@@ -104,18 +96,17 @@ public class TopWishListAdapter extends RecyclerView.Adapter<TopWishListAdapter.
             textViewComment.setText(wish.getComment());
         }
 
-        @OnClick(R.id.image_button_add)
+        @OnClick(R.id.layout_header)
         public void onClickEdit() {
 
             Intent intent = new Intent(context, WishEditActivity.class)
                     .setAction(WishEditActivity.ACTION_TAKE_FROM_TOP)
                     .putExtra(WishListFragment.WISH_LIST_ID, wishListId);
 
-            LocalStorage.getInstance().setWish(wishes.get(getAdapterPosition()));
+            LocalStorage.getInstance().setWish(getByIndex(getAdapterPosition()));
 
             context.startActivity(intent);
         }
-
 
     }
 

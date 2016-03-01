@@ -33,8 +33,6 @@ import com.company.wishlist.util.FirebaseUtil;
 import com.company.wishlist.util.LocalStorage;
 import com.company.wishlist.util.Utilities;
 import com.company.wishlist.util.social.InstagramUtil;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Length;
@@ -84,7 +82,6 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     private EditWishBean editWishBean;
     private Validator validator;
     private CalendarDatePickerDialogFragment reservedDateDialog;
-    private Firebase wishesRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,7 +161,6 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
             editWishBean.setId(null);
             editWishBean.setWishListId(getIntent().getStringExtra(WishListFragment.WISH_LIST_ID));
         }
-        wishesRef = new Firebase(FirebaseUtil.FIREBASE_URL).child(FirebaseUtil.WISH_TABLE);
     }
 
     private void initView() {
@@ -204,11 +200,12 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     private void deleteWish() {
         DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.remove_wish_dialog_text), this, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                editWishBean.remove();
+                editWishBean.softRemove();
                 Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " deleted", Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
+        //TODO: need to show SnackBar on main activity, like after swipe to remove, may be start this activity for result and return something like "removed" flag and than show SnackBar?
     }
 
     private void commitChanges() {
@@ -217,7 +214,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         if (getIntent().getAction().equals(ACTION_CREATE) || getIntent().getAction().equals(ACTION_TAKE_FROM_TOP)) {
             editWishBean.push();
         } else if (getIntent().getAction().equals(ACTION_EDIT)) {
-            wishesRef.child(editWishBean.getId()).updateChildren(editWishBean.toMap());
+            Wish.getFirebaseRef().child(editWishBean.getId()).updateChildren(editWishBean.toMap());
         }
         Toast.makeText(this, editWishBean.getTitle(), Toast.LENGTH_SHORT).show();
     }

@@ -39,7 +39,7 @@
             android:name=".activity.SettingsActivity"
             android:theme="@style/AppTheme" />
         <activity android:name=".activity.WishEditActivity" />
-        <activity android:name=".activity.TopWishActivity"/>
+        <activity android:name=".activity.TopWishActivity" />
     </application>
 
 </manifest>

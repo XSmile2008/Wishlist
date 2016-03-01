@@ -24,6 +24,7 @@ public class EditWishBean extends Wish{
         this.setComment(wish.getComment());
         this.setWishListId(wish.getWishListId());
         this.setReservation(wish.getReservation());
+        this.setIsRemoved(wish.getIsRemoved());
     }
 
     @JsonIgnore

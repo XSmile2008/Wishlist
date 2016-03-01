@@ -41,7 +41,7 @@ public class PinterestUtil {
             protected List<String> doInBackground(String... params) {
                 try {
 
-                    int imagesPerTag = 50 / params.length;
+                    int imagesPerTag = 80 / params.length;
 
                     for (String query : params) {
                         URL url = new URL(String.format(SEARCH_QUERY_LINK, URLEncoder.encode(query, "UTF-8")));

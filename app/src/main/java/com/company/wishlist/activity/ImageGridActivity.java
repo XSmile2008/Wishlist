@@ -18,6 +18,7 @@ import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.adapter.PinterestGridViewAdapter;
 import com.company.wishlist.util.pinterest.PinterestUtil;
+import com.etsy.android.grid.StaggeredGridView;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -60,7 +61,7 @@ public class ImageGridActivity extends InternetActivity {
         String query = getIntent().getStringExtra(QUERY);
         editText.setText(query);
 
-        final GridView gridView = (GridView) findViewById(R.id.imageGridView);
+        final StaggeredGridView gridView = (StaggeredGridView ) findViewById(R.id.imageGridView);
         final Context app = this;
 
         adapter = new PinterestGridViewAdapter(app, new ArrayList<String>());

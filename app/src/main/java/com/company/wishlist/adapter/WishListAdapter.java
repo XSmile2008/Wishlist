@@ -55,7 +55,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
     private WishEventListener listenersWish;
     private List<Query> queriesWish = new ArrayList<>();
-
     private List<Wish> wishes;
 
     private Wish wishBackUp;

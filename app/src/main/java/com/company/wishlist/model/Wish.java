@@ -158,6 +158,7 @@ public class Wish implements Serializable{
      */
     @JsonIgnore
     public void softRestore(Firebase.CompletionListener listener) {
+        this.isRemoved = null;
         getFirebaseRef().child(id).child("isRemoved").removeValue(listener);
     }
 
@@ -179,7 +180,8 @@ public class Wish implements Serializable{
      */
     @JsonIgnore
     public void reserve(String userId, long date, Firebase.CompletionListener listener) {
-        getFirebaseRef().child(this.id).child("reservation").setValue(new Reservation(userId, date), listener);
+        this.reservation = new Reservation(userId, date); //TODO: check it
+        getFirebaseRef().child(this.id).child("reservation").setValue(this.reservation, listener);
     }
 
     /**
@@ -196,6 +198,7 @@ public class Wish implements Serializable{
      */
     @JsonIgnore
     public void unreserve(Firebase.CompletionListener listener) {
+        this.reservation = null; //TODO: check it
         getFirebaseRef().child(id).child("reservation").removeValue(listener);
     }
 

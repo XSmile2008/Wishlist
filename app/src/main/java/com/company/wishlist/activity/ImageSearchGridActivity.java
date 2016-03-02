@@ -11,26 +11,22 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.adapter.PinterestGridViewAdapter;
 import com.company.wishlist.util.pinterest.PinterestUtil;
-import com.etsy.android.grid.StaggeredGridView;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class ImageGridActivity extends InternetActivity {
+public class ImageSearchGridActivity extends InternetActivity {
 
     public static final String QUERY = "com.company.wishlist.activity.QUERY";
     public static final String RESULT_DATA = "com.company.wishlist.activity.RESULT_DATA";
@@ -61,7 +57,7 @@ public class ImageGridActivity extends InternetActivity {
         String query = getIntent().getStringExtra(QUERY);
         editText.setText(query);
 
-        final StaggeredGridView gridView = (StaggeredGridView ) findViewById(R.id.imageGridView);
+        final GridView gridView = (GridView ) findViewById(R.id.imageGridView);
         final Context app = this;
 
         adapter = new PinterestGridViewAdapter(app, new ArrayList<String>());
@@ -96,6 +92,7 @@ public class ImageGridActivity extends InternetActivity {
         if (StringUtils.isEmpty(query)) {
             editText.setError("Should be not empty!");
         }else {
+            getIntent().putExtra(QUERY, query);
             getPictures(query);
         }
     }

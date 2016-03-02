@@ -229,8 +229,8 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         if (StringUtils.isEmpty(query)) {
             showSnake(message);
         } else {
-            Intent intent = new Intent(this, ImageGridActivity.class);
-            intent.putExtra(ImageGridActivity.QUERY, editTextTitle.getText().toString());
+            Intent intent = new Intent(this, ImageSearchGridActivity.class);
+            intent.putExtra(ImageSearchGridActivity.QUERY, editTextTitle.getText().toString());
             startActivityForResult(intent, RESULT_IMAGE_SELECT);
         }
     }
@@ -267,7 +267,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
                 Snackbar.make(findViewById(R.id.coordinator_layout_wish_edit), e.getMessage(), Snackbar.LENGTH_SHORT);
             }
         } else if (requestCode == RESULT_IMAGE_SELECT && resultCode == RESULT_OK && null != data) {
-            String url = data.getStringExtra(ImageGridActivity.RESULT_DATA).trim();
+            String url = data.getStringExtra(ImageSearchGridActivity.RESULT_DATA).trim();
             if (StringUtils.isEmpty(url)) {
                 showSnake("Something went wrong..");
             } else {

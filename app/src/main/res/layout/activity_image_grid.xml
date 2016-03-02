@@ -25,21 +25,9 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <!--<android.support.design.widget.TextInputLayout
-                    android:id="@+id/input_layout_name"
-                    android:textColorHint="#FFFFFF"
-                    android:layout_width="250dp"
-                    android:layout_height="wrap_content">
-
-                    <EditText
-                        android:id="@+id/queryImageGridList"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Query"
-                        android:singleLine="true" />
-                </android.support.design.widget.TextInputLayout>-->
 
                 <EditText
+                    android:background="#00000000"
                     android:id="@+id/queryImageGridList"
                     android:layout_width="250dp"
                     android:layout_height="wrap_content" />
@@ -53,22 +41,10 @@
             </LinearLayout>
 
         </android.support.v7.widget.Toolbar>
-        <!--</android.support.design.widget.CollapsingToolbarLayout>-->
 
     </android.support.design.widget.AppBarLayout>
 
-    <com.etsy.android.grid.StaggeredGridView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/imageGridView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:item_margin="8dp"
-        app:column_count="3"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-
-    <!--<GridView xmlns:android="http://schemas.android.com/apk/res/android"
+    <GridView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/imageGridView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -77,8 +53,7 @@
         android:numColumns="auto_fit"
         android:stretchMode="columnWidth"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-    </GridView>-->
+    </GridView>
 
 
 </android.support.design.widget.CoordinatorLayout>

@@ -168,7 +168,8 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     }
 
     private void showFriendWishList(String friendId) {
-        getSupportActionBar().setTitle(friendId);
+        User friend = friendListAdapter.getFriendById(friendId);
+        getSupportActionBar().setTitle(friend.getDisplayName());
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_wish_list);
         if (fragment == null) {
             fragment = TabbedWishListFragment.newInstance(friendId);

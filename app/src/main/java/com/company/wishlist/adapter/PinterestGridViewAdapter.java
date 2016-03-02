@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.company.wishlist.R;
 
 import org.jinstagram.entity.common.Images;
@@ -68,9 +69,11 @@ public class PinterestGridViewAdapter extends BaseAdapter {
         }
 
         String item = mItems.get(position);
+
         Glide.with(mContext)
                 .load(item)
                 .into(viewHolder.ivIcon);
+
         return convertView;
     }
 

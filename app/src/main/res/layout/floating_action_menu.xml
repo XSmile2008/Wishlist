@@ -12,7 +12,7 @@
     fab:menu_colorNormal="@color/colorAccent"
     fab:menu_colorPressed="@color/colorAccentDark"
     fab:menu_icon="@drawable/ic_add_white_24dp"
-    fab:menu_labels_margin="@dimen/default_padding_medium"
+    fab:menu_labels_margin="@dimen/default_margin_medium"
     fab:menu_labels_textSize="@dimen/text_small"
     fab:menu_shadowColor="#37000000">
 

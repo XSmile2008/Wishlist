@@ -40,17 +40,14 @@ public class PinterestUtil {
             @Override
             protected List<String> doInBackground(String... params) {
                 try {
-
-                    int imagesPerTag = 80 / params.length;
+                    int imagesPerTag = 80 / params.length; //TODO: in html loading 25 images, no more, can we load more?
 
                     for (String query : params) {
                         URL url = new URL(String.format(SEARCH_QUERY_LINK, URLEncoder.encode(query, "UTF-8")));
                         Document doc = Jsoup.parse(new Page(url).getContent());
 
-                        int length = doc.getElementsByClass("pinImg").not(".fade").size();
-
-                        List<Element> elements = doc.getElementsByClass("pinImg").not(".fade")
-                                .subList(0, length > imagesPerTag ? imagesPerTag : length);
+                        List<Element> elements = doc.getElementsByClass("pinImg").not(".fade");
+                        elements = elements.subList(0, elements.size() > imagesPerTag ? imagesPerTag : elements.size());
 
                         for (Element element : elements) {
                             urls.add(element.attr("src"));

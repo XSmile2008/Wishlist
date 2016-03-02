@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,13 +15,11 @@ import com.company.wishlist.R;
 import com.company.wishlist.activity.TopWishActivity;
 import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.adapter.FriendListAdapter;
-import com.company.wishlist.adapter.WishItemTouchHelper;
 import com.company.wishlist.adapter.WishListAdapter;
 import com.company.wishlist.events.FriendSelectedEvent;
 import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.FirebaseUtil;
 import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.github.clans.fab.FloatingActionMenu;
@@ -87,12 +84,10 @@ public class WishListFragment extends DebugFragment {
         this.mode = bundle.getInt(MODE);
         String friendId = bundle.getString(FriendListAdapter.FRIEND_ID);
 
-        adapter = new WishListAdapter(getContext(), mode == MY_WISH_LIST_MODE ? GIFT_LIST_MODE : mode);
+        adapter = new WishListAdapter(getContext(), getView(), mode == MY_WISH_LIST_MODE ? GIFT_LIST_MODE : mode);
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
-
-        new ItemTouchHelper(new WishItemTouchHelper(recyclerView)).attachToRecyclerView(recyclerView);
 
         onFriendSelectedEvent(new FriendSelectedEvent(friendId));
 

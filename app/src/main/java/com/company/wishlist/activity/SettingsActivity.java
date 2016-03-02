@@ -1,9 +1,7 @@
 package com.company.wishlist.activity;
 
-import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.support.annotation.LayoutRes;
@@ -11,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +20,9 @@ import com.company.wishlist.R;
  * Created by v.odahovskiy on 15.01.2016.
  */
 public class SettingsActivity extends PreferenceActivity  {
+
+    //TODO: add query that delete all soft-removed wishes for this user
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getDelegate().installViewFactory();

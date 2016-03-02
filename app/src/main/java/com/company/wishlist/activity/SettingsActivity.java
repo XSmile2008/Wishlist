@@ -1,25 +1,44 @@
 package com.company.wishlist.activity;
 
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.company.wishlist.R;
+import com.company.wishlist.fragment.WishListFragment;
+import com.company.wishlist.model.Reservation;
+import com.company.wishlist.model.Wish;
+import com.company.wishlist.model.WishList;
+import com.company.wishlist.util.FirebaseUtil;
+import com.facebook.Profile;
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 
 /**
  * Created by v.odahovskiy on 15.01.2016.
  */
-public class SettingsActivity extends PreferenceActivity  {
+public class SettingsActivity extends PreferenceActivity {
+
+    private static final String REMOVE_WISH_PREFS_KEY = "remove_wish";
 
     //TODO: add query that delete all soft-removed wishes for this user
 
@@ -32,15 +51,86 @@ public class SettingsActivity extends PreferenceActivity  {
         getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
     }
 
-    public static class MyPreferenceFragment extends PreferenceFragment
-    {
+    public static class MyPreferenceFragment extends PreferenceFragment {
         @Override
-        public void onCreate(final Bundle savedInstanceState)
-        {
+        public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
         }
+
+        @Override
+        public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+            if (preference.getKey().equals(REMOVE_WISH_PREFS_KEY)) {
+                new AlertDialog.Builder(getActivity())
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle("Message")
+                        .setMessage("After push Yes your removed wishes will be deleted.")
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                removeUserWishes();
+                            }
+
+                        })
+                        .setNegativeButton(R.string.no, null)
+                        .show();
+            }
+            return super.onPreferenceTreeClick(preferenceScreen, preference);
+        }
+
+        //todo may be put into wish.class
+        private void removeUserWishes() {
+            WishList.getFirebaseRef()
+                    .orderByChild("owner")
+                    .equalTo(Profile.getCurrentProfile().getId())
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            boolean endIterate = false;
+                            for (DataSnapshot wishListDS : dataSnapshot.getChildren()) {
+                                Wish.getFirebaseRef()
+                                        .orderByChild("wishListId")
+                                        .equalTo(wishListDS.getKey())
+                                        .addChildEventListener(new ChildEventListener() {
+
+                                            @Override
+                                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                                                Wish wish = dataSnapshot.getValue(Wish.class);
+                                                wish.setId(dataSnapshot.getKey());
+                                                if (wish.isRemoved()) {
+                                                    wish.remove(null);
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                                            }
+
+                                            @Override
+                                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                                            }
+
+                                            @Override
+                                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                                            }
+
+                                            @Override
+                                            public void onCancelled(FirebaseError firebaseError) {
+                                            }
+                                        });
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(FirebaseError firebaseError) {
+                            Log.d("wish_list.onCanceled()", firebaseError.toString());
+                        }
+                    });
+
+        }
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

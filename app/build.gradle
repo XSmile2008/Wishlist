@@ -53,4 +53,5 @@ dependencies {
 
     compile 'org.jsoup:jsoup:1.8.1'
     compile "com.daimajia.swipelayout:library:1.2.0@aar"
+    compile 'com.yqritc:recyclerview-flexibledivider:1.2.9'
 }

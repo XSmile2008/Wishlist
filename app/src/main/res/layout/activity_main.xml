@@ -75,7 +75,8 @@
             <TextView
                 style="@style/MediumText"
                 android:paddingLeft="@dimen/default_padding_medium"
-                android:text="@string/textViewFriendsText"/>
+                android:text="@string/textViewFriendsText"
+                android:layout_gravity="center_horizontal" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/friends_recycler_view"

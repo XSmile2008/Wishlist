@@ -39,6 +39,16 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
         this.friends = (null != friends) ? friends : new ArrayList<User>();
     }
 
+    public User getFriendById(String id) {
+        User result = null;
+        for (User user : friends) {
+            if (user.getId().equals(id)) {
+                return user;
+            }
+        }
+        throw new IllegalArgumentException(String.format("User with id(%s) not found in friend list", id));
+    }
+
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.drawer_list_item, parent, false));
@@ -65,8 +75,10 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
 
     public class Holder extends RecyclerView.ViewHolder {
 
-        @Bind(R.id.friend_avatar_iv) ImageView imageViewAvatar;
-        @Bind(R.id.friend_name_tv) TextView textViewTitle;
+        @Bind(R.id.friend_avatar_iv)
+        ImageView imageViewAvatar;
+        @Bind(R.id.friend_name_tv)
+        TextView textViewTitle;
 
         public Holder(View itemView) {
             super(itemView);

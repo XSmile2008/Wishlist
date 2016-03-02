@@ -47,4 +47,5 @@
     <string name="load_wish_progress_dialog_message">Loading wishes..</string>
     <string name="at_first_persist">At first persist</string>
 
+    <string name="loading_pints_dialog_message">Loading pics...</string>
 </resources>

@@ -32,6 +32,7 @@ import com.facebook.GraphResponse;
 import com.firebase.client.AuthData;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import org.json.JSONArray;
 
@@ -73,6 +74,7 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         RecyclerView recyclerViewFriends = (RecyclerView) drawer.findViewById(R.id.friends_recycler_view);
         recyclerViewFriends.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewFriends.setAdapter(friendListAdapter);
+        recyclerViewFriends.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).build());
 
         if (getFirebaseUtil().isAuthenticated()) {
             refreshUserDataUi();

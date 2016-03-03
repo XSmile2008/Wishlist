@@ -4,12 +4,17 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryDark">@color/app_theme_main</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="LoginPage" parent="Theme.AppCompat">
+    <style name="LoginPage" parent="Theme.AppCompat.Light">
         <item name="android:background">@color/app_theme_main</item>
+        <item name="colorPrimaryDark">@color/app_theme_main</item>
+    </style>
+
+    <style name="AppTheme.StatusColor" parent="Theme.AppCompat.Light">
+        <item name="colorPrimaryDark">@color/app_theme_main</item>
     </style>
 
     <style name="LoginPage.EditText.Title" parent="android:TextAppearance.Large">

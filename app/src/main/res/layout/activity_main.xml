@@ -9,6 +9,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context=".activity.MainActivity"
+    android:theme="@style/AppTheme.StatusColor"
     tools:openDrawer="start">
 
 

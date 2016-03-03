@@ -40,6 +40,7 @@ public class TopWishActivity extends FirebaseActivity {
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle(getString(R.string.top_wish_activity_title));
         actionBar.setHomeButtonEnabled(true);
 
         String wishListId = getIntent().getExtras().getString(WishListFragment.WISH_LIST_ID);
@@ -61,7 +62,6 @@ public class TopWishActivity extends FirebaseActivity {
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     wishes.add(postSnapshot.getValue(Wish.class));
                 }
-
 
                 Collections.shuffle(wishes);
 

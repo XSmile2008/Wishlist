@@ -17,7 +17,7 @@
 
         <ImageView
             android:id="@+id/image_view"
-            style="@style/AppTheme.CircleImageView"
+            style="@style/AppTheme.CircleImageView.Large"
             android:layout_marginRight="@dimen/cardview_horizontal_margin" />
 
         <TextView

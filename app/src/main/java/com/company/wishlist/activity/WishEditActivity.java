@@ -128,7 +128,6 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
             case R.id.action_done:
                 validator.validate();
                 LocalStorage.getInstance().setWish(null);
-                finish();
                 return false;
             case R.id.action_reserve:
                 reserveWish();
@@ -216,6 +215,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
             Wish.getFirebaseRef().child(editWishBean.getId()).updateChildren(editWishBean.toMap());
         }
         Toast.makeText(this, editWishBean.getTitle(), Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     @OnClick(R.id.insta_images_btn)

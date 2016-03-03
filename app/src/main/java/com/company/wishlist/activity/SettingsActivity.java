@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.company.wishlist.R;
+import com.company.wishlist.activity.abstracts.AuthActivity;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
 import com.facebook.Profile;
@@ -33,7 +34,7 @@ import com.firebase.client.ValueEventListener;
 /**
  * Created by v.odahovskiy on 15.01.2016.
  */
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends AuthActivity {
 
     private static final String REMOVE_WISH_PREFS_KEY = "remove_wish";
 
@@ -228,10 +229,10 @@ public class SettingsActivity extends PreferenceActivity {
         getDelegate().invalidateOptionsMenu();
     }
 
-    private AppCompatDelegate getDelegate() {
+   /* private AppCompatDelegate getDelegate() {
         if (mDelegate == null) {
             mDelegate = AppCompatDelegate.create(this, null);
         }
         return mDelegate;
-    }
+    }*/
 }

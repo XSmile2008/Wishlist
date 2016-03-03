@@ -5,6 +5,7 @@
     android:id="@+id/coordinator_layout_wish_edit"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:theme="@style/AppTheme.StatusColor"
     android:fitsSystemWindows="true"
     tools:context="com.company.wishlist.activity.WishEditActivity">
 

@@ -2,6 +2,7 @@ package com.company.wishlist.activity;
 
 import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -9,6 +10,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDelegate;
@@ -18,25 +20,21 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.company.wishlist.R;
-import com.company.wishlist.fragment.WishListFragment;
-import com.company.wishlist.model.Reservation;
+import com.company.wishlist.activity.abstracts.AuthActivity;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
-import com.company.wishlist.util.FirebaseUtil;
 import com.facebook.Profile;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
 /**
  * Created by v.odahovskiy on 15.01.2016.
  */
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends AuthActivity {
 
     private static final String REMOVE_WISH_PREFS_KEY = "remove_wish";
 
@@ -47,6 +45,9 @@ public class SettingsActivity extends PreferenceActivity {
         getDelegate().installViewFactory();
         getDelegate().onCreate(savedInstanceState);
         super.onCreate(savedInstanceState);
+
+        ActionBar bar = getSupportActionBar();
+        bar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.app_theme_main)));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
     }
@@ -60,23 +61,27 @@ public class SettingsActivity extends PreferenceActivity {
 
         @Override
         public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
-            if (preference.getKey().equals(REMOVE_WISH_PREFS_KEY)) {
-                new AlertDialog.Builder(getActivity())
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setTitle("Message")
-                        .setMessage("After push Yes your removed wishes will be deleted.")
-                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            try {
+                if (preference.getKey().equals(REMOVE_WISH_PREFS_KEY)) {
+                    new AlertDialog.Builder(getActivity())
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setTitle("Message")
+                            .setMessage("After push Yes your removed wishes will be deleted.")
+                            .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                removeUserWishes();
-                            }
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    removeUserWishes();
+                                }
 
-                        })
-                        .setNegativeButton(R.string.no, null)
-                        .show();
+                            })
+                            .setNegativeButton(R.string.no, null)
+                            .show();
+                }
+            }catch (Exception ex){}
+            finally {
+                return super.onPreferenceTreeClick(preferenceScreen, preference);
             }
-            return super.onPreferenceTreeClick(preferenceScreen, preference);
         }
 
         //todo may be put into wish.class
@@ -224,10 +229,10 @@ public class SettingsActivity extends PreferenceActivity {
         getDelegate().invalidateOptionsMenu();
     }
 
-    private AppCompatDelegate getDelegate() {
+   /* private AppCompatDelegate getDelegate() {
         if (mDelegate == null) {
             mDelegate = AppCompatDelegate.create(this, null);
         }
         return mDelegate;
-    }
+    }*/
 }

@@ -14,7 +14,7 @@ import com.firebase.client.FirebaseError;
 /**
  * Created by v.odahovskiy on 12.01.2016.
  */
-public abstract class FirebaseActivity extends InternetActivity implements FirebaseUtil.IFirebaseConnection {
+public abstract class FirebaseActivity extends AuthActivity implements FirebaseUtil.IFirebaseConnection {
 
     public static final String RELOAD_DATA = "RELOAD_DATA";
 

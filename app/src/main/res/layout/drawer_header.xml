@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/side_nav_bar"
+    android:background="@color/app_theme_main"
     android:orientation="vertical"
     android:paddingBottom="@dimen/cardview_padding"
     android:paddingLeft="@dimen/cardview_padding"

@@ -9,8 +9,8 @@
     </style>
 
     <style name="LoginPage" parent="Theme.AppCompat.Light">
-        <item name="android:background">@color/app_theme_main</item>
-        <item name="colorPrimaryDark">@color/app_theme_main</item>
+        <item name="android:background">#0084ff</item>
+        <item name="colorPrimaryDark">#0084ff</item>
     </style>
 
     <style name="AppTheme.StatusColor" parent="Theme.AppCompat.Light">

@@ -18,8 +18,8 @@
 
         <ImageView
             android:id="@+id/profile_user_avatar_iw"
-            android:layout_width="@dimen/circle_icon_size"
-            android:layout_height="@dimen/circle_icon_size"
+            android:layout_width="@dimen/image_size_medium"
+            android:layout_height="@dimen/image_size_medium"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true" />
 

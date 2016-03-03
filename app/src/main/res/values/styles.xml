@@ -13,10 +13,22 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <!-- CircleImageView-->
     <style name="AppTheme.CircleImageView">
-        <item name="android:layout_width">56dp</item>
-        <item name="android:layout_height">56dp</item>
+        <item name="android:layout_width">@dimen/image_size_medium</item>
+        <item name="android:layout_height">@dimen/image_size_medium</item>
     </style>
+
+    <style name="AppTheme.CircleImageView.Small" parent="AppTheme.CircleImageView">
+        <item name="android:layout_width">@dimen/image_size_small</item>
+        <item name="android:layout_height">@dimen/image_size_small</item>
+    </style>
+
+    <style name="AppTheme.CircleImageView.Large" parent="AppTheme.CircleImageView">
+        <item name="android:layout_width">@dimen/image_size_large</item>
+        <item name="android:layout_height">@dimen/image_size_large</item>
+    </style>
+    <!-- CircleImageView end-->
 
     <style name="AppTheme.ImageButton">
         <item name="android:layout_width">wrap_content</item>
@@ -33,8 +45,8 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
         <item name="android:src">@android:color/darker_gray</item>
-        <item name="android:layout_marginTop">8dp</item>
-        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:layout_marginTop">@dimen/default_margin_medium</item>
+        <item name="android:layout_marginBottom">@dimen/default_margin_medium</item>
     </style>
 
     <style name="SmallText" parent="android:TextAppearance.Small">

@@ -37,7 +37,9 @@
     <dimen name="default_margin_large">16dp</dimen>
 
     <!-- images parameters-->
-    <dimen name="circle_icon_size">56dp</dimen>
-    <dimen name="image_preview_size">100dp</dimen>
+    <dimen name="image_size_small">40dp</dimen>
+    <dimen name="image_size_medium">56dp</dimen>
+    <dimen name="image_size_large">80dp</dimen>
+    <dimen name="image_size_large_large">112dp</dimen>
 
 </resources>

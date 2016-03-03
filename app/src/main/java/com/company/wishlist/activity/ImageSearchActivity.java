@@ -49,7 +49,7 @@ public class ImageSearchActivity extends InternetActivity implements ImageSearch
         String query = getIntent().getStringExtra(QUERY);
         editText.setText(query);
 
-        RecyclerView.LayoutManager layoutManager = new GridAutofitLayoutManager(this, (int) getResources().getDimension(R.dimen.image_preview_size));
+        RecyclerView.LayoutManager layoutManager = new GridAutofitLayoutManager(this, (int) getResources().getDimension(R.dimen.image_size_large_large));
         adapter = new ImageSearchAdapter(this, this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(layoutManager);

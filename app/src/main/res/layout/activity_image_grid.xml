@@ -19,25 +19,6 @@
             app:layout_collapseMode="pin"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <EditText
-                    android:id="@+id/queryImageGridList"
-                    android:layout_width="250dp"
-                    android:layout_height="wrap_content"
-                    android:background="#00000000" />
-
-                <android.support.design.widget.VisibilityAwareImageButton
-                    android:id="@+id/filterGridListBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:src="@android:drawable/ic_menu_search" />
-            </LinearLayout>
-
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>

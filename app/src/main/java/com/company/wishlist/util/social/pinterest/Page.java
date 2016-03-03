@@ -1,4 +1,4 @@
-package com.company.wishlist.util.pinterest;
+package com.company.wishlist.util.social.pinterest;
 
 import java.io.IOException;
 import java.net.URL;

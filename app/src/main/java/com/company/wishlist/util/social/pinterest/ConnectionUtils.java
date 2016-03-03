@@ -1,7 +1,6 @@
-package com.company.wishlist.util.pinterest;
+package com.company.wishlist.util.social.pinterest;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;

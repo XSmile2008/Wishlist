@@ -26,9 +26,8 @@ public class ImageSearchActivity extends InternetActivity implements ImageSearch
     public static final String QUERY = "com.company.wishlist.activity.QUERY";
     public static final String RESULT_DATA = "com.company.wishlist.activity.RESULT_DATA";
 
-    @Bind(R.id.recyclerView) RecyclerView recyclerView;
-    @Bind(R.id.filterGridListBtn) ImageButton imageButton;
-    @Bind(R.id.queryImageGridList) EditText editText;
+    @Bind(R.id.recyclerView)
+    RecyclerView recyclerView;
 
     ImageSearchAdapter adapter;
 
@@ -44,27 +43,16 @@ public class ImageSearchActivity extends InternetActivity implements ImageSearch
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
-        actionBar.setTitle("");
 
         String query = getIntent().getStringExtra(QUERY);
-        editText.setText(query);
+
+        actionBar.setTitle(String.format("Results for query:%s", query));
 
         RecyclerView.LayoutManager layoutManager = new GridAutofitLayoutManager(this, (int) getResources().getDimension(R.dimen.image_preview_size));
         adapter = new ImageSearchAdapter(this, this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(layoutManager);
         adapter.getPictures(query);
-    }
-
-    @OnClick(R.id.filterGridListBtn)
-    public void search(View view){
-        String query = editText.getText().toString().trim();
-        if (StringUtils.isEmpty(query)) {
-            editText.setError("Should be not empty!");
-        }else {
-            getIntent().putExtra(QUERY, query);
-            adapter.getPictures(query);
-        }
     }
 
     @Override

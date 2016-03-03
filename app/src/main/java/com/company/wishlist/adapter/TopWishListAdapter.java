@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.company.wishlist.R;
+import com.company.wishlist.activity.TopWishActivity;
 import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
@@ -101,11 +102,13 @@ public class TopWishListAdapter extends RecyclerView.Adapter<TopWishListAdapter.
 
             Intent intent = new Intent(context, WishEditActivity.class)
                     .setAction(WishEditActivity.ACTION_TAKE_FROM_TOP)
-                    .putExtra(WishListFragment.WISH_LIST_ID, wishListId);
+                    .putExtra(WishListFragment.WISH_LIST_ID, wishListId)
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
             LocalStorage.getInstance().setWish(getByIndex(getAdapterPosition()));
 
             context.startActivity(intent);
+            ((TopWishActivity)context).finish();
         }
 
     }

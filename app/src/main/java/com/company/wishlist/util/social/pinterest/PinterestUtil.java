@@ -1,4 +1,4 @@
-package com.company.wishlist.util.pinterest;
+package com.company.wishlist.util.social.pinterest;
 
 
 import android.os.AsyncTask;
@@ -7,18 +7,13 @@ import android.util.Log;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 
@@ -40,24 +35,24 @@ public class PinterestUtil {
             @Override
             protected List<String> doInBackground(String... params) {
                 try {
-                    int imagesPerTag = 80 / params.length; //TODO: in html loading 25 images, no more, can we load more?
-
                     for (String query : params) {
                         URL url = new URL(String.format(SEARCH_QUERY_LINK, URLEncoder.encode(query, "UTF-8")));
                         Document doc = Jsoup.parse(new Page(url).getContent());
 
                         List<Element> elements = doc.getElementsByClass("pinImg").not(".fade");
-                        elements = elements.subList(0, elements.size() > imagesPerTag ? imagesPerTag : elements.size());
 
                         for (Element element : elements) {
                             urls.add(element.attr("src"));
                         }
+
                     }
                 } catch (IOException ignored) {
                 } finally {
                     return urls;
                 }
             }
+
+
         }
 
         try {

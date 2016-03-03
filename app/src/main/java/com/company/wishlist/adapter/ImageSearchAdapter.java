@@ -9,7 +9,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
-import com.company.wishlist.util.pinterest.PinterestUtil;
+import com.company.wishlist.util.social.pinterest.PinterestUtil;
 
 import java.util.List;
 

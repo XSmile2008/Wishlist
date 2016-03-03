@@ -8,4 +8,8 @@
             android:targetClass="com.company.wishlist.activity.LoginActivity"
             android:action="LOGOUT" />
     </Preference>
+    <Preference android:title="Clean Wishes" android:key="remove_wish"
+        android:summary="Delete all own soft removed wishes from system">
+
+    </Preference>
 </PreferenceScreen>

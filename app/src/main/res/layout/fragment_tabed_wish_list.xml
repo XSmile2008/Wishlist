@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_gravity="bottom"
-        android:background="@color/app_theme_main"
+        android:background="@color/colorPrimary"
         app:tabTextColor="@color/semi_translucent_white"
         app:tabSelectedTextColor="@color/done_text_color_dark"
         app:tabMode="scrollable" />

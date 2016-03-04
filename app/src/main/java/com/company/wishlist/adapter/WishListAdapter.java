@@ -2,9 +2,9 @@ package com.company.wishlist.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -59,6 +59,8 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
     private Wish wishBackUp;
     private int wishBackUpPos;//TODO: check it
+
+    private SwipeLayout swipedItem;
 
     /**
      * @param context context that will be used in this adapter
@@ -260,6 +262,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         @Bind(R.id.image_view) ImageView imageView;
         @Bind(R.id.text_view_title) TextView textViewTitle;
         @Bind(R.id.text_view_comment) TextView textViewComment;
+        @Bind(R.id.text_view_status) TextView textViewStatus;
 
         //Background
         @Bind(R.id.bottom_view_remove) ViewGroup bottomViewRemove;
@@ -286,8 +289,15 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
                 @Override
                 public void onStartOpen(SwipeLayout layout) {
+                    if (swipedItem != null && !swipeLayout.equals(swipedItem)) swipedItem.close();
+                    swipedItem = swipeLayout;
                     if (layout.getDragEdge() == SwipeLayout.DragEdge.Right)
                         textViewReserve.setText(wishes.get(getAdapterPosition()).isReserved() ? R.string.action_unreserve : R.string.action_reserve);
+                }
+
+                @Override
+                public void onClose(SwipeLayout layout) {
+                    if (swipeLayout.equals(swipedItem)) swipedItem = null;
                 }
             });
         }
@@ -297,11 +307,18 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             else imageView.setImageBitmap(Utilities.decodeThumbnail(wish.getPicture()));
             textViewTitle.setText(wish.getTitle());
             textViewComment.setText(wish.getComment());
+            if (wish.isReserved()) {
+                textViewStatus.setTextColor(Color.RED);
+                textViewStatus.setText("Reserved");
+            } else {
+                textViewStatus.setText("");
+            }
         }
 
         @OnClick({R.id.card_view, R.id.bottom_view_reserve})
         public void onClick(View v) {
-            swipeLayout.close();
+            swipedItem.close();
+            swipedItem = null;
             switch (v.getId()) {
                 case R.id.card_view:
                     Toast.makeText(context, "item " + getAdapterPosition() + " edit", Toast.LENGTH_SHORT).show();

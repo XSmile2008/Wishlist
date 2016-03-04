@@ -46,8 +46,6 @@ public class SettingsActivity extends AuthActivity {
         getDelegate().onCreate(savedInstanceState);
         super.onCreate(savedInstanceState);
 
-        ActionBar bar = getSupportActionBar();
-        bar.setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(this, R.color.app_theme_main)));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
     }

@@ -9,8 +9,8 @@
         android:id="@+id/bottom_view_remove"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/default_padding_large"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:paddingLeft="@dimen/default_padding_large">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -20,7 +20,7 @@
         <TextView
             style="@style/MediumText"
             android:layout_marginRight="@dimen/default_margin_medium"
-            android:text="@string/action_remove"/>
+            android:text="@string/action_remove" />
 
     </LinearLayout>
     <!-- Bottom View Remove End-->
@@ -30,8 +30,8 @@
         android:id="@+id/bottom_view_reserve"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingRight="@dimen/default_padding_large"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:paddingRight="@dimen/default_padding_large">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -39,10 +39,10 @@
             android:src="@drawable/ic_favorite_red_600_24dp" />
 
         <TextView
-            style="@style/MediumText"
             android:id="@+id/text_view_reserve"
+            style="@style/MediumText"
             android:layout_marginLeft="@dimen/default_margin_medium"
-            android:text="@string/action_reserve"/>
+            android:text="@string/action_reserve" />
 
     </LinearLayout>
     <!-- Bottom View Reserve End-->
@@ -70,7 +70,7 @@
 
                 <ImageView
                     android:id="@+id/image_view"
-                    style="@style/AppTheme.CircleImageView"
+                    style="@style/AppTheme.CircleImageView.Large"
                     android:layout_marginRight="@dimen/cardview_horizontal_margin" />
 
                 <TextView
@@ -85,9 +85,17 @@
                     android:layout_toRightOf="@+id/image_view"
                     android:ellipsize="end" />
 
+                <TextView
+                    android:id="@+id/text_view_status"
+                    style="@style/SmallText"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:textAllCaps="true" />
+
             </RelativeLayout>
 
         </android.support.v7.widget.CardView>
+
     </FrameLayout>
     <!-- Surface View End -->
 

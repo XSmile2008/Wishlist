@@ -5,7 +5,6 @@
     android:id="@+id/coordinator_layout_wish_edit"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/AppTheme.StatusColor"
     android:fitsSystemWindows="true"
     tools:context="com.company.wishlist.activity.WishEditActivity">
 
@@ -24,8 +23,8 @@
         <ImageView
             android:id="@+id/image_view"
             style="@style/AppTheme.CircleImageView"
-            android:layout_width="112dp"
-            android:layout_height="112dp"
+            android:layout_width="@dimen/image_size_large_large"
+            android:layout_height="@dimen/image_size_large_large"
             android:layout_gravity="center_horizontal" />
 
         <LinearLayout

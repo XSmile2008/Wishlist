@@ -317,7 +317,8 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
         @OnClick({R.id.card_view, R.id.bottom_view_reserve})
         public void onClick(View v) {
-            swipeLayout.close();
+            swipedItem.close();
+            swipedItem = null;
             switch (v.getId()) {
                 case R.id.card_view:
                     Toast.makeText(context, "item " + getAdapterPosition() + " edit", Toast.LENGTH_SHORT).show();

@@ -1,5 +1,6 @@
 package com.company.wishlist.application;
 
+import com.company.wishlist.model.Notification;
 import com.facebook.FacebookSdk;
 import com.firebase.client.Firebase;
 
@@ -11,6 +12,7 @@ public class Application extends android.app.Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Firebase.getDefaultConfig().setPersistenceEnabled(true);
         Firebase.setAndroidContext(this);
         FacebookSdk.sdkInitialize(getApplicationContext());
     }

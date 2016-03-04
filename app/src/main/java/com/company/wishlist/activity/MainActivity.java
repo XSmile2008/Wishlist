@@ -23,6 +23,7 @@ import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.fragment.TabbedWishListFragment;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
+import com.company.wishlist.model.Notification;
 import com.company.wishlist.model.User;
 import com.company.wishlist.service.NotificationService;
 import com.company.wishlist.util.CropCircleTransformation;
@@ -31,6 +32,7 @@ import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.firebase.client.AuthData;
+import com.firebase.client.Firebase;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
@@ -81,6 +83,7 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
             refreshUserDataUi();
             showMyWishList();
         }
+
 
         Intent intent = new Intent(this, NotificationService.class);
         startService(intent);

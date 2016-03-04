@@ -12,5 +12,6 @@ public class LeftOneHourNotification extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
       //
+        //set confirm true to wish notification or remove
     }
 }

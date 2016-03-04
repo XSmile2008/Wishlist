@@ -40,11 +40,8 @@ public class NotificationService  extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Intent intentLater = new Intent(this, LeftOneHourNotification.class);
-        PendingIntent pendIntentLater = PendingIntent.getService(this, 0, intentLater, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Intent intentDontNotificate = new Intent(this, LeftOneHourNotification.class);
-        PendingIntent pendIntentDontNotificate = PendingIntent.getService(this, 0, intentDontNotificate, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent intentDontRemind = new Intent(this, LeftOneHourNotification.class);
+        PendingIntent pendIntentDontRemind = PendingIntent.getService(this, 0, intentDontRemind, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Intent intentStartApp = new Intent(this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendIntentApp = PendingIntent.getActivity(this, 0, intentStartApp, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -54,8 +51,7 @@ public class NotificationService  extends Service {
                 .setContentTitle("Wish reminder")
                 .setContentIntent(pendIntentApp)
                 .setAutoCancel(true)
-                .addAction(android.R.drawable.arrow_up_float, "Later", pendIntentLater)
-                .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Ok", pendIntentDontNotificate);
+                .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Don't remind", pendIntentDontRemind);
 
         ntfcManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -97,6 +93,7 @@ public class NotificationService  extends Service {
              * I'm using owner , cause if we will used date field, we cat take many records for this date
              * need to think what way is better
              */
+
             Notification.getFirebaseRef().orderByChild("owner").equalTo(Profile.getCurrentProfile().getId())
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -107,7 +104,7 @@ public class NotificationService  extends Service {
                                 if (notification.isToday() && !notification.getConfirm()) {
                                     builder.setContentText("Don't forget for " + notification.getWishTitle());
                                     Integer id = notifications.get(notification.getId());
-                                    id = (null == id)? notifications.values().size() + 1 : id;
+                                    id = (null == id) ? notifications.values().size() + 1 : id;
                                     notifications.put(notification.getId(), id);// check for duplicates
                                     manager.notify(id, builder.build());
                                 }
@@ -119,6 +116,6 @@ public class NotificationService  extends Service {
 
                         }
                     });
-            }
+        }
         }
     }

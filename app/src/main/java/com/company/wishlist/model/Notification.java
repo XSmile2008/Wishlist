@@ -1,0 +1,127 @@
+package com.company.wishlist.model;
+
+import com.company.wishlist.util.DateUtil;
+import com.company.wishlist.util.FirebaseUtil;
+import com.facebook.Profile;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
+
+import java.util.Date;
+
+public class Notification {
+
+    public static final int NOTIFY_BEFORE_RESERVATION_DAYS = 1;
+
+    @JsonIgnore
+    private String id;
+    private String wishId;
+    private String wishTitle;
+    private String picture;
+    private Boolean confirm;
+    private String reservationDate;
+    private String notifyDate;
+    private String owner;
+
+    @JsonIgnore
+    public String create(Firebase.CompletionListener listener, Wish wish) {
+        Firebase wishTable = getFirebaseRef();
+        this.id = wishTable.push().getKey();
+        this.wishId = wish.getId();
+        this.wishTitle = wish.getTitle();
+        this.picture = wish.getPicture();
+        this.reservationDate = wish.getReservation().getForDate();
+        this.owner = Profile.getCurrentProfile().getId();
+        this.confirm = false;
+
+        long reserve = Long.valueOf(wish.getReservation().getForDate());
+        long notify = DateUtil.isToday(reserve) ? reserve : DateUtil.substractDaysFromDate(reserve, NOTIFY_BEFORE_RESERVATION_DAYS);
+        this.notifyDate = String.valueOf(DateUtil.getDateWithoutTime(new Date(notify)));
+
+        wishTable.child(this.id).setValue(this);
+        wishTable.child(this.id).keepSynced(true);
+        return this.id;
+    }
+
+    @JsonIgnore
+    public void remove(Firebase.CompletionListener listener) {
+        getFirebaseRef().child(this.id).removeValue(listener);
+    }
+
+    @JsonIgnore
+    public static Firebase getFirebaseRef() {
+        return new Firebase(FirebaseUtil.FIREBASE_URL).child(Notification.class.getSimpleName());
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getWishId() {
+        return wishId;
+    }
+
+    public void setWishId(String wishId) {
+        this.wishId = wishId;
+    }
+
+    public String getWishTitle() {
+        return wishTitle;
+    }
+
+    public void setWishTitle(String wishTitle) {
+        this.wishTitle = wishTitle;
+    }
+
+    public Boolean getConfirm() {
+        return confirm;
+    }
+
+    public void setConfirm(Boolean confirm) {
+        this.confirm = confirm;
+    }
+
+    public String getPicture() {
+        return picture;
+    }
+
+    public void setPicture(String picture) {
+        this.picture = picture;
+    }
+
+    public String getReservationDate() {
+        return reservationDate;
+    }
+
+    public void setReservationDate(String reservationDate) {
+        this.reservationDate = reservationDate;
+    }
+
+    public String getNotifyDate() {
+        return notifyDate;
+    }
+
+    public void setNotifyDate(String notifyDate) {
+        this.notifyDate = notifyDate;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    @JsonIgnore
+    public boolean isToday() {
+        return DateUtil.isToday(Long.valueOf(this.notifyDate));
+    }
+}

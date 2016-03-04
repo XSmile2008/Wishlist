@@ -1,8 +1,14 @@
 package com.company.wishlist.model;
 
+import android.util.Log;
+
 import com.company.wishlist.util.FirebaseUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -132,6 +138,7 @@ public class Wish implements Serializable{
     @JsonIgnore
     public void softRemove() {
         this.softRemove(null);
+        removeNotification();
     }
 
     /**
@@ -150,6 +157,7 @@ public class Wish implements Serializable{
     @JsonIgnore
     public void softRestore() {
         this.softRestore(null);
+        new Notification().create(null, this);
     }
 
     /**
@@ -170,6 +178,7 @@ public class Wish implements Serializable{
     @JsonIgnore
     public void reserve(String userId, long date) {
         this.reserve(userId, date, null);
+        new Notification().create(null, this);
     }
 
     /**
@@ -190,6 +199,8 @@ public class Wish implements Serializable{
     @JsonIgnore
     public void unreserve() {
         this.unreserve(null);
+        removeNotification();
+        //todo remove notification
     }
 
     /**
@@ -210,6 +221,33 @@ public class Wish implements Serializable{
     @JsonIgnore
     public boolean isRemoved() {
         return null != isRemoved;
+    }
+
+    @JsonIgnore
+    private void removeNotification(){
+        Notification.getFirebaseRef().orderByChild("wishId").equalTo(this.getId())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                            Notification notification = ds.getValue(Notification.class);
+                            notification.setId(ds.getKey());
+                            notification.remove(new Firebase.CompletionListener() {
+                                @Override
+                                public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                                    Log.d(this.getClass().getSimpleName(), " Notification for this wish was removed");
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
+
+                    }
+                });
+
+
     }
 
     @JsonIgnore

@@ -20,8 +20,6 @@ public class Notification {
     private String id;
     private String wishId;
     private String wishTitle;
-    private String picture;
-    private Boolean confirm;
     private String reservationDate;
     private String notifyDate;
     private String owner;
@@ -32,10 +30,8 @@ public class Notification {
         this.id = wishTable.push().getKey();
         this.wishId = wish.getId();
         this.wishTitle = wish.getTitle();
-        this.picture = wish.getPicture();
         this.reservationDate = wish.getReservation().getForDate();
         this.owner = Profile.getCurrentProfile().getId();
-        this.confirm = false;
 
         long reserve = Long.valueOf(wish.getReservation().getForDate());
         long notify = DateUtil.isToday(reserve) ? reserve : DateUtil.substractDaysFromDate(reserve, NOTIFY_BEFORE_RESERVATION_DAYS);
@@ -78,22 +74,6 @@ public class Notification {
 
     public void setWishTitle(String wishTitle) {
         this.wishTitle = wishTitle;
-    }
-
-    public Boolean getConfirm() {
-        return confirm;
-    }
-
-    public void setConfirm(Boolean confirm) {
-        this.confirm = confirm;
-    }
-
-    public String getPicture() {
-        return picture;
-    }
-
-    public void setPicture(String picture) {
-        this.picture = picture;
     }
 
     public String getReservationDate() {

@@ -17,7 +17,7 @@ import com.firebase.client.FirebaseError;
  */
 public class FirebaseUtil implements Firebase.AuthResultHandler {
 
-    public static String FIREBASE_URL;//TODO:
+    public static String FIREBASE_URL = "https://appwishlist.firebaseio.com";
 
     //interface for interact util with activity for connection
     public interface IFirebaseConnection {
@@ -36,8 +36,8 @@ public class FirebaseUtil implements Firebase.AuthResultHandler {
     public FirebaseUtil(Context context) {
         this.context = context;
         Firebase.setAndroidContext(context);
-        FIREBASE_URL = context.getString(R.string.firebase_url);
-        firebaseRoot = new Firebase(context.getString(R.string.firebase_url));
+        //FIREBASE_URL = context.getString(R.string.firebase_url);
+        firebaseRoot = new Firebase(FIREBASE_URL);
         refreshAuth();
     }
 

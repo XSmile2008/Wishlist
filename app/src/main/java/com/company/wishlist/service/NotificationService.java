@@ -1,31 +1,30 @@
 package com.company.wishlist.service;
 
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
+import android.content.SharedPreferences;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v7.app.NotificationCompat;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.MainActivity;
-import com.company.wishlist.model.Notification;
 import com.facebook.Profile;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class NotificationService  extends Service {
+public class NotificationService extends Service {
 
     private Timer timer;
     private UpdateTimerTask updateTimerTask;
@@ -40,27 +39,25 @@ public class NotificationService  extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Intent intentDontRemind = new Intent(this, LeftOneHourNotification.class);
-        PendingIntent pendIntentDontRemind = PendingIntent.getService(this, 0, intentDontRemind, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Intent intentStartApp = new Intent(this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendIntentApp = PendingIntent.getActivity(this, 0, intentStartApp, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        android.support.v4.app.NotificationCompat.Builder ntfcBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Wish reminder")
-                .setContentIntent(pendIntentApp)
-                .setAutoCancel(true)
-                .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Don't remind", pendIntentDontRemind);
-
         ntfcManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         timer = new Timer();
-        updateTimerTask = new UpdateTimerTask(ntfcBuilder, ntfcManager);
+        updateTimerTask = new UpdateTimerTask(ntfcManager, this);
 
-        timer.schedule(updateTimerTask, UpdateTimerTask.TASK_DELAY, UpdateTimerTask.TASTK_REPEAT);
+        int val = getRepeatValueAsMinutes();
+        timer.schedule(updateTimerTask, UpdateTimerTask.TASK_DELAY, val);
 
         return START_STICKY;
+    }
+
+    private int getRepeatValueAsMinutes() {
+        SharedPreferences shared = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        String repeatMinutes = shared.getString(getString(R.string.settings_notification_reserve_repeat_key), null);
+
+        if (null != repeatMinutes) {
+            return 1000 * 60 * Integer.valueOf(repeatMinutes);
+        } else return UpdateTimerTask.TASTK_REPEAT;
+
     }
 
     @Override
@@ -75,15 +72,14 @@ public class NotificationService  extends Service {
     private class UpdateTimerTask extends TimerTask {
 
         public final static int TASK_DELAY = 1000; //in milliseconds
-//        public final static int TASTK_REPEAT = 1000 * 60 * 15;//60 seconds
-        public final static int TASTK_REPEAT = 1000 * 35; //60 seconds
+        public final static int TASTK_REPEAT = 1000 * 60 * 60; // Repeat every hour
 
-        private android.support.v4.app.NotificationCompat.Builder builder;
         private NotificationManager manager;
+        private Service service;
 
-        public UpdateTimerTask(android.support.v4.app.NotificationCompat.Builder builder, NotificationManager manager) {
-            this.builder = builder;
+        public UpdateTimerTask(NotificationManager manager, Service service) {
             this.manager = manager;
+            this.service = service;
         }
 
         @Override
@@ -93,29 +89,54 @@ public class NotificationService  extends Service {
              * I'm using owner , cause if we will used date field, we cat take many records for this date
              * need to think what way is better
              */
+            try {
+                com.company.wishlist.model.Notification.getFirebaseRef().orderByChild("owner").equalTo(Profile.getCurrentProfile().getId())
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                    com.company.wishlist.model.Notification notification = ds.getValue(com.company.wishlist.model.Notification.class);
+                                    notification.setId(ds.getKey());
+                                    if (notification.isToday()) {
+                                        Integer id = notifications.get(notification.getId());
+                                        id = (null == id) ? notifications.values().size() + 1 : id;
+                                        notifications.put(notification.getId(), id);// check for duplicates
 
-            Notification.getFirebaseRef().orderByChild("owner").equalTo(Profile.getCurrentProfile().getId())
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                                Notification notification = ds.getValue(Notification.class);
-                                notification.setId(ds.getKey());
-                                if (notification.isToday() && !notification.getConfirm()) {
-                                    builder.setContentText("Don't forget for " + notification.getWishTitle());
-                                    Integer id = notifications.get(notification.getId());
-                                    id = (null == id) ? notifications.values().size() + 1 : id;
-                                    notifications.put(notification.getId(), id);// check for duplicates
-                                    manager.notify(id, builder.build());
+                                        buildAndNotify(notification, id);
+                                    }
                                 }
                             }
-                        }
 
-                        @Override
-                        public void onCancelled(FirebaseError firebaseError) {
+                            private void buildAndNotify(com.company.wishlist.model.Notification notification, Integer id) {
+                                Intent intentDontRemind = new Intent(service, LeftOneHourNotification.class);
+                                intentDontRemind.putExtra(LeftOneHourNotification.NOTIFICATION_ID, notification.getId());
+                                intentDontRemind.putExtra(LeftOneHourNotification.ANDROID_NOTIFICATION_ID, id);
 
-                        }
-                    });
-        }
+                                Intent intentStartApp = new Intent(service, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                PendingIntent pendIntentApp = PendingIntent.getActivity(service, 0, intentStartApp, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                                PendingIntent pendIntentDontRemind = PendingIntent.getService(service, 0, intentDontRemind, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                                android.support.v4.app.NotificationCompat.Builder ntfcBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(service)
+                                        .setSmallIcon(R.mipmap.ic_launcher)
+                                        .setContentTitle(service.getString(R.string.notification_service_title))
+                                        .setContentIntent(pendIntentApp)
+                                        .setAutoCancel(true);
+
+                                ntfcBuilder.setContentText(service.getString(R.string.notification_reserve_text, notification.getWishTitle()));
+
+                                ntfcBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, service.getString(R.string.notification_action_text), pendIntentDontRemind);
+
+                                manager.notify(id, ntfcBuilder.build());
+                            }
+
+                            @Override
+                            public void onCancelled(FirebaseError firebaseError) {
+
+                            }
+                        });
+            } catch (Exception ex) {
+            }
         }
     }
+}

@@ -46,10 +46,12 @@ public abstract class FirebaseActivity extends AuthActivity implements FirebaseU
     @Override
     public void onResume() {
         super.onResume();
-        if (null != this.getIntent().getExtras()) {
-            boolean reloadData = this.getIntent().getExtras().getBoolean(RELOAD_DATA, false);
-            if (reloadData) {
-                firebaseUtil.refreshAuth();
+        if (isConnected()) {
+            if (null != this.getIntent().getExtras()) {
+                boolean reloadData = this.getIntent().getExtras().getBoolean(RELOAD_DATA, false);
+                if (reloadData) {
+                    firebaseUtil.refreshAuth();
+                }
             }
         }
     }

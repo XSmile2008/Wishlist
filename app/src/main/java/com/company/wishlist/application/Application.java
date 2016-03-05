@@ -1,6 +1,5 @@
 package com.company.wishlist.application;
 
-import com.company.wishlist.model.Notification;
 import com.facebook.FacebookSdk;
 import com.firebase.client.Firebase;
 

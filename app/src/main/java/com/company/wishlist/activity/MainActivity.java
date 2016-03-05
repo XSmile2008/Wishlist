@@ -79,7 +79,8 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         recyclerViewFriends.setAdapter(friendListAdapter);
         recyclerViewFriends.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).build());
 
-        if (getFirebaseUtil().isAuthenticated()) {
+        if (getFirebaseUtil().isAuthenticated() && isConnected()) {
+            System.out.println("bla");
             refreshUserDataUi();
             showMyWishList();
         }

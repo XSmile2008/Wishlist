@@ -1,13 +1,21 @@
 package com.company.wishlist.activity.abstracts;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
 import com.company.wishlist.R;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by vladstarikov on 11.01.16.
@@ -57,8 +65,33 @@ public class InternetActivity extends DebugActivity {
 
     public boolean isConnected() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        final NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        // boolean result = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        class CheckInternet extends AsyncTask<Void, Void, Boolean> {
+
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                boolean result = false;
+                if (activeNetwork != null && activeNetwork.isConnected()) {
+                    try {
+                        URL url = new URL("http://www.google.com");
+                        HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
+                        urlc.setConnectTimeout(3000);
+                        urlc.connect();
+                        if (urlc.getResponseCode() == 200) {
+                            result = true;
+                        }
+                    } catch (IOException ignored) {}
+                }
+                return result;
+            }
+        }
+
+        try {
+            return new CheckInternet().execute().get();
+        } catch (InterruptedException | ExecutionException e) {
+            return false;
+        }
     }
 
 }

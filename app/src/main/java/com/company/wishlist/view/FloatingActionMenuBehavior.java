@@ -1,4 +1,4 @@
-package com.company.wishlist.util;
+package com.company.wishlist.view;
 
 import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;

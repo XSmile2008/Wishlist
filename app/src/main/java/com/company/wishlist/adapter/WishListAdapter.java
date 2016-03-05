@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -36,7 +38,9 @@ import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -47,18 +51,20 @@ import butterknife.OnClick;
  */
 public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder> implements IOnFriendSelectedListener, IWishItemAdapter {
 
-    private String LOG_TAG = getClass().getSimpleName();
+    private static String LOG_TAG = WishListAdapter.class.getSimpleName();
+    private static int NOT_FIND = -1;//TODO:
 
     private Context context;
     private View rootView;
     private int mode;//WISH_LIST_MODE or GIFT_LIST_MODE
 
-    private WishEventListener listenersWish;
+    private WishEventListener listenersWish = new WishEventListener();
     private List<Query> queriesWish = new ArrayList<>();
-    private List<Wish> wishes;
 
+    private Map<String, WishList> wishLists = new HashMap<>();
+    private List<Wish> wishes = new ArrayList<>();
     private Wish wishBackUp;
-    private int wishBackUpPos;//TODO: check it
+    private String friendId;
 
     private SwipeLayout swipedItem;
 
@@ -70,8 +76,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         this.context = context;
         this.rootView = rootView;
         this.mode = mode;
-        this.wishes = new ArrayList<>();
-        this.listenersWish = new WishEventListener();
     }
 
     @Override
@@ -89,12 +93,38 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         return wishes.size();
     }
 
-    @Deprecated
+    class WishComparator implements java.util.Comparator<Wish> {
+
+        public int graduateByReservation(Wish wish) {
+            if (wish.getReservation() == null) return 1;
+            else if (wish.getReservation().getByUser().equals(FirebaseUtil.getCurrentUser().getId())) return 2;
+            else return 0;
+        }
+
+        @Override
+        public int compare(Wish left, Wish right) {
+            int gradLeft = graduateByReservation(left);
+            int gradRight = graduateByReservation(right);
+            if (gradLeft < gradRight) return -1;
+            else if (gradLeft > gradRight) return 1;
+            else return right.getTitle().toLowerCase().compareTo(left.getTitle().toLowerCase());//TODO: may be use Collator
+        }
+
+    }
+
+    private int findPositionForWish(Wish wish) {
+        WishComparator comparator = new WishComparator();
+        for (int i = 0; i < wishes.size(); i++) {
+            if (comparator.compare(wish, wishes.get(i)) >= 0) return i;
+        }
+        return wishes.size();
+    }
+
     private int findWishIndexById(String id) {
         for (int i = 0; i < wishes.size(); i++) {
             if (wishes.get(i).getId().equals(id)) return i;
         }
-        return -1;
+        return NOT_FIND;
     }
 
     @Override
@@ -120,8 +150,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
     @Override
     public void removeWish(int position) {
-        Toast.makeText(context, "item " + position + " removed", Toast.LENGTH_SHORT).show();
-        wishBackUpPos = position;
         wishBackUp = wishes.get(position);
         wishBackUp.softRemove();
         Snackbar.make(rootView, R.string.message_wish_removed, Snackbar.LENGTH_LONG)
@@ -137,7 +165,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     @Override
     public void restoreWish() {
         Toast.makeText(context, "restore", Toast.LENGTH_SHORT).show();
-        wishes.add(wishBackUpPos, wishBackUp);
         notifyDataSetChanged();
         wishBackUp.softRestore();
     }
@@ -145,6 +172,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     @Override
     public void onFriendSelected(String id) {
         Log.d(LOG_TAG, "onFriendSelected(" + id + ")");
+        this.friendId = id;
         wishes.clear();
         for (Query query : queriesWish) query.removeEventListener(listenersWish);//remove all unused listeners
         getWishLists(id);
@@ -170,12 +198,16 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
                             wishList.setId(wishListDS.getKey());
                             switch (mode) {
                                 case WishListFragment.WISH_LIST_MODE:
-                                    if (!wishList.getOwner().equals(FirebaseUtil.getCurrentUser().getId()))
+                                    if (!wishList.getOwner().equals(FirebaseUtil.getCurrentUser().getId())) {
+                                        wishLists.put(wishList.getId(), wishList);
                                         getWishes(wishList.getId());
+                                    }
                                     break;
                                 case WishListFragment.GIFT_LIST_MODE:
-                                    if (wishList.getOwner().equals(FirebaseUtil.getCurrentUser().getId()))
+                                    if (wishList.getOwner().equals(FirebaseUtil.getCurrentUser().getId())) {
+                                        wishLists.put(wishList.getId(), wishList);
                                         getWishes(wishList.getId());
+                                    }
                                     break;
                             }
                         }
@@ -193,7 +225,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
      * @param wishListId - id of wishList from that we getting wishes
      */
     private void getWishes(final String wishListId) {
-        Log.d(LOG_TAG, "punyan =" + wishListId);
         Query query = Wish.getFirebaseRef()
                 .orderByChild("wishListId")
                 .equalTo(wishListId);
@@ -206,10 +237,13 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String prevKey) {
             Wish wish = dataSnapshot.getValue(Wish.class);
-            if (!wish.isRemoved()) {
-                wish.setReservation(dataSnapshot.child("reservation").getValue(Reservation.class));
-                wish.setId(dataSnapshot.getKey());
-                wishes.add(wish);
+            wish.setId(dataSnapshot.getKey());
+            wish.setReservation(dataSnapshot.child("reservation").getValue(Reservation.class));
+            if (!wish.isRemoved() &&
+                    (wishLists.get(wish.getWishListId()).getOwner().equals(friendId) ||
+                            wish.isReserved() ||
+                            mode == WishListFragment.GIFT_LIST_MODE)) {
+                wishes.add(findPositionForWish(wish), wish);
                 notifyDataSetChanged();
             }
             Log.d(LOG_TAG, "Wish.onChildAdded()" + wish.toString());
@@ -220,12 +254,19 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             Wish wish = dataSnapshot.getValue(Wish.class);
             wish.setId(dataSnapshot.getKey());
             int index = findWishIndexById(wish.getId());
-            if (!wish.isRemoved()) {
+            if (!wish.isRemoved() &&
+                    (wishLists.get(wish.getWishListId()).getOwner().equals(friendId) ||
+                            wish.isReserved() ||
+                            mode == WishListFragment.GIFT_LIST_MODE)) {
                 wish.setReservation(dataSnapshot.child("reservation").getValue(Reservation.class));
-                if (index != -1) wishes.set(index, wish);
-                else wishes.add(wish);
-                notifyItemChanged(index);
-            } else if (index != -1) {
+                if (index != NOT_FIND) {//change
+                    wishes.remove(index);
+                    wishes.add(findPositionForWish(wish), wish);
+                } else {//soft-restore
+                    wishes.add(findPositionForWish(wish), wish);
+                }
+                notifyDataSetChanged();
+            } else if (index != NOT_FIND) {//soft-remove
                 wishes.remove(index);
                 notifyDataSetChanged();
             }
@@ -235,7 +276,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         @Override
         public void onChildRemoved(DataSnapshot dataSnapshot) {
             int index = findWishIndexById(dataSnapshot.getKey());
-            if (index != -1) {
+            if (index != NOT_FIND) {
                 wishes.remove(index);
                 notifyDataSetChanged();
             }
@@ -259,6 +300,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         @Bind(R.id.swipe_layout) SwipeLayout swipeLayout;
 
         //CardView
+        @Bind(R.id.card_view) CardView cardView;
         @Bind(R.id.image_view) ImageView imageView;
         @Bind(R.id.text_view_title) TextView textViewTitle;
         @Bind(R.id.text_view_comment) TextView textViewComment;
@@ -278,17 +320,35 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             swipeLayout.addSwipeListener(new SimpleSwipeListener() {
                 @Override
                 public void onOpen(SwipeLayout layout) {
-                    if (layout.getDragEdge() == SwipeLayout.DragEdge.Left) removeWish(getAdapterPosition());
+                    Log.d("swipe", "onOpen");
+                    if (layout.getDragEdge() == SwipeLayout.DragEdge.Left) {
+                        removeWish(getAdapterPosition());
+                    } else {
+//                        swipeLayout.setSwipeEnabled(false);//TODO
+//                        swipeLayout.setOnTouchListener(new View.OnTouchListener() {
+//                            @Override
+//                            public boolean onTouch(View v, MotionEvent event) {
+//                                if (event.getAction() == MotionEvent.ACTION_UP) {
+//                                    swipeLayout.setSwipeEnabled(true);
+//                                    swipeLayout.setOnTouchListener(null);
+//                                    Log.d("swipe", "unlocked");
+//                                }
+//                                return true;
+//                            }
+//                        });
+                    }
                 }
 
                 @Override
                 public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
+                    //Log.d("swipe", "onUpdate");
                     float alpha = Math.abs((float) leftOffset / (float) bottomViewReserve.getWidth());//TODO:
                     layout.getCurrentBottomView().setAlpha(alpha);
                 }
 
                 @Override
                 public void onStartOpen(SwipeLayout layout) {
+                    Log.e("swipe", "onStartOpen");
                     if (swipedItem != null && !swipeLayout.equals(swipedItem)) swipedItem.close();
                     swipedItem = swipeLayout;
                     if (layout.getDragEdge() == SwipeLayout.DragEdge.Right)
@@ -297,8 +357,10 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
                 @Override
                 public void onClose(SwipeLayout layout) {
+                    Log.d("swipe", "onClose");
                     if (swipeLayout.equals(swipedItem)) swipedItem = null;
                 }
+
             });
         }
 
@@ -307,17 +369,25 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             else imageView.setImageBitmap(Utilities.decodeThumbnail(wish.getPicture()));
             textViewTitle.setText(wish.getTitle());
             textViewComment.setText(wish.getComment());
+
             if (wish.isReserved()) {
+                if (wish.getReservation().getByUser().equals(FirebaseUtil.getCurrentUser().getId())) {
+                    textViewStatus.setText("Reserved by you");//TODO:
+                    swipeLayout.setRightSwipeEnabled(true);
+                } else {
+                    textViewStatus.setText("Reserved by another user");//TODO:
+                    swipeLayout.setRightSwipeEnabled(false);
+                }
                 textViewStatus.setTextColor(Color.RED);
-                textViewStatus.setText("Reserved");
             } else {
                 textViewStatus.setText("");
+                swipeLayout.setRightSwipeEnabled(true);
             }
         }
 
         @OnClick({R.id.card_view, R.id.bottom_view_reserve})
         public void onClick(View v) {
-            swipedItem.close();
+            if (swipedItem != null) swipedItem.close();
             swipedItem = null;
             switch (v.getId()) {
                 case R.id.card_view:

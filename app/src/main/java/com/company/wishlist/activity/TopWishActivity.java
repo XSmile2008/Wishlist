@@ -28,7 +28,7 @@ public class TopWishActivity extends FirebaseActivity {
 
     TopWishListAdapter adapter;
     RecyclerView recyclerView;
-    ProgressDialog progressloadingWithDialog;
+    ProgressDialog progressLoadingWithDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +49,9 @@ public class TopWishActivity extends FirebaseActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        progressloadingWithDialog = DialogUtil.progressDialog(getString(R.string.app_name), getString(R.string.load_wish_progress_dialog_message), this);
+        progressLoadingWithDialog = DialogUtil.progressDialog(getString(R.string.app_name), getString(R.string.load_wish_progress_dialog_message), this);
 
-        progressloadingWithDialog.show();
+        progressLoadingWithDialog.show();
 
         loadWishes(new ValueEventListener() {
 
@@ -62,12 +62,9 @@ public class TopWishActivity extends FirebaseActivity {
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     wishes.add(postSnapshot.getValue(Wish.class));
                 }
-
                 Collections.shuffle(wishes);
-
                 adapter.addAll(wishes);
-
-                progressloadingWithDialog.dismiss();
+                progressLoadingWithDialog.dismiss();
             }
 
             @Override

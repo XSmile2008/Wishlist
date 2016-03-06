@@ -1,9 +1,11 @@
 package com.company.wishlist.model;
 
+import java.io.Serializable;
+
 /**
  * Created by v.odahovskiy on 16.01.2016.
  */
-public class Reservation {
+public class Reservation implements Serializable{
 
     String byUser;
     String forDate;

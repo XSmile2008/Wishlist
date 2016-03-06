@@ -121,7 +121,6 @@ public class WishListFragment extends DebugFragment {
                 break;
             case R.id.fab_choose:
                 startActivity(new Intent(getContext(), TopWishActivity.class)
-                        .setAction(WishEditActivity.ACTION_CREATE)
                         .putExtra(WISH_LIST_ID, wishListId));
                 break;
         }

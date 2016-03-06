@@ -6,20 +6,14 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageButton;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.adapter.ImageSearchAdapter;
 import com.company.wishlist.view.GridAutofitLayoutManager;
 
-import org.apache.commons.lang3.StringUtils;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class ImageSearchActivity extends InternetActivity implements ImageSearchAdapter.IOnPictureSelectedListener {
 

@@ -3,38 +3,23 @@ package com.company.wishlist.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.TopWishActivity;
 import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.fragment.WishListFragment;
-import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.Wish;
-import com.company.wishlist.model.WishList;
-import com.company.wishlist.util.FirebaseUtil;
-import com.company.wishlist.util.LocalStorage;
-import com.company.wishlist.util.Utilities;
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+import com.company.wishlist.util.CloudinaryUtil;
+import com.company.wishlist.util.CropCircleTransformation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import butterknife.Bind;
@@ -55,7 +40,7 @@ public class TopWishListAdapter extends RecyclerView.Adapter<TopWishListAdapter.
     }
 
     private Wish getByIndex(int index) {
-        return (Wish) wishes.toArray()[index];
+        return (Wish) wishes.toArray()[index];//TODO: optimize this
     }
 
     @Override
@@ -91,22 +76,25 @@ public class TopWishListAdapter extends RecyclerView.Adapter<TopWishListAdapter.
         }
 
         public void onBind(Wish wish) {
-            if (wish.getPicture() == null) imageView.setImageResource(R.drawable.gift_icon);//TODO: circle image
-            else imageView.setImageBitmap(Utilities.decodeThumbnail(wish.getPicture()));
+            if (wish.getPicture() == null) {
+                imageView.setImageResource(R.drawable.gift_icon);//TODO: default circle image
+            } else {
+                Glide.with(context)
+                        .load(CloudinaryUtil.getInstance().url().generate(wish.getPicture()))
+                        .bitmapTransform(new CropCircleTransformation(Glide.get(context).getBitmapPool()))
+                        .into(imageView);
+            }
             textViewTitle.setText(wish.getTitle());
             textViewComment.setText(wish.getComment());
         }
 
         @OnClick(R.id.layout_header)
-        public void onClickEdit() {
-
+        public void onClick() {
             Intent intent = new Intent(context, WishEditActivity.class)
                     .setAction(WishEditActivity.ACTION_TAKE_FROM_TOP)
                     .putExtra(WishListFragment.WISH_LIST_ID, wishListId)
+                    .putExtra(Wish.class.getSimpleName(), getByIndex(getAdapterPosition()))
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-            LocalStorage.getInstance().setWish(getByIndex(getAdapterPosition()));
-
             context.startActivity(intent);
             ((TopWishActivity)context).finish();
         }

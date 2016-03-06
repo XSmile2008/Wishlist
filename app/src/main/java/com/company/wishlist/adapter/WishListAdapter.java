@@ -9,13 +9,13 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.WishEditActivity;
@@ -25,9 +25,9 @@ import com.company.wishlist.interfaces.IWishItemAdapter;
 import com.company.wishlist.model.Reservation;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
+import com.company.wishlist.util.CloudinaryUtil;
+import com.company.wishlist.util.CropCircleTransformation;
 import com.company.wishlist.util.FirebaseUtil;
-import com.company.wishlist.util.LocalStorage;
-import com.company.wishlist.util.Utilities;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.firebase.client.ChildEventListener;
@@ -365,8 +365,14 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         }
 
         public void onBind(Wish wish) {
-            if (wish.getPicture() == null) imageView.setImageResource(R.drawable.gift_icon);//TODO: circle image
-            else imageView.setImageBitmap(Utilities.decodeThumbnail(wish.getPicture()));
+            if (wish.getPicture() == null) {
+                imageView.setImageResource(R.drawable.gift_icon);//TODO: default circle image
+            } else {
+                Glide.with(context)
+                        .load(CloudinaryUtil.getInstance().url().generate(wish.getPicture()))
+                        .bitmapTransform(new CropCircleTransformation(Glide.get(context).getBitmapPool()))
+                        .into(imageView);
+            }
             textViewTitle.setText(wish.getTitle());
             textViewComment.setText(wish.getComment());
 
@@ -391,10 +397,9 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             swipedItem = null;
             switch (v.getId()) {
                 case R.id.card_view:
-                    Toast.makeText(context, "item " + getAdapterPosition() + " edit", Toast.LENGTH_SHORT).show();
-                    LocalStorage.getInstance().setWish(wishes.get(getAdapterPosition()));
-                    Intent intent = new Intent(context, WishEditActivity.class);
-                    intent.setAction(WishEditActivity.ACTION_EDIT);
+                    Intent intent = new Intent(context, WishEditActivity.class)
+                            .setAction(WishEditActivity.ACTION_EDIT)
+                            .putExtra("Wish", wishes.get(getAdapterPosition()));
                     context.startActivity(intent);
                     break;
                 case R.id.bottom_view_reserve:

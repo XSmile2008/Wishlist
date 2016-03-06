@@ -28,6 +28,11 @@ public class EditWishBean extends Wish{
     }
 
     @JsonIgnore
+    public Wish getOriginalWish() {
+        return wish;
+    }
+
+    @JsonIgnore
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> result = new HashMap<>();

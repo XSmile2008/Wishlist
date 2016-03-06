@@ -38,7 +38,7 @@ public class SettingsActivity extends AuthActivity {
 
     private static final String REMOVE_WISH_PREFS_KEY = "remove_wish";
 
-    //TODO: add query that delete all soft-removed wishes for this user
+    //TODO: add query that destroy all soft-removed wishes for this user
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

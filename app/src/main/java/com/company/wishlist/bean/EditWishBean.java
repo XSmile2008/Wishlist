@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
  * Created by v.odahovskiy on 19.01.2016.
  */
@@ -28,11 +27,6 @@ public class EditWishBean extends Wish{
     }
 
     @JsonIgnore
-    public Wish getOriginalWish() {
-        return wish;
-    }
-
-    @JsonIgnore
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> result = new HashMap<>();
@@ -48,6 +42,16 @@ public class EditWishBean extends Wish{
         return result;
     }
 
+    @JsonIgnore
+    public Wish getOriginalWish() {
+        return wish;
+    }
+
+    @JsonIgnore
+    public boolean isPictureChanged() {
+        return this.getPicture() != null && (wish.getPicture() == null || !this.getPicture().equals(wish.getPicture()));
+    }
+
     /**
      * Check if field of edit bean equals for initial state
      * @param value current value
@@ -57,4 +61,5 @@ public class EditWishBean extends Wish{
     private boolean isDifferent(String value, String parentValue) {
         return (null != value && !value.equals(parentValue));
     }
+
 }

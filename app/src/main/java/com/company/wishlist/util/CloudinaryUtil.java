@@ -1,6 +1,7 @@
 package com.company.wishlist.util;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
@@ -56,8 +57,8 @@ public class CloudinaryUtil {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    getInstance().uploader().destroy(publicId, ObjectUtils.emptyMap());
-                    if (listener != null) listener.onDone(null);//TODO:
+                    Map map = getInstance().uploader().destroy(publicId, ObjectUtils.emptyMap());
+                    if (listener != null) listener.onDone(map);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -70,8 +71,7 @@ public class CloudinaryUtil {
 
         IOnDoneListener listener;
 
-        public AsyncUploader() {
-        }
+        public AsyncUploader() {}
 
         public AsyncUploader(IOnDoneListener listener) {
             this.listener = listener;
@@ -80,8 +80,7 @@ public class CloudinaryUtil {
         @Override
         protected Void doInBackground(Object... params) {
             try {
-                Map<String, Object> options = new HashMap<>();//TODO: simplify
-                Map map = CloudinaryUtil.getInstance().uploader().upload(params[0], options);
+                Map map = CloudinaryUtil.getInstance().uploader().upload(params[0], ObjectUtils.emptyMap());
                 if (listener != null) listener.onDone(map);
             } catch (IOException e) {
                 e.printStackTrace();

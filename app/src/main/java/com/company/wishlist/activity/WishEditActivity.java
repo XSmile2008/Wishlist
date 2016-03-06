@@ -68,19 +68,15 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     @Length(min = 2)
     EditText editTextComment;
 
-    @Bind(R.id.search_images_btn)
-    ImageButton searchImagesBtn;
-
     @Bind(R.id.coordinator_layout)
     CoordinatorLayout coordinatorLayout;
 
-    private EditWishBean editWishBean;
+    private EditWishBean editWishBean;//TODO: test if edit wish bean contains correct data after screen rotate
     private Validator validator;
     private CalendarDatePickerDialogFragment reservedDateDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wish_edit);
         ButterKnife.bind(this);
@@ -102,8 +98,33 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         reservedDateDialog.setRetainInstance(true);
         reservedDateDialog.setThemeDark(true);
 
-        initWishEdit();
-        initView();
+        //Init bean
+        switch (getIntent().getAction()) {
+            case ACTION_CREATE:
+                editWishBean = new EditWishBean(new Wish());
+                editWishBean.setWishListId(getIntent().getStringExtra(WishListFragment.WISH_LIST_ID));
+                break;
+            case ACTION_EDIT:
+                editWishBean = new EditWishBean((Wish) getIntent().getSerializableExtra(Wish.class.getSimpleName()));
+                break;
+            case ACTION_TAKE_FROM_TOP:
+                editWishBean = new EditWishBean((Wish) getIntent().getSerializableExtra(Wish.class.getSimpleName()));
+                editWishBean.setId(null);
+                editWishBean.setWishListId(getIntent().getStringExtra(WishListFragment.WISH_LIST_ID));
+                break;
+        }
+
+        //Init view
+        editTextTitle.setText(editWishBean.getTitle());
+        editTextComment.setText(editWishBean.getComment());
+        if (editWishBean.getPicture() == null) {
+            imageView.setImageResource(R.drawable.gift_icon);
+        } else {
+            Glide.with(getApplicationContext())
+                    .load(CloudinaryUtil.getInstance().url().generate(editWishBean.getPicture()))
+                    .bitmapTransform(new CropCircleTransformation(Glide.get(getApplicationContext()).getBitmapPool()))
+                    .into(imageView);
+        }
     }
 
     @Override
@@ -119,7 +140,6 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                discardChanges();
                 onBackPressed();
                 return false;
             case R.id.action_done:
@@ -135,39 +155,16 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         return super.onOptionsItemSelected(item);
     }
 
-    public void initWishEdit() {
-        switch (getIntent().getAction()) {
-            case ACTION_CREATE:
-                editWishBean = new EditWishBean(new Wish());
-                editWishBean.setWishListId(getIntent().getStringExtra(WishListFragment.WISH_LIST_ID));
-                break;
-            case ACTION_EDIT:
-                editWishBean = new EditWishBean((Wish) getIntent().getSerializableExtra(Wish.class.getSimpleName()));
-                break;
-            case ACTION_TAKE_FROM_TOP:
-                editWishBean = new EditWishBean((Wish) getIntent().getSerializableExtra(Wish.class.getSimpleName()));
-                editWishBean.setId(null);
-                editWishBean.setWishListId(getIntent().getStringExtra(WishListFragment.WISH_LIST_ID));
-                break;
-        }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        discardChanges();
     }
 
-    private void initView() {
-        editTextTitle.setText(editWishBean.getTitle());
-        editTextComment.setText(editWishBean.getComment());
-        if (editWishBean.getPicture() == null) {
-            imageView.setImageResource(R.drawable.gift_icon);//TODO: default circle image
-        } else {
-            Glide.with(getApplicationContext())
-                    .load(CloudinaryUtil.getInstance().url().generate(editWishBean.getPicture()))
-                    .bitmapTransform(new CropCircleTransformation(Glide.get(getApplicationContext()).getBitmapPool()))
-                    .into(imageView);
-        }
-    }
-
-    /**
-     * Change logic
+    /*vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+     * Database changes logic section
      */
+
     private void reserveWish() {
         if (!editWishBean.isReserved()) {
             reservedDateDialog.setOnDateSetListener(new CalendarDatePickerDialogFragment.OnDateSetListener() {
@@ -200,7 +197,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     }
 
     private void commitChanges() {
-        if (editWishBean.getPicture() != null && editWishBean.getOriginalWish().getPicture() != null) {
+        if (editWishBean.isPictureChanged()) {
             CloudinaryUtil.destroy(editWishBean.getOriginalWish().getPicture());//destroy old image on cloud
         }
         editWishBean.setComment(editTextComment.getText().toString());
@@ -215,30 +212,34 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     }
 
     private void discardChanges() {
-        if (editWishBean.getPicture() != null) {
+        if (editWishBean.isPictureChanged()) {
             CloudinaryUtil.destroy(editWishBean.getPicture());//destroy new image on cloud
         }
     }
 
-    @OnClick(R.id.search_images_btn)
+    /*
+     * Database changes logic section end
+     *^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
+
+    @OnClick({R.id.search_images_btn, R.id.gallery_image_btn})
     public void showImagesDialog(View view) {
-        String query = editTextTitle.getText().toString().trim();
-        if (!query.isEmpty()) {
-            Snackbar.make(coordinatorLayout, "Wish title should be not empty!", Snackbar.LENGTH_SHORT).show();
-        } else {
-            Intent intent = new Intent(this, ImageSearchActivity.class);
-            intent.putExtra(ImageSearchActivity.QUERY, editTextTitle.getText().toString());
-            startActivityForResult(intent, RESULT_IMAGE_SELECT);
+        switch (view.getId()) {
+            case R.id.search_images_btn:
+                String query = editTextTitle.getText().toString().trim();
+                if (query.isEmpty()) {
+                    Snackbar.make(coordinatorLayout, "Wish title should be not empty!", Snackbar.LENGTH_SHORT).show();
+                } else {
+                    Intent intent = new Intent(this, ImageSearchActivity.class);
+                    intent.putExtra(ImageSearchActivity.QUERY, editTextTitle.getText().toString());
+                    startActivityForResult(intent, RESULT_IMAGE_SELECT);
+                }
+                break;
+            case R.id.gallery_image_btn:
+                startActivityForResult(Intent.createChooser(new Intent(Intent.ACTION_GET_CONTENT)
+                        .setType("image/*"), getString(R.string.choose_image)), RESULT_LOAD_IMAGE);
+                break;
         }
     }
-
-    @OnClick(R.id.gallery_image_btn)
-    public void chooseWishImage(ImageView view) {
-        startActivityForResult(Intent.createChooser(new Intent(Intent.ACTION_GET_CONTENT)
-                .setType("image/*"), getString(R.string.choose_image)), RESULT_LOAD_IMAGE);
-    }
-
-    //TODO: if discard changes destroy image from cloud
 
     /**
      * called when user choose image from device
@@ -258,8 +259,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
                                     .load(url).crossFade()
                                     .bitmapTransform(new CropCircleTransformation(Glide.get(getApplicationContext()).getBitmapPool()))
                                     .into(imageView);
-                            String publicId = CloudinaryUtil.getPublicId(url);
-                            editWishBean.setPicture(publicId);
+                            editWishBean.setPicture((String) imgInfo.get("public_id"));
                         }
                     });
                 }
@@ -280,6 +280,10 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         }
     }
 
+    /*vvvvvvvvvvvvvvvvvvv
+     * Validation section
+     */
+
     @Override
     public void onValidationSucceeded() {
         commitChanges();
@@ -297,5 +301,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
             }
         }
     }
-
+    /*
+     * Validation section end
+     *^^^^^^^^^^^^^^^^^^^^^^^*/
 }

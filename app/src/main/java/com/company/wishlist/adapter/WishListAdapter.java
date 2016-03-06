@@ -365,9 +365,11 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         }
 
         public void onBind(Wish wish) {
+            Log.e(LOG_TAG, ".Holder.OnBind()");
             if (wish.getPicture() == null) {
                 imageView.setImageResource(R.drawable.gift_icon);//TODO: default circle image
             } else {
+                Log.d(LOG_TAG, ".Holder.LoadImage: " + wish.getPicture());
                 Glide.with(context)
                         .load(CloudinaryUtil.getInstance().url().generate(wish.getPicture()))
                         .bitmapTransform(new CropCircleTransformation(Glide.get(context).getBitmapPool()))

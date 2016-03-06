@@ -1,5 +1,6 @@
 package com.company.wishlist.application;
 
+import com.company.wishlist.util.AuthUtils;
 import com.facebook.FacebookSdk;
 import com.firebase.client.Firebase;
 
@@ -13,6 +14,7 @@ public class Application extends android.app.Application {
         super.onCreate();
         Firebase.getDefaultConfig().setPersistenceEnabled(true);
         Firebase.setAndroidContext(this);
+        AuthUtils.setAndroidContext(this);
         FacebookSdk.sdkInitialize(getApplicationContext());
     }
 }

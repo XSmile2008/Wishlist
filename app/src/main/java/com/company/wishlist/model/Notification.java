@@ -1,14 +1,10 @@
 package com.company.wishlist.model;
 
 import com.company.wishlist.util.DateUtil;
-import com.company.wishlist.util.FirebaseUtil;
+import com.company.wishlist.util.FirebaseUtils;
 import com.facebook.Profile;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
 
 import java.util.Date;
 
@@ -98,7 +94,7 @@ public class Notification {
 
     @JsonIgnore
     public static Firebase getFirebaseRef() {
-        return new Firebase(FirebaseUtil.FIREBASE_URL).child(Notification.class.getSimpleName());
+        return FirebaseUtils.get().child(Notification.class.getSimpleName());
     }
 
     @JsonIgnore

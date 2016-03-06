@@ -18,21 +18,17 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
-import com.company.wishlist.activity.abstracts.FirebaseActivity;
+import com.company.wishlist.activity.abstracts.AuthActivity;
 import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.fragment.TabbedWishListFragment;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
-import com.company.wishlist.model.Notification;
 import com.company.wishlist.model.User;
 import com.company.wishlist.service.NotificationService;
 import com.company.wishlist.util.CropCircleTransformation;
-import com.company.wishlist.util.FirebaseUtil;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.firebase.client.AuthData;
-import com.firebase.client.Firebase;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
@@ -47,7 +43,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends FirebaseActivity implements IOnFriendSelectedListener {
+public class MainActivity extends AuthActivity implements IOnFriendSelectedListener {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -79,8 +75,7 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         recyclerViewFriends.setAdapter(friendListAdapter);
         recyclerViewFriends.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).build());
 
-        if (getFirebaseUtil().isAuthenticated() && isConnected()) {
-            System.out.println("bla");
+        if (isAuth() && isConnected()) {
             refreshUserDataUi();
             showMyWishList();
         }
@@ -106,7 +101,7 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     }
 
     private void refreshUserDataUi() {
-        User user = FirebaseUtil.getCurrentUser();
+        User user = currentUser();
         if (null != user) {
             profileUserName.setText(user.getDisplayName());
 
@@ -129,11 +124,9 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
     }
 
     @Override
-    public void onAuthenticated(AuthData authData) {
-        super.onAuthenticated(authData);
-        if (isConnected()) {
-            refreshUserDataUi();
-        }
+    protected void onResume() {
+        super.onResume();
+        refreshUserDataUi();
     }
 
     @OnClick({R.id.header_layout, R.id.button_settings})
@@ -163,13 +156,13 @@ public class MainActivity extends FirebaseActivity implements IOnFriendSelectedL
         getSupportActionBar().setTitle(getResources().getString(R.string.my_wish_list));
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_wish_list);
         if (fragment == null) {
-            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, FirebaseUtil.getCurrentUser().getId());
+            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, currentUser().getId());
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.container_wish_list, fragment)
                     .commit();
         } else if (!(fragment instanceof WishListFragment)) {
-            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, FirebaseUtil.getCurrentUser().getId());
+            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, currentUser().getId());
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.container_wish_list, fragment)

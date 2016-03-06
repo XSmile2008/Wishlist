@@ -12,9 +12,7 @@ import android.util.Log;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.MainActivity;
-import com.company.wishlist.util.FirebaseUtil;
 import com.facebook.Profile;
-import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;

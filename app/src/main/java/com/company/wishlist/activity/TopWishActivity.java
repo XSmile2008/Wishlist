@@ -9,7 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.company.wishlist.R;
-import com.company.wishlist.activity.abstracts.FirebaseActivity;
+import com.company.wishlist.activity.abstracts.AuthActivity;
 import com.company.wishlist.adapter.TopWishListAdapter;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.model.Wish;
@@ -24,7 +24,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import butterknife.ButterKnife;
 
-public class TopWishActivity extends FirebaseActivity {
+public class TopWishActivity extends AuthActivity {
 
     TopWishListAdapter adapter;
     RecyclerView recyclerView;

@@ -25,9 +25,10 @@ import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.bean.EditWishBean;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.model.Wish;
+import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.CropCircleTransformation;
 import com.company.wishlist.util.DialogUtil;
-import com.company.wishlist.util.FirebaseUtil;
+import com.company.wishlist.util.FirebaseUtils;
 import com.company.wishlist.util.LocalStorage;
 import com.company.wishlist.util.Utilities;
 import com.mobsandgeeks.saripaar.ValidationError;
@@ -178,7 +179,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
             reservedDateDialog.setOnDateSetListener(new CalendarDatePickerDialogFragment.OnDateSetListener() {
                 @Override
                 public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
-                    editWishBean.reserve(FirebaseUtil.getCurrentUser().getId(), dialog.getSelectedDay().getDateInMillis());
+                    editWishBean.reserve(AuthUtils.getCurrentUser().getId(), dialog.getSelectedDay().getDateInMillis());
                     Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " reserved", Toast.LENGTH_SHORT).show();
                 }
             });

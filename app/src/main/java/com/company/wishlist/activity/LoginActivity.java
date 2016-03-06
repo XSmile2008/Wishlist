@@ -10,6 +10,8 @@ import android.view.View;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.InternetActivity;
+import com.company.wishlist.util.AuthUtils;
+import com.company.wishlist.util.FirebaseUtils;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -33,7 +35,8 @@ public class LoginActivity extends InternetActivity {
     public static final String AUTH_TOKEN_EXTRA = "AUTH_TOKEN_EXTRA";
     public static final String ACTION_LOGOUT = "LOGOUT";
 
-    @Bind(R.id.login_button) LoginButton loginButton;
+    @Bind(R.id.login_button)
+    LoginButton loginButton;
 
     /* A reference to the Firebase */
     private Firebase mFirebaseRef;
@@ -66,25 +69,21 @@ public class LoginActivity extends InternetActivity {
         };
 
         /* Create the Firebase ref that is used for all authentication with Firebase */
-        mFirebaseRef = new Firebase(getResources().getString(R.string.firebase_url));
+        mFirebaseRef = FirebaseUtils.get();
 
-        mFirebaseRef.addAuthStateListener(new Firebase.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(AuthData authData) {
-                if (authData != null) {
-                    startMainActivity();
-                }
-            }
-        });
+        boolean isDisconnected = AuthUtils.isDisconnected();
+        if (!isDisconnected && !isLogout(getIntent())) {
+            startMainActivity();
+        } else {
+            logOut();
+        }
 
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        if (isLogout(getIntent())) {
-            logOut();
-        }
+
     }
 
     private boolean isLogout(Intent intent) {
@@ -106,7 +105,7 @@ public class LoginActivity extends InternetActivity {
     }
 
     public void logOut() {
-        mFirebaseRef.unauth();
+        AuthUtils.unauth();
         LoginManager.getInstance().logOut();
     }
 
@@ -147,7 +146,7 @@ public class LoginActivity extends InternetActivity {
     private void startMainActivity() {
         getApplicationContext()
                 .startActivity(new Intent(getApplicationContext(), MainActivity.class)
-                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         finish();
     }
 
@@ -155,10 +154,10 @@ public class LoginActivity extends InternetActivity {
         if (token != null) {
             progressDialog = getDialog();
             progressDialog.show();
-            mFirebaseRef.authWithOAuthToken("facebook", token.getToken(), new AuthResultHandler());
+            AuthUtils.auth("facebook", token.getToken(), new AuthResultHandler());
         } else {
             if (this.mAuthData != null && this.mAuthData.getProvider().equals("facebook")) {
-                mFirebaseRef.unauth();
+                AuthUtils.unauth();
                 loginButton.setVisibility(View.VISIBLE);
             }
         }

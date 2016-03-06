@@ -5,20 +5,45 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.company.wishlist.activity.LoginActivity;
-import com.company.wishlist.util.FirebaseUtil;
+import com.company.wishlist.model.User;
+import com.company.wishlist.util.AuthUtils;
+import com.company.wishlist.util.FirebaseUtils;
+import com.company.wishlist.util.social.FacebookUtil;
+import com.facebook.AccessToken;
 
 public abstract class AuthActivity extends InternetActivity {
+
+    public static final String RELOAD_DATA = "RELOAD_DATA";
+
+    private String authToken = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         checkAuth();
+        processFirebaseLogin();
+
+    }
+
+
+    private void processFirebaseLogin() {
+        if (isConnected()) {
+            if (AuthUtils.isDisconnected()) {
+                AuthUtils.auth("facebook", AccessToken.getCurrentAccessToken().getToken(), null);
+            }
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         checkAuth();
+        if (null != this.getIntent().getExtras()) {
+            boolean reloadData = this.getIntent().getExtras().getBoolean(RELOAD_DATA, false);
+            if (reloadData) {
+                AuthUtils.refreshAuthData();
+            }
+        }
     }
 
     public void checkAuth() {
@@ -30,7 +55,11 @@ public abstract class AuthActivity extends InternetActivity {
         }
     }
 
+    public User currentUser() {
+        return AuthUtils.getCurrentUser();
+    }
+
     public boolean isAuth() {
-        return new FirebaseUtil(this).isAuthenticated();
+        return !AuthUtils.isDisconnected();
     }
 }

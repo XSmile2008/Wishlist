@@ -2,9 +2,8 @@ package com.company.wishlist.model;
 
 import android.util.Log;
 
-import com.company.wishlist.util.FirebaseUtil;
+import com.company.wishlist.util.FirebaseUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -94,7 +93,7 @@ public class Wish implements Serializable {
 
     @JsonIgnore
     public static Firebase getFirebaseRef() {
-        return new Firebase(FirebaseUtil.FIREBASE_URL).child(Wish.class.getSimpleName());
+        return FirebaseUtils.get().child(Wish.class.getSimpleName());
     }
 
     /**

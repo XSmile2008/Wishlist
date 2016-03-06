@@ -1,6 +1,6 @@
 package com.company.wishlist.model;
 
-import com.company.wishlist.util.FirebaseUtil;
+import com.company.wishlist.util.FirebaseUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.firebase.client.Firebase;
 import com.google.gson.annotations.SerializedName;
@@ -94,7 +94,7 @@ public class User {
 
     @JsonIgnore
     public static Firebase getFirebaseRef() {
-        return new Firebase(FirebaseUtil.FIREBASE_URL).child(User.class.getSimpleName());
+        return FirebaseUtils.get().child(User.class.getSimpleName());
     }
 
     @JsonIgnore

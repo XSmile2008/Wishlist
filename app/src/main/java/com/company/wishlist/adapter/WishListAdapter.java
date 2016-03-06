@@ -9,7 +9,6 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -25,7 +24,8 @@ import com.company.wishlist.interfaces.IWishItemAdapter;
 import com.company.wishlist.model.Reservation;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
-import com.company.wishlist.util.FirebaseUtil;
+import com.company.wishlist.util.AuthUtils;
+import com.company.wishlist.util.FirebaseUtils;
 import com.company.wishlist.util.LocalStorage;
 import com.company.wishlist.util.Utilities;
 import com.daimajia.swipe.SimpleSwipeListener;
@@ -98,7 +98,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
         public int graduateByReservation(Wish wish) {
             if (wish.getReservation() == null) return 1;
-            else if (wish.getReservation().getByUser().equals(FirebaseUtil.getCurrentUser().getId())) return 2;
+            else if (wish.getReservation().getByUser().equals(AuthUtils.getCurrentUser().getId())) return 2;
             else return 0;
         }
 
@@ -141,7 +141,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             reservedDateDialog.setOnDateSetListener(new CalendarDatePickerDialogFragment.OnDateSetListener() {
                 @Override
                 public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
-                    wishes.get(position).reserve(FirebaseUtil.getCurrentUser().getId(), dialog.getSelectedDay().getDateInMillis());
+                    wishes.get(position).reserve(AuthUtils.getCurrentUser().getId(), dialog.getSelectedDay().getDateInMillis());
                     Toast.makeText(context, "item " + position + " reserved", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -199,13 +199,13 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
                             wishList.setId(wishListDS.getKey());
                             switch (mode) {
                                 case WishListFragment.WISH_LIST_MODE:
-                                    if (!wishList.getOwner().equals(FirebaseUtil.getCurrentUser().getId())) {
+                                    if (!wishList.getOwner().equals(AuthUtils.getCurrentUser().getId())) {
                                         wishLists.put(wishList.getId(), wishList);
                                         getWishes(wishList.getId());
                                     }
                                     break;
                                 case WishListFragment.GIFT_LIST_MODE:
-                                    if (wishList.getOwner().equals(FirebaseUtil.getCurrentUser().getId())) {
+                                    if (wishList.getOwner().equals(AuthUtils.getCurrentUser().getId())) {
                                         wishLists.put(wishList.getId(), wishList);
                                         getWishes(wishList.getId());
                                     }

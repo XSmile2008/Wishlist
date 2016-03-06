@@ -3,38 +3,22 @@ package com.company.wishlist.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.TopWishActivity;
 import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.fragment.WishListFragment;
-import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.Wish;
-import com.company.wishlist.model.WishList;
-import com.company.wishlist.util.FirebaseUtil;
 import com.company.wishlist.util.LocalStorage;
 import com.company.wishlist.util.Utilities;
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import butterknife.Bind;

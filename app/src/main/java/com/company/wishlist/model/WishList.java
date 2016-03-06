@@ -1,6 +1,6 @@
 package com.company.wishlist.model;
 
-import com.company.wishlist.util.FirebaseUtil;
+import com.company.wishlist.util.FirebaseUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.firebase.client.Firebase;
 
@@ -46,7 +46,7 @@ public class WishList {
 
     @JsonIgnore
     public static Firebase getFirebaseRef() {
-        return new Firebase(FirebaseUtil.FIREBASE_URL).child(WishList.class.getSimpleName());
+        return FirebaseUtils.get().child(WishList.class.getSimpleName());
     }
 
     @JsonIgnore

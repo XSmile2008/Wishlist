@@ -28,6 +28,7 @@ import java.util.TimerTask;
 //TODO: may be use ChildEventListener?
 //TODO: make option how many days before reservation date to start send notifications
 //TODO: group notifications
+
 /**
  * I'm using owner , cause if we will used date field, we cat take many records for this date
  * need to think what way is better
@@ -59,7 +60,7 @@ public class NotificationService extends Service {
 
         int period = s != null ? 1000 * 60 * Integer.valueOf(s) : TASK_REPEAT;
 
-        if (timer != null ) {
+        if (timer != null) {
             timer.cancel();
             timer.purge();
         }
@@ -91,9 +92,9 @@ public class NotificationService extends Service {
                 .getFirebaseRef()
                 .orderByChild("owner")
                 .equalTo(Profile.getCurrentProfile().getId())
-                .addChildEventListener(new ChildEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    public void onDataChange(DataSnapshot dataSnapshot) {
                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
                             com.company.wishlist.model.Notification notification = ds.getValue(com.company.wishlist.model.Notification.class);
                             notification.setId(ds.getKey());
@@ -104,21 +105,6 @@ public class NotificationService extends Service {
                                 buildAndNotify(notification, id);
                             }
                         }
-                    }
-
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
                     }
 
                     @Override

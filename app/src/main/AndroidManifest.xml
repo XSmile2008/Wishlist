@@ -30,13 +30,16 @@
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/my_wish_list">
+
+        </activity>
+
+        <activity android:name=".activity.LoginActivity" android:theme="@style/AppTheme.ActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".activity.LoginActivity" android:theme="@style/AppTheme.ActionBar"/>
         <activity android:name=".activity.abstracts.InternetActivity" />
         <activity android:name=".activity.SettingsActivity" android:theme="@style/AppTheme" />
         <activity android:name=".activity.WishEditActivity" />

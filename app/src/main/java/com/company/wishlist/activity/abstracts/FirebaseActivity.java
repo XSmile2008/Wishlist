@@ -6,11 +6,9 @@ import android.support.v7.app.AlertDialog;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.LoginActivity;
-import com.company.wishlist.model.Notification;
 import com.company.wishlist.util.FirebaseUtil;
 import com.company.wishlist.util.social.FacebookUtil;
 import com.firebase.client.AuthData;
-import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 
 /**
@@ -26,10 +24,7 @@ public abstract class FirebaseActivity extends AuthActivity implements FirebaseU
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         firebaseUtil = new FirebaseUtil(this);
-        Notification.getFirebaseRef().keepSynced(true);
-
         Bundle extras = getIntent().getExtras();
         if (extras != null && extras.containsKey(LoginActivity.AUTH_TOKEN_EXTRA)) {
             authToken = extras.getString(LoginActivity.AUTH_TOKEN_EXTRA);
@@ -46,12 +41,10 @@ public abstract class FirebaseActivity extends AuthActivity implements FirebaseU
     @Override
     public void onResume() {
         super.onResume();
-        if (isConnected()) {
-            if (null != this.getIntent().getExtras()) {
-                boolean reloadData = this.getIntent().getExtras().getBoolean(RELOAD_DATA, false);
-                if (reloadData) {
-                    firebaseUtil.refreshAuth();
-                }
+        if (null != this.getIntent().getExtras()) {
+            boolean reloadData = this.getIntent().getExtras().getBoolean(RELOAD_DATA, false);
+            if (reloadData) {
+                firebaseUtil.refreshAuth();
             }
         }
     }

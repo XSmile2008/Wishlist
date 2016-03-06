@@ -68,6 +68,15 @@ public class LoginActivity extends InternetActivity {
         /* Create the Firebase ref that is used for all authentication with Firebase */
         mFirebaseRef = new Firebase(getResources().getString(R.string.firebase_url));
 
+        mFirebaseRef.addAuthStateListener(new Firebase.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(AuthData authData) {
+                if (authData != null) {
+                    startMainActivity();
+                }
+            }
+        });
+
     }
 
     @Override
@@ -125,10 +134,7 @@ public class LoginActivity extends InternetActivity {
         public void onAuthenticated(AuthData authData) {
             progressDialog.hide();
             mAuthData = authData;
-            getApplicationContext()
-                    .startActivity(new Intent(getApplicationContext(), MainActivity.class)
-                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-            finish();
+            startMainActivity();
         }
 
         @Override
@@ -136,6 +142,13 @@ public class LoginActivity extends InternetActivity {
             showErrorDialog(firebaseError.toString());
         }
 
+    }
+
+    private void startMainActivity() {
+        getApplicationContext()
+                .startActivity(new Intent(getApplicationContext(), MainActivity.class)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        finish();
     }
 
     private void onFacebookAccessTokenChange(AccessToken token) {

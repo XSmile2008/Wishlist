@@ -61,4 +61,5 @@ public class WishList {
         wishListTable.child(this.id).setValue(this, listener);
         return this.id;
     }
+
 }

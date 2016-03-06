@@ -32,7 +32,6 @@ public class Utilities {
         return urlEncoded;
     }
 
-
     public static boolean isUrlValid(String urlToValidate) {
         return Patterns.WEB_URL.matcher(urlToValidate).matches();
     }
@@ -58,13 +57,12 @@ public class Utilities {
 
     public static Bitmap getBitmapFromURL(final String src) {
 
-        class LoadImageFromUrl extends AsyncTask<String,Void,Bitmap>{
+        class LoadImageFromUrl extends AsyncTask<String, Void, Bitmap> {
 
             @Override
             protected Bitmap doInBackground(String... params) {
-                URL url = null;
                 try {
-                    url = new URL(params[0]);
+                    URL url = new URL(params[0]);
 
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setDoInput(true);
@@ -76,8 +74,8 @@ public class Utilities {
                 } catch (IOException e) {
                     return null;
                 }
-
             }
+
         }
         try {
             return new LoadImageFromUrl().execute(src).get();

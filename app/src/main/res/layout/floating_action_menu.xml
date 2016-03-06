@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:layout_gravity="bottom|end"
     android:padding="@dimen/default_padding_large"
-    app:layout_behavior="com.company.wishlist.util.FloatingActionMenuBehavior"
+    app:layout_behavior="com.company.wishlist.view.FloatingActionMenuBehavior"
     fab:menu_colorNormal="@color/colorAccent"
     fab:menu_colorPressed="@color/colorAccentDark"
     fab:menu_icon="@drawable/ic_add_white_24dp"

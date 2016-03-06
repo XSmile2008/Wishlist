@@ -1,12 +1,12 @@
 package com.company.wishlist.activity;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -71,12 +70,11 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     @Length(min = 2)
     EditText editTextComment;
 
-    @Bind(R.id.insta_images_btn)
-    ImageButton instaImgBtn;
+    @Bind(R.id.search_images_btn)
+    ImageButton searchImagesBtn;
 
-    @Bind(R.id.insta_layout)
-    LinearLayout instaLayout;
-
+    @Bind(R.id.coordinator_layout)
+    CoordinatorLayout coordinatorLayout;
 
     private EditWishBean editWishBean;
     private Validator validator;
@@ -147,7 +145,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
       - try to remove editWishBean
       //TODO: alternative way
       - we can add onComplete listeners to all edit queries
-     */
+    */
     public void initWishEdit() {
         if (getIntent().getAction().equals(ACTION_CREATE)) {
             editWishBean = new EditWishBean(new Wish());
@@ -218,16 +216,11 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         finish();
     }
 
-    @OnClick(R.id.insta_images_btn)
-    public void showInstaImagesDialog(View view) {
-        //String[] tags = editTextTitle.getText().toString().split("\\s+");
-        final Context app = this;
-
+    @OnClick(R.id.search_images_btn)
+    public void showImagesDialog(View view) {
         String query = editTextTitle.getText().toString().trim();
-
-        String message = "Wish title should be not empty!";
         if (StringUtils.isEmpty(query)) {
-            showSnake(message);
+            Snackbar.make(coordinatorLayout, "Wish title should be not empty!", Snackbar.LENGTH_SHORT).show();
         } else {
             Intent intent = new Intent(this, ImageSearchActivity.class);
             intent.putExtra(ImageSearchActivity.QUERY, editTextTitle.getText().toString());
@@ -235,11 +228,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
         }
     }
 
-    private void showSnake(String message) {
-        Snackbar.make(findViewById(R.id.coordinator_layout_wish_edit), message, Snackbar.LENGTH_SHORT).show();
-    }
-
-    @OnClick(R.id.galery_image_btn)
+    @OnClick(R.id.gallery_image_btn)
     public void chooseWishImage(ImageView view) {
         startActivityForResult(
                 Intent.createChooser(
@@ -264,12 +253,12 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
                         .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
                         .into(imageView);
             } catch (IOException e) {
-                Snackbar.make(findViewById(R.id.coordinator_layout_wish_edit), e.getMessage(), Snackbar.LENGTH_SHORT);
+                Snackbar.make(findViewById(R.id.coordinator_layout), e.getMessage(), Snackbar.LENGTH_SHORT);
             }
         } else if (requestCode == RESULT_IMAGE_SELECT && resultCode == RESULT_OK && null != data) {
             String url = data.getStringExtra(ImageSearchActivity.RESULT_DATA).trim();
             if (StringUtils.isEmpty(url)) {
-                showSnake("Something went wrong..");
+                Snackbar.make(coordinatorLayout, "Something went wrong..", Snackbar.LENGTH_SHORT).show();
             } else {
                 Glide.with(getApplicationContext())
                         .load(url)

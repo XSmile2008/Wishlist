@@ -16,41 +16,14 @@ public class Notification {
 
     public static final int NOTIFY_BEFORE_RESERVATION_DAYS = 1;
 
-    @JsonIgnore
-    private String id;
+    @JsonIgnore private String id;
     private String wishId;
     private String wishTitle;
     private String reservationDate;
     private String notifyDate;
     private String owner;
 
-    @JsonIgnore
-    public String create(Firebase.CompletionListener listener, Wish wish) {
-        Firebase wishTable = getFirebaseRef();
-        this.id = wishTable.push().getKey();
-        this.wishId = wish.getId();
-        this.wishTitle = wish.getTitle();
-        this.reservationDate = wish.getReservation().getForDate();
-        this.owner = Profile.getCurrentProfile().getId();
-
-        long reserve = Long.valueOf(wish.getReservation().getForDate());
-        long notify = DateUtil.isToday(reserve) ? reserve : DateUtil.substractDaysFromDate(reserve, NOTIFY_BEFORE_RESERVATION_DAYS);
-        this.notifyDate = String.valueOf(DateUtil.getDateWithoutTime(new Date(notify)));
-
-        wishTable.child(this.id).setValue(this);
-        wishTable.child(this.id).keepSynced(true);
-        return this.id;
-    }
-
-    @JsonIgnore
-    public void remove(Firebase.CompletionListener listener) {
-        getFirebaseRef().child(this.id).removeValue(listener);
-    }
-
-    @JsonIgnore
-    public static Firebase getFirebaseRef() {
-        return new Firebase(FirebaseUtil.FIREBASE_URL).child(Notification.class.getSimpleName());
-    }
+    public Notification() {}
 
     public String getId() {
         return id;
@@ -101,7 +74,36 @@ public class Notification {
     }
 
     @JsonIgnore
+    public String create(Firebase.CompletionListener listener, Wish wish) {
+        Firebase wishTable = getFirebaseRef();
+        this.id = wishTable.push().getKey();
+        this.wishId = wish.getId();
+        this.wishTitle = wish.getTitle();
+        this.reservationDate = wish.getReservation().getForDate();
+        this.owner = Profile.getCurrentProfile().getId();
+
+        long reserve = Long.valueOf(wish.getReservation().getForDate());
+        long notify = DateUtil.isToday(reserve) ? reserve : DateUtil.substractDaysFromDate(reserve, NOTIFY_BEFORE_RESERVATION_DAYS);
+        this.notifyDate = String.valueOf(DateUtil.getDateWithoutTime(new Date(notify)));
+
+        wishTable.child(this.id).setValue(this);
+        wishTable.child(this.id).keepSynced(true);
+        return this.id;
+    }
+
+    @JsonIgnore
+    public void remove(Firebase.CompletionListener listener) {
+        getFirebaseRef().child(this.id).removeValue(listener);
+    }
+
+    @JsonIgnore
+    public static Firebase getFirebaseRef() {
+        return new Firebase(FirebaseUtil.FIREBASE_URL).child(Notification.class.getSimpleName());
+    }
+
+    @JsonIgnore
     public boolean isToday() {
         return DateUtil.isToday(Long.valueOf(this.notifyDate));
     }
+
 }

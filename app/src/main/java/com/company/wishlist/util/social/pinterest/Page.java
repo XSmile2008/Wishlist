@@ -3,7 +3,6 @@ package com.company.wishlist.util.social.pinterest;
 import java.io.IOException;
 import java.net.URL;
 
-
 public class Page {
 
     private String content;
@@ -17,4 +16,5 @@ public class Page {
     public String getContent() {
         return content;
     }
+
 }

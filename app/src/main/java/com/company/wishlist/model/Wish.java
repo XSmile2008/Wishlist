@@ -14,9 +14,10 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Wish implements Serializable{
+public class Wish implements Serializable {
 
-    @JsonIgnore String id;
+    @JsonIgnore
+    String id;
     String wishListId;
     String title;
     String comment;
@@ -25,7 +26,7 @@ public class Wish implements Serializable{
     Boolean isReceived;
     Boolean isRemoved;
 
-    public Wish(){}
+    public Wish() {}
 
     public String getId() {
         return id;
@@ -98,6 +99,7 @@ public class Wish implements Serializable{
 
     /**
      * push new item to database and create unique ID
+     *
      * @return generated id for this Wish
      */
     @JsonIgnore
@@ -107,6 +109,7 @@ public class Wish implements Serializable{
 
     /**
      * push new item to database and create unique ID
+     *
      * @param listener onCompleteListener
      * @return generated id for this Wish
      */
@@ -125,6 +128,7 @@ public class Wish implements Serializable{
 
     /**
      * Hard remove this item form database
+     *
      * @param listener onCompleteListener
      */
     @JsonIgnore
@@ -143,6 +147,7 @@ public class Wish implements Serializable{
 
     /**
      * Soft remove this item form database
+     *
      * @param listener onCompleteListener
      */
     @JsonIgnore
@@ -162,6 +167,7 @@ public class Wish implements Serializable{
 
     /**
      * Soft remove this item form database
+     *
      * @param listener onCompleteListener
      */
     @JsonIgnore
@@ -172,8 +178,9 @@ public class Wish implements Serializable{
 
     /**
      * Reserve this wish in database
+     *
      * @param userId user thar reserve this wish
-     * @param date reservation date
+     * @param date   reservation date
      */
     @JsonIgnore
     public void reserve(String userId, long date) {
@@ -183,8 +190,9 @@ public class Wish implements Serializable{
 
     /**
      * Reserve this wish in database
-     * @param userId user thar reserve this wish
-     * @param date reservation date
+     *
+     * @param userId   user thar reserve this wish
+     * @param date     reservation date
      * @param listener onCompleteListener
      */
     @JsonIgnore
@@ -205,6 +213,7 @@ public class Wish implements Serializable{
 
     /**
      * Unreserve this wish in database
+     *
      * @param listener onCompleteListener
      */
     @JsonIgnore
@@ -224,7 +233,7 @@ public class Wish implements Serializable{
     }
 
     @JsonIgnore
-    private void removeNotification(){
+    private void removeNotification() {
         Notification.getFirebaseRef().orderByChild("wishId").equalTo(this.getId())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

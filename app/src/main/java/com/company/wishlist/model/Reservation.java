@@ -30,4 +30,5 @@ public class Reservation {
     public void setForDate(String forDate) {
         this.forDate = forDate;
     }
+
 }

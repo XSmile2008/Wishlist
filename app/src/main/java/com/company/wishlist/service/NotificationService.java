@@ -13,6 +13,8 @@ import android.util.Log;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.MainActivity;
 import com.company.wishlist.util.FirebaseUtil;
+import com.facebook.Profile;
+import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
@@ -88,10 +90,10 @@ public class NotificationService extends Service {
         com.company.wishlist.model.Notification
                 .getFirebaseRef()
                 .orderByChild("owner")
-                .equalTo(FirebaseUtil.getCurrentUser().getId())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+                .equalTo(Profile.getCurrentProfile().getId())
+                .addChildEventListener(new ChildEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         for (DataSnapshot ds : dataSnapshot.getChildren()) {
                             com.company.wishlist.model.Notification notification = ds.getValue(com.company.wishlist.model.Notification.class);
                             notification.setId(ds.getKey());
@@ -105,6 +107,21 @@ public class NotificationService extends Service {
                     }
 
                     @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
                     public void onCancelled(FirebaseError firebaseError) {
 
                     }
@@ -113,9 +130,9 @@ public class NotificationService extends Service {
 
     private void buildAndNotify(com.company.wishlist.model.Notification notification, Integer id) {
         //PendingIntent don't remind
-        Intent intentDontRemind = new Intent(this, LeftOneHourNotification.class);
-        intentDontRemind.putExtra(LeftOneHourNotification.NOTIFICATION_ID, notification.getId());
-        intentDontRemind.putExtra(LeftOneHourNotification.ANDROID_NOTIFICATION_ID, id);
+        Intent intentDontRemind = new Intent(this, NotRemindNotificationAction.class);
+        intentDontRemind.putExtra(NotRemindNotificationAction.NOTIFICATION_ID, notification.getId());
+        intentDontRemind.putExtra(NotRemindNotificationAction.ANDROID_NOTIFICATION_ID, id);
         PendingIntent pendIntentDontRemind = PendingIntent.getService(this, 0, intentDontRemind, PendingIntent.FLAG_UPDATE_CURRENT);
 
         //PendingIntent start app

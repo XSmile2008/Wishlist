@@ -30,6 +30,7 @@ import com.company.wishlist.util.LocalStorage;
 import com.company.wishlist.util.Utilities;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
+import com.facebook.Profile;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
@@ -152,7 +153,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     public void removeWish(int position) {
         wishBackUp = wishes.get(position);
         wishBackUp.softRemove();
-        Snackbar.make(rootView, R.string.message_wish_removed, Snackbar.LENGTH_LONG)
+        Snackbar.make(rootView, context.getString(R.string.message_wish_removed, position), Snackbar.LENGTH_LONG)
                 .setAction(R.string.undo, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -371,11 +372,12 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             textViewComment.setText(wish.getComment());
 
             if (wish.isReserved()) {
-                if (wish.getReservation().getByUser().equals(FirebaseUtil.getCurrentUser().getId())) {
-                    textViewStatus.setText("Reserved by you");//TODO:
+                if (wish.getReservation().getByUser().equals(Profile.getCurrentProfile().getId())) {
+                    textViewStatus.setText("Reserved by me");//TODO:
                     swipeLayout.setRightSwipeEnabled(true);
                 } else {
-                    textViewStatus.setText("Reserved by another user");//TODO:
+                    // by another user
+                    textViewStatus.setText("Reserved");//TODO: purpose right only Reserved, cause we don't know who present the gift, it should be secret for all
                     swipeLayout.setRightSwipeEnabled(false);
                 }
                 textViewStatus.setTextColor(Color.RED);

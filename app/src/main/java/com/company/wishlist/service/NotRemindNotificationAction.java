@@ -7,14 +7,14 @@ import android.content.Intent;
 import com.company.wishlist.model.Notification;
 import com.company.wishlist.model.Wish;
 
-public class LeftOneHourNotification extends IntentService {
+public class NotRemindNotificationAction extends IntentService {
 
     public static final String NOTIFICATION_ID = "com.company.wishlist.service.notification.id";
     public static final String ANDROID_NOTIFICATION_ID = "com.company.wishlist.service.android.notification.id";
     private static final int NOTIFICATION_MISSED = -99999;
 
 
-    public LeftOneHourNotification() {
+    public NotRemindNotificationAction() {
         super("UpdateProcessService");
     }
 

@@ -1,6 +1,5 @@
 package com.company.wishlist.util.social.pinterest;
 
-
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -27,39 +26,9 @@ public class PinterestUtil {
     }
 
     public static List<String> getImagesAsLinks(String... query) {
-
-        class ImageTask extends AsyncTask<String, Void, List<String>> {
-
-            private List<String> urls = new CopyOnWriteArrayList<>();
-
-            @Override
-            protected List<String> doInBackground(String... params) {
-                try {
-                    for (String query : params) {
-                        URL url = new URL(String.format(SEARCH_QUERY_LINK, URLEncoder.encode(query, "UTF-8")));
-                        Document doc = Jsoup.parse(new Page(url).getContent());
-
-                        List<Element> elements = doc.getElementsByClass("pinImg").not(".fade");
-
-                        for (Element element : elements) {
-                            urls.add(element.attr("src"));
-                        }
-
-                    }
-                } catch (IOException ignored) {
-                } finally {
-                    return urls;
-                }
-            }
-
-
-        }
-
         try {
-
             List<String> urls = new ImageTask().execute(query).get();
             Collections.shuffle(urls);
-
             return urls;
         } catch (InterruptedException | ExecutionException e) {
             Log.v("PinterestUtil", e.getMessage());
@@ -75,7 +44,6 @@ public class PinterestUtil {
         }
     }
 
-
     private static List<String> getFilterData(List<String> urls) {
         List<String> result = new ArrayList<>();
         for (String url : urls) {
@@ -84,6 +52,32 @@ public class PinterestUtil {
             }
         }
         return result;
+    }
+
+    private static class ImageTask extends AsyncTask<String, Void, List<String>> {
+
+        private List<String> urls = new CopyOnWriteArrayList<>();
+
+        @Override
+        protected List<String> doInBackground(String... params) {
+            try {
+                for (String query : params) {
+                    URL url = new URL(String.format(SEARCH_QUERY_LINK, URLEncoder.encode(query, "UTF-8")));
+                    Document doc = Jsoup.parse(new Page(url).getContent());
+
+                    List<Element> elements = doc.getElementsByClass("pinImg").not(".fade");
+
+                    for (Element element : elements) {
+                        urls.add(element.attr("src"));
+                    }
+
+                }
+            } catch (IOException ignored) {
+            } finally {
+                return urls;
+            }
+        }
+
     }
 
 }

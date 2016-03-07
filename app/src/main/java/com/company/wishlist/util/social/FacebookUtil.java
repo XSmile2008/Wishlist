@@ -35,4 +35,5 @@ public class FacebookUtil {
         logoutIntent.setAction(LoginActivity.ACTION_LOGOUT);
         context.startActivity(logoutIntent);
     }
+
 }

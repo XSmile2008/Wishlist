@@ -5,16 +5,11 @@
     <color name="colorAccent">#FF5252</color>
     <color name="colorAccentDark">#FF1744</color>
 
-    <color name="list_item_title">#000000</color>
     <color name="list_divider">#A8A8A8</color>
-    <color name="list_background_pressed">#FF00FF</color>
-    <color name="list_background">#000000</color>
 
     <color name="semi_translucent_white">#D2E0E0E0</color>
 
     <color name="md_grey_600">#757575</color>
     <color name="white">#fafafa</color>
     <color name="md_grey_400">#BDBDBD</color>
-
-    <color name="app_theme_main">#0084ff</color>
 </resources>

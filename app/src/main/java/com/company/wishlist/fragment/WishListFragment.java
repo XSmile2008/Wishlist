@@ -18,7 +18,7 @@ import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.adapter.WishListAdapter;
 import com.company.wishlist.events.FriendSelectedEvent;
 import com.company.wishlist.model.WishList;
-import com.company.wishlist.util.FirebaseUtil;
+import com.company.wishlist.util.AuthUtils;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
@@ -134,7 +134,7 @@ public class WishListFragment extends DebugFragment {
             case WISH_LIST_MODE:
                 adapter.onFriendSelected(friendId); return;
             case MY_WISH_LIST_MODE:
-                if (!event.getFriendId().equals(FirebaseUtil.getCurrentUser().getId())) return;
+                if (!event.getFriendId().equals(AuthUtils.getCurrentUser().getId())) return;
             case GIFT_LIST_MODE:
                 WishList.getFirebaseRef()
                         .orderByChild("forUser")
@@ -144,13 +144,13 @@ public class WishListFragment extends DebugFragment {
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 Log.d(LOG_TAG, getId() + " - " + fragment.hashCode() + ".onDataChange(" + dataSnapshot + ")");
                                 for (DataSnapshot wishListDS : dataSnapshot.getChildren()) {
-                                    if (wishListDS.getValue(WishList.class).getOwner().equals(FirebaseUtil.getCurrentUser().getId())) {
+                                    if (wishListDS.getValue(WishList.class).getOwner().equals(AuthUtils.getCurrentUser().getId())) {
                                         wishListId = wishListDS.getKey();
                                         adapter.onFriendSelected(friendId);
                                         return;
                                     }
                                 }
-                                WishList wishList = new WishList(FirebaseUtil.getCurrentUser().getId(), friendId);
+                                WishList wishList = new WishList(AuthUtils.getCurrentUser().getId(), friendId);
                                 wishListId = wishList.push();
                                 adapter.onFriendSelected(friendId);
                             }

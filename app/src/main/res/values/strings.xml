@@ -50,4 +50,38 @@
     <string name="loading_pints_dialog_message">Loading pics…</string>
 
     <string name="top_wish_activity_title">Top wishes</string>
+
+
+    <string name="notification_service_title">Wish reserve remind</string>
+    <string name="notification_action_text">Don\'t remind</string>
+    <string name="notification_reserve_text">Don\'t forget for  %1$s!</string>
+
+    <!--  Settings -->
+    <string name="settings_notification_title">Notifications</string>
+    <string name="settings_notification_reserve">Reserve notification</string>
+    <string name="settings_notification_reserve_repeat">Repeat frequency</string>
+    <string name="settings_notification_reserve_repeat_key">notification_reserve</string>
+
+
+    <string-array name="notificationRepeatEntries">
+        <item>5 minutes</item>
+        <item>10 minutes</item>
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>45 minutes</item>
+        <item>1 hour</item>
+        <item>2 hour</item>
+        <item>3 hour</item>
+    </string-array>
+
+    <string-array name="notificationRepeatValues">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>30</item>
+        <item>45</item>
+        <item>60</item>
+        <item>120</item>
+        <item>180</item>
+    </string-array>
 </resources>

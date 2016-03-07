@@ -2,15 +2,13 @@ package com.company.wishlist.activity;
 
 import android.content.DialogInterface;
 import android.content.res.Configuration;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDelegate;
@@ -25,7 +23,7 @@ import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.AuthActivity;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
-import com.facebook.Profile;
+import com.company.wishlist.util.AuthUtils;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
@@ -76,7 +74,7 @@ public class SettingsActivity extends AuthActivity {
                             .setNegativeButton(R.string.no, null)
                             .show();
                 }
-            }catch (Exception ex){}
+            }catch (Exception e){e.printStackTrace();}
             finally {
                 return super.onPreferenceTreeClick(preferenceScreen, preference);
             }
@@ -86,11 +84,10 @@ public class SettingsActivity extends AuthActivity {
         private void removeUserWishes() {
             WishList.getFirebaseRef()
                     .orderByChild("owner")
-                    .equalTo(Profile.getCurrentProfile().getId())
+                    .equalTo(AuthUtils.getCurrentUser().getId())
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            boolean endIterate = false;
                             for (DataSnapshot wishListDS : dataSnapshot.getChildren()) {
                                 Wish.getFirebaseRef()
                                         .orderByChild("wishListId")
@@ -168,6 +165,7 @@ public class SettingsActivity extends AuthActivity {
         getDelegate().setSupportActionBar(toolbar);
     }
 
+    @NonNull
     @Override
     public MenuInflater getMenuInflater() {
         return getDelegate().getMenuInflater();

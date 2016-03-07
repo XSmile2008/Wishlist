@@ -4,12 +4,12 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.InternetActivity;
+import com.company.wishlist.util.AuthUtils;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -33,10 +33,8 @@ public class LoginActivity extends InternetActivity {
     public static final String AUTH_TOKEN_EXTRA = "AUTH_TOKEN_EXTRA";
     public static final String ACTION_LOGOUT = "LOGOUT";
 
-    @Bind(R.id.login_button) LoginButton loginButton;
-
-    /* A reference to the Firebase */
-    private Firebase mFirebaseRef;
+    @Bind(R.id.login_button)
+    LoginButton loginButton;
 
     /* Data from the authenticated user */
     private AuthData mAuthData;
@@ -65,17 +63,19 @@ public class LoginActivity extends InternetActivity {
             }
         };
 
-        /* Create the Firebase ref that is used for all authentication with Firebase */
-        mFirebaseRef = new Firebase(getResources().getString(R.string.firebase_url));
+        boolean isDisconnected = AuthUtils.isDisconnected();
+        if (!isDisconnected && !isLogout(getIntent())) {
+            startMainActivity();
+        } else {
+            logOut();
+        }
 
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        if (isLogout(getIntent())) {
-            logOut();
-        }
+
     }
 
     private boolean isLogout(Intent intent) {
@@ -97,7 +97,7 @@ public class LoginActivity extends InternetActivity {
     }
 
     public void logOut() {
-        mFirebaseRef.unauth();
+        AuthUtils.unauth();
         LoginManager.getInstance().logOut();
     }
 
@@ -125,10 +125,7 @@ public class LoginActivity extends InternetActivity {
         public void onAuthenticated(AuthData authData) {
             progressDialog.hide();
             mAuthData = authData;
-            getApplicationContext()
-                    .startActivity(new Intent(getApplicationContext(), MainActivity.class)
-                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-            finish();
+            startMainActivity();
         }
 
         @Override
@@ -138,14 +135,21 @@ public class LoginActivity extends InternetActivity {
 
     }
 
+    private void startMainActivity() {
+        getApplicationContext()
+                .startActivity(new Intent(getApplicationContext(), MainActivity.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        finish();
+    }
+
     private void onFacebookAccessTokenChange(AccessToken token) {
         if (token != null) {
             progressDialog = getDialog();
             progressDialog.show();
-            mFirebaseRef.authWithOAuthToken("facebook", token.getToken(), new AuthResultHandler());
+            AuthUtils.auth("facebook", token.getToken(), new AuthResultHandler());
         } else {
             if (this.mAuthData != null && this.mAuthData.getProvider().equals("facebook")) {
-                mFirebaseRef.unauth();
+                AuthUtils.unauth();
                 loginButton.setVisibility(View.VISIBLE);
             }
         }

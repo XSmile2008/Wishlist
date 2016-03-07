@@ -32,4 +32,5 @@ public class Reservation implements Serializable{
     public void setForDate(String forDate) {
         this.forDate = forDate;
     }
+
 }

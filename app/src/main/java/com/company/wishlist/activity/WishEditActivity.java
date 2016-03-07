@@ -13,7 +13,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -24,10 +23,10 @@ import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.bean.EditWishBean;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.model.Wish;
+import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.CloudinaryUtil;
 import com.company.wishlist.util.CropCircleTransformation;
 import com.company.wishlist.util.DialogUtil;
-import com.company.wishlist.util.FirebaseUtil;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Length;
@@ -170,7 +169,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
             reservedDateDialog.setOnDateSetListener(new CalendarDatePickerDialogFragment.OnDateSetListener() {
                 @Override
                 public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
-                    editWishBean.reserve(FirebaseUtil.getCurrentUser().getId(), dialog.getSelectedDay().getDateInMillis());
+                    editWishBean.reserve(AuthUtils.getCurrentUser().getId(), dialog.getSelectedDay().getDateInMillis());
                     Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " reserved", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -197,7 +196,7 @@ public class WishEditActivity extends InternetActivity implements Validator.Vali
     }
 
     private void commitChanges() {
-        if (editWishBean.isPictureChanged()) {
+        if (editWishBean.isPictureChanged() && editWishBean.getOriginalWish().getPicture() != null) {
             CloudinaryUtil.destroy(editWishBean.getOriginalWish().getPicture());//destroy old image on cloud
         }
         editWishBean.setComment(editTextComment.getText().toString());

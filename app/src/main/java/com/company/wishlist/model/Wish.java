@@ -1,16 +1,21 @@
 package com.company.wishlist.model;
 
-import com.company.wishlist.util.FirebaseUtil;
+import android.util.Log;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Wish implements Serializable{
+public class Wish implements Serializable {
 
-    @JsonIgnore String id;
+    @JsonIgnore
+    String id;
     String wishListId;
     String title;
     String comment;
@@ -19,7 +24,7 @@ public class Wish implements Serializable{
     Boolean isReceived;
     Boolean isRemoved;
 
-    public Wish(){}
+    public Wish() {}
 
     public String getId() {
         return id;
@@ -87,11 +92,12 @@ public class Wish implements Serializable{
 
     @JsonIgnore
     public static Firebase getFirebaseRef() {
-        return new Firebase(FirebaseUtil.FIREBASE_URL).child(Wish.class.getSimpleName());
+        return FirebaseRoot.get().child(Wish.class.getSimpleName());
     }
 
     /**
      * push new item to database and create unique ID
+     *
      * @return generated id for this Wish
      */
     @JsonIgnore
@@ -101,6 +107,7 @@ public class Wish implements Serializable{
 
     /**
      * push new item to database and create unique ID
+     *
      * @param listener onCompleteListener
      * @return generated id for this Wish
      */
@@ -119,6 +126,7 @@ public class Wish implements Serializable{
 
     /**
      * Hard remove this item form database
+     *
      * @param listener onCompleteListener
      */
     @JsonIgnore
@@ -132,10 +140,12 @@ public class Wish implements Serializable{
     @JsonIgnore
     public void softRemove() {
         this.softRemove(null);
+        removeNotification();
     }
 
     /**
      * Soft remove this item form database
+     *
      * @param listener onCompleteListener
      */
     @JsonIgnore
@@ -150,10 +160,12 @@ public class Wish implements Serializable{
     @JsonIgnore
     public void softRestore() {
         this.softRestore(null);
+        new Notification().create(null, this);
     }
 
     /**
      * Soft remove this item form database
+     *
      * @param listener onCompleteListener
      */
     @JsonIgnore
@@ -164,18 +176,21 @@ public class Wish implements Serializable{
 
     /**
      * Reserve this wish in database
+     *
      * @param userId user thar reserve this wish
-     * @param date reservation date
+     * @param date   reservation date
      */
     @JsonIgnore
     public void reserve(String userId, long date) {
         this.reserve(userId, date, null);
+        new Notification().create(null, this);
     }
 
     /**
      * Reserve this wish in database
-     * @param userId user thar reserve this wish
-     * @param date reservation date
+     *
+     * @param userId   user thar reserve this wish
+     * @param date     reservation date
      * @param listener onCompleteListener
      */
     @JsonIgnore
@@ -194,12 +209,14 @@ public class Wish implements Serializable{
 
     /**
      * Unreserve this wish in database
+     *
      * @param listener onCompleteListener
      */
     @JsonIgnore
     public void unreserve(Firebase.CompletionListener listener) {
         this.reservation = null; //TODO: check it
         getFirebaseRef().child(id).child("reservation").removeValue(listener);
+        removeNotification();//TODO: test it!
     }
 
     @JsonIgnore
@@ -210,6 +227,31 @@ public class Wish implements Serializable{
     @JsonIgnore
     public boolean isRemoved() {
         return null != isRemoved;
+    }
+
+    @JsonIgnore
+    private void removeNotification() {
+        Notification.getFirebaseRef().orderByChild("wishId").equalTo(this.getId())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                            Notification notification = ds.getValue(Notification.class);
+                            notification.setId(ds.getKey());
+                            notification.remove(new Firebase.CompletionListener() {
+                                @Override
+                                public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                                    Log.d(this.getClass().getSimpleName(), " Notification for this wish was removed");
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
+
+                    }
+                });
     }
 
     @JsonIgnore

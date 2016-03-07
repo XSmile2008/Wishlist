@@ -16,27 +16,36 @@
         android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
+
+        <!-- Meta-data section-->
+
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/app_id" />
+
+        <!-- Activity section-->
 
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/my_wish_list">
+
+        </activity>
+
+        <activity
+            android:name=".activity.LoginActivity"
+            android:theme="@style/AppTheme.ActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activity.LoginActivity"
-            android:theme="@style/AppTheme.ActionBar" />
+
         <activity android:name=".activity.abstracts.InternetActivity" />
         <activity
             android:name=".activity.SettingsActivity"
@@ -44,6 +53,16 @@
         <activity android:name=".activity.WishEditActivity" />
         <activity android:name=".activity.TopWishActivity" />
         <activity android:name=".activity.ImageSearchActivity" />
+
+        <!-- Service section-->
+        <service
+            android:name=".service.NotRemindNotificationAction"
+            android:exported="false" />
+
+        <service
+            android:name=".service.NotificationService"
+            android:label="MyService" />
+
     </application>
 
 </manifest>

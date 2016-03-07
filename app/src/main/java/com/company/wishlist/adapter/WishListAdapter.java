@@ -27,7 +27,7 @@ import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.CloudinaryUtil;
 import com.company.wishlist.util.CropCircleTransformation;
-import com.company.wishlist.util.FirebaseUtil;
+import com.company.wishlist.util.AuthUtils;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.firebase.client.ChildEventListener;
@@ -97,7 +97,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
 
         public int graduateByReservation(Wish wish) {
             if (wish.getReservation() == null) return 1;
-            else if (wish.getReservation().getByUser().equals(FirebaseUtil.getCurrentUser().getId())) return 2;
+            else if (wish.getReservation().getByUser().equals(AuthUtils.getCurrentUser().getId())) return 2;
             else return 0;
         }
 
@@ -140,7 +140,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             reservedDateDialog.setOnDateSetListener(new CalendarDatePickerDialogFragment.OnDateSetListener() {
                 @Override
                 public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
-                    wishes.get(position).reserve(FirebaseUtil.getCurrentUser().getId(), dialog.getSelectedDay().getDateInMillis());
+                    wishes.get(position).reserve(AuthUtils.getCurrentUser().getId(), dialog.getSelectedDay().getDateInMillis());
                     Toast.makeText(context, "item " + position + " reserved", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -152,7 +152,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     public void removeWish(int position) {
         wishBackUp = wishes.get(position);
         wishBackUp.softRemove();
-        Snackbar.make(rootView, R.string.message_wish_removed, Snackbar.LENGTH_LONG)
+        Snackbar.make(rootView, context.getString(R.string.message_wish_removed, position), Snackbar.LENGTH_LONG)
                 .setAction(R.string.undo, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -198,13 +198,13 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
                             wishList.setId(wishListDS.getKey());
                             switch (mode) {
                                 case WishListFragment.WISH_LIST_MODE:
-                                    if (!wishList.getOwner().equals(FirebaseUtil.getCurrentUser().getId())) {
+                                    if (!wishList.getOwner().equals(AuthUtils.getCurrentUser().getId())) {
                                         wishLists.put(wishList.getId(), wishList);
                                         getWishes(wishList.getId());
                                     }
                                     break;
                                 case WishListFragment.GIFT_LIST_MODE:
-                                    if (wishList.getOwner().equals(FirebaseUtil.getCurrentUser().getId())) {
+                                    if (wishList.getOwner().equals(AuthUtils.getCurrentUser().getId())) {
                                         wishLists.put(wishList.getId(), wishList);
                                         getWishes(wishList.getId());
                                     }
@@ -379,11 +379,12 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             textViewComment.setText(wish.getComment());
 
             if (wish.isReserved()) {
-                if (wish.getReservation().getByUser().equals(FirebaseUtil.getCurrentUser().getId())) {
-                    textViewStatus.setText("Reserved by you");//TODO:
+                if (wish.getReservation().getByUser().equals(AuthUtils.getCurrentUser().getId())) {
+                    textViewStatus.setText("Reserved by me");//TODO:
                     swipeLayout.setRightSwipeEnabled(true);
                 } else {
-                    textViewStatus.setText("Reserved by another user");//TODO:
+                    // by another user
+                    textViewStatus.setText("Reserved");//TODO: purpose right only Reserved, cause we don't know who present the gift, it should be secret for all
                     swipeLayout.setRightSwipeEnabled(false);
                 }
                 textViewStatus.setTextColor(Color.RED);

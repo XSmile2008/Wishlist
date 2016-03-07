@@ -2,7 +2,6 @@ package com.company.wishlist.model;
 
 import android.util.Log;
 
-import com.company.wishlist.util.FirebaseUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -93,7 +92,7 @@ public class Wish implements Serializable {
 
     @JsonIgnore
     public static Firebase getFirebaseRef() {
-        return FirebaseUtils.get().child(Wish.class.getSimpleName());
+        return FirebaseRoot.get().child(Wish.class.getSimpleName());
     }
 
     /**

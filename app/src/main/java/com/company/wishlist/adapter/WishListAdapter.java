@@ -25,12 +25,10 @@ import com.company.wishlist.model.Reservation;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.AuthUtils;
-import com.company.wishlist.util.FirebaseUtils;
 import com.company.wishlist.util.LocalStorage;
 import com.company.wishlist.util.Utilities;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
-import com.facebook.Profile;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
@@ -372,7 +370,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             textViewComment.setText(wish.getComment());
 
             if (wish.isReserved()) {
-                if (wish.getReservation().getByUser().equals(Profile.getCurrentProfile().getId())) {
+                if (wish.getReservation().getByUser().equals(AuthUtils.getCurrentUser().getId())) {
                     textViewStatus.setText("Reserved by me");//TODO:
                     swipeLayout.setRightSwipeEnabled(true);
                 } else {

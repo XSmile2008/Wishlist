@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.company.wishlist.activity.abstracts.InternetActivity;
+import com.company.wishlist.model.FirebaseRoot;
 import com.company.wishlist.model.User;
 import com.company.wishlist.util.social.FacebookUtil;
 import com.facebook.Profile;
@@ -19,13 +20,13 @@ import com.google.gson.Gson;
 public class AuthUtils {
 
     private final static String USER_PREFS = "USER_DATA";
-    private static Firebase firebase = FirebaseUtils.get();
+    private static Firebase firebase = FirebaseRoot.get();
     private static User currentUser;
     private static AuthData data;
-    private static Context context;
+    private static Context context;//TODO: Static context is a good idea?
 
-    public static void setAndroidContext(Context ctx) {
-        context = ctx;
+    public static void setAndroidContext(Context context) {
+        AuthUtils.context = context;
         data = firebase.getAuth();
     }
 
@@ -40,7 +41,6 @@ public class AuthUtils {
 
             @Override
             public void onAuthenticationError(FirebaseError firebaseError) {
-
                 handler.onAuthenticationError(firebaseError);
             }
         });

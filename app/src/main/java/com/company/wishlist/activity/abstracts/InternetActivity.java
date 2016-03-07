@@ -1,5 +1,6 @@
 package com.company.wishlist.activity.abstracts;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -62,14 +63,18 @@ public class InternetActivity extends DebugActivity {
     }
 
     public boolean isConnected() {
-
-        try {
-            return new CheckInternetConnectionStatus().execute().get();
-        } catch (InterruptedException | ExecutionException e) {
-            return false;
-        }
+        ConnectivityManager cm = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+//        return true;
+//        try {
+//            return new CheckInternetConnectionStatus().execute().get();
+//        } catch (InterruptedException | ExecutionException e) {
+//            return false;
+//        }
     }
 
+    @Deprecated
     private class CheckInternetConnectionStatus extends AsyncTask<Void, Void, Boolean> {
 
         @Override

@@ -65,7 +65,7 @@ public class MainActivity extends AuthActivity implements IOnFriendSelectedListe
         setSupportActionBar(toolbar);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.toggle_open_drawer, R.string.toggle_close_drawer);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         //Setup friend list in drawer
@@ -77,9 +77,8 @@ public class MainActivity extends AuthActivity implements IOnFriendSelectedListe
 
         if (isAuth() && isConnected()) {
             refreshUserDataUi();
-            showMyWishList();
+            showMyWishList();//TODO: save current state
         }
-
 
         Intent intent = new Intent(this, NotificationService.class);
         startService(intent);
@@ -114,10 +113,13 @@ public class MainActivity extends AuthActivity implements IOnFriendSelectedListe
                     new GraphRequest.GraphJSONArrayCallback() {
                         @Override
                         public void onCompleted(JSONArray objects, GraphResponse response) {
-                            List<User> friends = new Gson()
-                                    .fromJson(objects.toString(), new TypeToken<List<User>>() {
-                                    }.getType());
-                            friendListAdapter.setFriends(friends);
+                            if (response.getError() == null) {
+                                List<User> friends = new Gson().fromJson(objects.toString(), new TypeToken<List<User>>() {
+                                }.getType());
+                                friendListAdapter.setFriends(friends);
+                            } else {
+                                Log.e(LOG_TAG, "GraphRequestError: " + response.getError().getErrorMessage());
+                            }
                         }
                     }).executeAsync();
         }

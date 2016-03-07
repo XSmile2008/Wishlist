@@ -17,4 +17,5 @@ public class Application extends android.app.Application {
         AuthUtils.setAndroidContext(this);
         FacebookSdk.sdkInitialize(getApplicationContext());
     }
+
 }

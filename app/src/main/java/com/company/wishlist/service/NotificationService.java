@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.MainActivity;
+import com.company.wishlist.util.AuthUtils;
 import com.facebook.Profile;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
@@ -89,7 +90,7 @@ public class NotificationService extends Service {
         com.company.wishlist.model.Notification
                 .getFirebaseRef()
                 .orderByChild("owner")
-                .equalTo(Profile.getCurrentProfile().getId())
+                .equalTo(AuthUtils.getCurrentUser().getId())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {

@@ -4,14 +4,12 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.util.AuthUtils;
-import com.company.wishlist.util.FirebaseUtils;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -37,9 +35,6 @@ public class LoginActivity extends InternetActivity {
 
     @Bind(R.id.login_button)
     LoginButton loginButton;
-
-    /* A reference to the Firebase */
-    private Firebase mFirebaseRef;
 
     /* Data from the authenticated user */
     private AuthData mAuthData;
@@ -67,9 +62,6 @@ public class LoginActivity extends InternetActivity {
                 LoginActivity.this.onFacebookAccessTokenChange(currentAccessToken);
             }
         };
-
-        /* Create the Firebase ref that is used for all authentication with Firebase */
-        mFirebaseRef = FirebaseUtils.get();
 
         boolean isDisconnected = AuthUtils.isDisconnected();
         if (!isDisconnected && !isLogout(getIntent())) {

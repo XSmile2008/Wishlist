@@ -19,7 +19,6 @@ import com.company.wishlist.adapter.WishListAdapter;
 import com.company.wishlist.events.FriendSelectedEvent;
 import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.AuthUtils;
-import com.company.wishlist.util.FirebaseUtils;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;

@@ -23,7 +23,7 @@ import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.AuthActivity;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
-import com.facebook.Profile;
+import com.company.wishlist.util.AuthUtils;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
@@ -74,7 +74,7 @@ public class SettingsActivity extends AuthActivity {
                             .setNegativeButton(R.string.no, null)
                             .show();
                 }
-            }catch (Exception ex){}
+            }catch (Exception e){e.printStackTrace();}
             finally {
                 return super.onPreferenceTreeClick(preferenceScreen, preference);
             }
@@ -84,11 +84,10 @@ public class SettingsActivity extends AuthActivity {
         private void removeUserWishes() {
             WishList.getFirebaseRef()
                     .orderByChild("owner")
-                    .equalTo(Profile.getCurrentProfile().getId())
+                    .equalTo(AuthUtils.getCurrentUser().getId())
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            boolean endIterate = false;
                             for (DataSnapshot wishListDS : dataSnapshot.getChildren()) {
                                 Wish.getFirebaseRef()
                                         .orderByChild("wishListId")

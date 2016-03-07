@@ -28,7 +28,6 @@ import com.company.wishlist.model.Wish;
 import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.CropCircleTransformation;
 import com.company.wishlist.util.DialogUtil;
-import com.company.wishlist.util.FirebaseUtils;
 import com.company.wishlist.util.LocalStorage;
 import com.company.wishlist.util.Utilities;
 import com.mobsandgeeks.saripaar.ValidationError;

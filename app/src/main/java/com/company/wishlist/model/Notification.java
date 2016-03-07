@@ -1,8 +1,7 @@
 package com.company.wishlist.model;
 
+import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.DateUtil;
-import com.company.wishlist.util.FirebaseUtils;
-import com.facebook.Profile;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.firebase.client.Firebase;
 
@@ -76,7 +75,7 @@ public class Notification {
         this.wishId = wish.getId();
         this.wishTitle = wish.getTitle();
         this.reservationDate = wish.getReservation().getForDate();
-        this.owner = Profile.getCurrentProfile().getId();
+        this.owner = AuthUtils.getCurrentUser().getId();
 
         long reserve = Long.valueOf(wish.getReservation().getForDate());
         long notify = DateUtil.isToday(reserve) ? reserve : DateUtil.substractDaysFromDate(reserve, NOTIFY_BEFORE_RESERVATION_DAYS);
@@ -94,7 +93,7 @@ public class Notification {
 
     @JsonIgnore
     public static Firebase getFirebaseRef() {
-        return FirebaseUtils.get().child(Notification.class.getSimpleName());
+        return FirebaseRoot.get().child(Notification.class.getSimpleName());
     }
 
     @JsonIgnore

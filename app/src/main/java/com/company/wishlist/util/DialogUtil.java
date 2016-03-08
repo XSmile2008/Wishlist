@@ -33,8 +33,8 @@ public class DialogUtil {
                 .setTitle(title)
                 .setMessage(message)
                 .setCancelable(false)
-                .setPositiveButton(context.getString(R.string.yes), onClickListener)
-                .setNegativeButton(context.getString(R.string.no), null)
+                .setPositiveButton(android.R.string.yes, onClickListener)
+                .setNegativeButton(android.R.string.no, null)
                 .show();
     }
 

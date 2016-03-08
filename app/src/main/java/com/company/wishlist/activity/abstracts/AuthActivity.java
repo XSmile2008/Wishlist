@@ -6,11 +6,14 @@ import android.os.Bundle;
 import com.company.wishlist.activity.LoginActivity;
 import com.company.wishlist.model.User;
 import com.company.wishlist.util.AuthUtils;
+import com.company.wishlist.util.ConnectionUtil;
 import com.facebook.AccessToken;
 
-public abstract class AuthActivity extends InternetActivity {
+public abstract class AuthActivity extends DebugActivity {
 
     public static final String RELOAD_DATA = "RELOAD_DATA";
+
+    private ConnectionUtil connection = new ConnectionUtil(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +35,7 @@ public abstract class AuthActivity extends InternetActivity {
     }
 
     private void processFirebaseLogin() {
-        if (isConnected()) {
+        if (connection.isConnected()) {
             if (AuthUtils.isDisconnected()) {
                 AuthUtils.auth("facebook", AccessToken.getCurrentAccessToken().getToken(), null);
             }

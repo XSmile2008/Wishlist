@@ -33,7 +33,7 @@ public class ImageSearchAdapter extends RecyclerView.Adapter<ImageSearchAdapter.
 
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.pinterest_grid_item, parent, false));
+        return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.image_search_item, parent, false));
     }
 
     @Override

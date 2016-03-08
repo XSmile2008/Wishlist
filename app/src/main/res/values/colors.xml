@@ -8,6 +8,7 @@
     <color name="list_divider">#A8A8A8</color>
 
     <color name="semi_translucent_white">#D2E0E0E0</color>
+    <color name="semi_translucent_black">#44000000</color>
 
     <color name="md_grey_600">#757575</color>
     <color name="white">#fafafa</color>

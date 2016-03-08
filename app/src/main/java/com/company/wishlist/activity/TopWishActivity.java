@@ -1,6 +1,8 @@
 package com.company.wishlist.activity;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,11 +11,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.company.wishlist.R;
-import com.company.wishlist.activity.abstracts.AuthActivity;
+import com.company.wishlist.activity.abstracts.DebugActivity;
 import com.company.wishlist.adapter.TopWishListAdapter;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.model.Wish;
-import com.company.wishlist.util.DialogUtil;
+import com.company.wishlist.util.ConnectionUtil;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
@@ -24,11 +26,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import butterknife.ButterKnife;
 
-public class TopWishActivity extends AuthActivity {
+public class TopWishActivity extends DebugActivity {
 
-    TopWishListAdapter adapter;
-    RecyclerView recyclerView;
-    ProgressDialog progressLoadingWithDialog;
+    private TopWishListAdapter adapter;
+    private AlertDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,32 +46,49 @@ public class TopWishActivity extends AuthActivity {
 
         String wishListId = getIntent().getExtras().getString(WishListFragment.WISH_LIST_ID);
         adapter = new TopWishListAdapter(this, wishListId);
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        progressLoadingWithDialog = DialogUtil.progressDialog(getString(R.string.app_name), getString(R.string.load_wish_progress_dialog_message), this);
+        progressDialog = new ProgressDialog.Builder(this)
+                .setTitle(R.string.app_name)
+                .setMessage(R.string.message_load_wish_progress_dialog)
+                .setCancelable(false).show();
 
-        progressLoadingWithDialog.show();
+        if (ConnectionUtil.isConnected()) {
+            loadWishes(new ValueEventListener() {
 
-        loadWishes(new ValueEventListener() {
+                List<Wish> wishes = new CopyOnWriteArrayList<Wish>();
 
-            List<Wish> wishes = new CopyOnWriteArrayList<Wish>();
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    wishes.add(postSnapshot.getValue(Wish.class));
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                        wishes.add(postSnapshot.getValue(Wish.class));
+                    }
+                    Collections.shuffle(wishes);
+                    adapter.addAll(wishes);
+                    progressDialog.dismiss();
                 }
-                Collections.shuffle(wishes);
-                adapter.addAll(wishes);
-                progressLoadingWithDialog.dismiss();
-            }
 
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-            }
-        });
+                @Override
+                public void onCancelled(FirebaseError firebaseError) {}
+
+            });
+        } else {
+            progressDialog.dismiss();
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.no_connection)
+                    .setMessage(R.string.check_connection)
+                    .setIcon(R.drawable.ic_perm_scan_wifi_grey_600_24dp)
+                    .setCancelable(false)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
+                    .show();
+        }
 
     }
 

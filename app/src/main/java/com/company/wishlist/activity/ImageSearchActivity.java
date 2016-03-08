@@ -8,14 +8,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.company.wishlist.R;
-import com.company.wishlist.activity.abstracts.InternetActivity;
+import com.company.wishlist.activity.abstracts.DebugActivity;
 import com.company.wishlist.adapter.ImageSearchAdapter;
 import com.company.wishlist.view.GridAutofitLayoutManager;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class ImageSearchActivity extends InternetActivity implements ImageSearchAdapter.IOnPictureSelectedListener {
+public class ImageSearchActivity extends DebugActivity implements ImageSearchAdapter.IOnPictureSelectedListener {
 
     public static final String QUERY = "com.company.wishlist.activity.QUERY";
     public static final String RESULT_DATA = "com.company.wishlist.activity.RESULT_DATA";

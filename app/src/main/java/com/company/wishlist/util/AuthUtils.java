@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.company.wishlist.activity.abstracts.InternetActivity;
 import com.company.wishlist.model.FirebaseRoot;
 import com.company.wishlist.model.User;
 import com.company.wishlist.util.social.FacebookUtil;

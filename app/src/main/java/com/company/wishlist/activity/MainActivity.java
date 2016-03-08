@@ -2,6 +2,7 @@ package com.company.wishlist.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -25,6 +26,7 @@ import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.User;
 import com.company.wishlist.service.NotificationService;
+import com.company.wishlist.util.ConnectionUtil;
 import com.company.wishlist.util.CropCircleTransformation;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
@@ -50,9 +52,11 @@ public class MainActivity extends AuthActivity implements IOnFriendSelectedListe
     private FriendListAdapter friendListAdapter;
 
     //NavigationDrawer
+    @Nullable DrawerLayout drawer;
     @Bind(R.id.profile_user_avatar_iw) ImageView userAvatarView;
     @Bind(R.id.profile_user_name_tv) TextView profileUserName;
-    @Bind(R.id.drawer_layout) DrawerLayout drawer;
+    @Bind(R.id.connectivity_status) View connectivityStatus;
+    @Bind(R.id.recycler_view_friends) RecyclerView recyclerViewFriends;
     //@Bind(R.id.collapsing_toolbar) CollapsingToolbarLayout collapsingToolbarLayout;
 
     @Override
@@ -61,27 +65,33 @@ public class MainActivity extends AuthActivity implements IOnFriendSelectedListe
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        //Init Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.toggle_open_drawer, R.string.toggle_close_drawer);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+        //Init navigation drawer
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer != null) {
+            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.toggle_open_drawer, R.string.toggle_close_drawer);
+            drawer.addDrawerListener(toggle);
+            toggle.syncState();
+        }
 
         //Setup friend list in drawer
         friendListAdapter = new FriendListAdapter(this, new ArrayList<User>());
-        RecyclerView recyclerViewFriends = (RecyclerView) drawer.findViewById(R.id.friends_recycler_view);
         recyclerViewFriends.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewFriends.setAdapter(friendListAdapter);
         recyclerViewFriends.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).build());
 
-        if (isAuth() && isConnected()) {
-            refreshUserDataUi();
-            showMyWishList();//TODO: save current state
-        }
+        //Start service
+        startService(new Intent(this, NotificationService.class));
+    }
 
-        Intent intent = new Intent(this, NotificationService.class);
-        startService(intent);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        showMyWishList();//TODO: save current state
+        refreshUserDataUi();
     }
 
     @Override
@@ -97,6 +107,20 @@ public class MainActivity extends AuthActivity implements IOnFriendSelectedListe
                 return false;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @OnClick({R.id.header_layout, R.id.button_settings})
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.header_layout:
+                showMyWishList();
+                break;
+            case R.id.button_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
+        }
+        if (drawer != null) drawer.closeDrawer(GravityCompat.START);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
     private void refreshUserDataUi() {
@@ -118,6 +142,8 @@ public class MainActivity extends AuthActivity implements IOnFriendSelectedListe
                                 }.getType());
                                 friendListAdapter.setFriends(friends);
                             } else {
+                                connectivityStatus.setVisibility(View.VISIBLE);//TODO: check connection when open drawer
+                                recyclerViewFriends.setVisibility(View.GONE);
                                 Log.e(LOG_TAG, "GraphRequestError: " + response.getError().getErrorMessage());
                             }
                         }
@@ -126,28 +152,8 @@ public class MainActivity extends AuthActivity implements IOnFriendSelectedListe
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        refreshUserDataUi();
-    }
-
-    @OnClick({R.id.header_layout, R.id.button_settings})
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.header_layout:
-                showMyWishList();
-                break;
-            case R.id.button_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
-                break;
-        }
-        drawer.closeDrawer(GravityCompat.START);
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-    }
-
-    @Override
     public void onFriendSelected(String friendId) {
-        drawer.closeDrawer(GravityCompat.START);
+        if (drawer != null) drawer.closeDrawer(GravityCompat.START);
         showFriendWishList(friendId);
 
         List<Fragment> fragments = getSupportFragmentManager().getFragments();

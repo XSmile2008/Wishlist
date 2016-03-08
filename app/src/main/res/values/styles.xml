@@ -8,18 +8,6 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="LoginPage" parent="AppTheme">
-        <item name="android:background">#0084ff</item>
-        <item name="colorPrimaryDark">#0084ff</item>
-    </style>
-
-    <style name="LoginPage.EditText.Title" parent="android:TextAppearance.Large">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:textSize">30sp</item>
-    </style>
-
     <style name="AppTheme.NoActionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -28,6 +16,27 @@
     <style name="AppTheme.ActionBar" parent="AppTheme">
         <item name="windowNoTitle">true</item>
     </style>
+
+    <!-- Login Page-->
+    <style name="AppTheme.LoginPage" parent="AppTheme">
+        <item name="colorButtonNormal">@color/com_facebook_button_background_color</item>
+    </style>
+
+    <style name="AppTheme.LoginPage.EditText.Title" parent="LargeText">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="AppTheme.LoginPage.FacebookButton" parent="AppTheme.LoginPage">
+        <item name="android:drawableLeft">@drawable/ic_facebook_icon</item>
+        <item name="android:drawableStart">@drawable/ic_facebook_icon</item>
+        <item name="android:drawablePadding">@dimen/default_padding_medium</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Medium</item>
+        <item name="android:textColor">@color/com_facebook_share_button_text_color</item>
+        <item name="android:text">@string/login_with_facebook</item>
+    </style>
+    <!-- Login Page end-->
 
     <!-- CircleImageView-->
     <style name="AppTheme.CircleImageView" parent="AppTheme">
@@ -46,6 +55,23 @@
     </style>
     <!-- CircleImageView end-->
 
+    <!-- TextView styles-->
+    <style name="SmallText" parent="android:TextAppearance.Small">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="MediumText" parent="android:TextAppearance.Medium">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="LargeText" parent="android:TextAppearance.Large">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+    <!-- TextView styles end-->
+
     <style name="AppTheme.ImageButton" parent="AppTheme">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -63,21 +89,6 @@
         <item name="android:src">@android:color/darker_gray</item>
         <item name="android:layout_marginTop">@dimen/default_margin_medium</item>
         <item name="android:layout_marginBottom">@dimen/default_margin_medium</item>
-    </style>
-
-    <style name="SmallText" parent="android:TextAppearance.Small">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
-
-    <style name="MediumText" parent="android:TextAppearance.Medium">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
-
-    <style name="LargeText" parent="android:TextAppearance.Large">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

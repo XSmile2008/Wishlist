@@ -63,7 +63,7 @@ public class SettingsActivity extends AuthActivity {
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .setTitle("Message")
                             .setMessage("After push Yes your removed wishes will be deleted.")
-                            .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -71,7 +71,7 @@ public class SettingsActivity extends AuthActivity {
                                 }
 
                             })
-                            .setNegativeButton(R.string.no, null)
+                            .setNegativeButton(android.R.string.no, null)
                             .show();
                 }
             }catch (Exception e){e.printStackTrace();}

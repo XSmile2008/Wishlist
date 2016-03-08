@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Drawer header-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:background="@drawable/drawer_header"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+        <RelativeLayout
+            android:id="@+id/header_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/default_margin_medium"
+            android:layout_marginRight="@dimen/default_margin_medium"
+            android:layout_marginTop="32dp">
+
+            <ImageView
+                android:id="@+id/profile_user_avatar_iw"
+                android:layout_width="@dimen/image_size_medium"
+                android:layout_height="@dimen/image_size_medium"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true" />
+
+            <TextView
+                android:id="@+id/profile_user_name_tv"
+                style="@style/MediumText"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/cardview_horizontal_margin"
+                android:layout_toRightOf="@+id/profile_user_avatar_iw" />
+
+            <ImageButton
+                android:id="@+id/button_settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@null"
+                android:src="@drawable/ic_settings_white_24dp" />
+
+        </RelativeLayout>
+
+        <TextView
+            style="@style/MediumText"
+            android:layout_width="match_parent"
+            android:layout_below="@id/header_layout"
+            android:layout_marginTop="@dimen/default_margin_medium"
+            android:background="@color/semi_translucent_black"
+            android:gravity="center"
+            android:text="@string/my_friends" />
+
+    </RelativeLayout>
+    <!-- Drawer header end-->
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view_friends"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:choiceMode="singleChoice"
+        android:divider="@color/list_divider"
+        android:dividerHeight="1dp"
+        android:paddingTop="@dimen/default_padding_small" />
+
+    <include layout="@layout/connectivity_status" />
+
+</LinearLayout>

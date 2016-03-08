@@ -21,12 +21,11 @@ import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.AuthActivity;
 import com.company.wishlist.adapter.FriendListAdapter;
+import com.company.wishlist.events.FriendSelectedEvent;
 import com.company.wishlist.fragment.TabbedWishListFragment;
 import com.company.wishlist.fragment.WishListFragment;
-import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.User;
 import com.company.wishlist.service.NotificationService;
-import com.company.wishlist.util.ConnectionUtil;
 import com.company.wishlist.util.CropCircleTransformation;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
@@ -35,6 +34,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AuthActivity implements IOnFriendSelectedListener {
+public class MainActivity extends AuthActivity  {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -57,7 +58,8 @@ public class MainActivity extends AuthActivity implements IOnFriendSelectedListe
     @Bind(R.id.profile_user_name_tv) TextView profileUserName;
     @Bind(R.id.connectivity_status) View connectivityStatus;
     @Bind(R.id.recycler_view_friends) RecyclerView recyclerViewFriends;
-    //@Bind(R.id.collapsing_toolbar) CollapsingToolbarLayout collapsingToolbarLayout;
+
+    private User selectedFriend;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,13 +87,30 @@ public class MainActivity extends AuthActivity implements IOnFriendSelectedListe
 
         //Start service
         startService(new Intent(this, NotificationService.class));
+
+        if (savedInstanceState != null) {
+            User friend = (User) savedInstanceState.getSerializable(User.class.getSimpleName());
+            if (friend.getId().equals(currentUser().getId())) {
+                showMyWishList();
+            } else {
+                showFriendWishList(friend);
+            }
+        } else {
+            showMyWishList();
+        }
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
-        showMyWishList();//TODO: save current state
-        refreshUserDataUi();
+        EventBus.getDefault().register(this);
+        refreshUserDataUi();//TODO:
+    }
+
+    @Override
+    public void onPause() {
+        EventBus.getDefault().unregister(this);
+        super.onPause();
     }
 
     @Override
@@ -107,6 +126,12 @@ public class MainActivity extends AuthActivity implements IOnFriendSelectedListe
                 return false;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(User.class.getSimpleName(), this.selectedFriend);
     }
 
     @OnClick({R.id.header_layout, R.id.button_settings})
@@ -151,26 +176,27 @@ public class MainActivity extends AuthActivity implements IOnFriendSelectedListe
         }
     }
 
-    @Override
-    public void onFriendSelected(String friendId) {
+    @Subscribe
+    public void onFriendSelectedEvent(FriendSelectedEvent event) {
         if (drawer != null) drawer.closeDrawer(GravityCompat.START);
-        showFriendWishList(friendId);
+        showFriendWishList(event.getFriend());
 
         List<Fragment> fragments = getSupportFragmentManager().getFragments();
         Log.d(LOG_TAG, Arrays.toString(fragments.toArray()));
     }
 
     private void showMyWishList() {
+        this.selectedFriend = currentUser();
         getSupportActionBar().setTitle(getResources().getString(R.string.my_wish_list));
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_wish_list);
         if (fragment == null) {
-            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, currentUser().getId());
+            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, currentUser());
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.container_wish_list, fragment)
                     .commit();
         } else if (!(fragment instanceof WishListFragment)) {
-            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, currentUser().getId());
+            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, currentUser());
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.container_wish_list, fragment)
@@ -178,18 +204,18 @@ public class MainActivity extends AuthActivity implements IOnFriendSelectedListe
         }
     }
 
-    private void showFriendWishList(String friendId) {
-        User friend = friendListAdapter.getFriendById(friendId);
+    private void showFriendWishList(User friend) {
+        this.selectedFriend = friend;
         getSupportActionBar().setTitle(friend.getDisplayName());
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_wish_list);
         if (fragment == null) {
-            fragment = TabbedWishListFragment.newInstance(friendId);
+            fragment = TabbedWishListFragment.newInstance(friend);//TODO:
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.container_wish_list, fragment)
                     .commit();
         } else if (!(fragment instanceof TabbedWishListFragment)) {
-            fragment = TabbedWishListFragment.newInstance(friendId);
+            fragment = TabbedWishListFragment.newInstance(friend);//TODO
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.container_wish_list, fragment)

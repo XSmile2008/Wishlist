@@ -5,7 +5,7 @@ import com.firebase.client.Firebase;
 /**
  * Created by vladstarikov on 07.03.16.
  */
-public class FirebaseRoot {
+public abstract class FirebaseRoot {
 
     private static final String FIREBASE_URL = "https://appwishlist.firebaseio.com";
 

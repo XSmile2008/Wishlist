@@ -3,9 +3,9 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF5252</color>
-    <color name="colorAccentDark">#FF1744</color>
+    <color name="colorAccentDark">#D50000</color>
 
-    <color name="list_divider">#A8A8A8</color>
+    <color name="divider">#B6B6B6</color>
 
     <color name="semi_translucent_white">#D2E0E0E0</color>
     <color name="semi_translucent_black">#44000000</color>

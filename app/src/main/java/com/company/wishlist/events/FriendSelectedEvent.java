@@ -1,16 +1,18 @@
 package com.company.wishlist.events;
 
+import com.company.wishlist.model.User;
+
 /**
  * Created by vladstarikov on 17.02.16.
  */
 public class FriendSelectedEvent {
-    private String friendId;
+    private User friend;
 
-    public FriendSelectedEvent(String friendId) {
-        this.friendId = friendId;
+    public FriendSelectedEvent(User friend) {
+        this.friend = friend;
     }
 
-    public String getFriendId() {
-        return friendId;
+    public User getFriend() {
+        return friend;
     }
 }

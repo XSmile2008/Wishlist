@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.firebase.client.Firebase;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by v.odahovskiy on 06.01.2016.
  */
-public class User {
+public class User implements Serializable{
 
     @JsonIgnore@SerializedName("id") private String id;
     @SerializedName("name") private String displayName;
@@ -21,10 +23,8 @@ public class User {
 
     public User(){}
 
-    public User(String id, String displayName, String provider) {
+    public User(String id) {
         this.id = id;
-        this.displayName = displayName;
-        this.provider = provider;
     }
 
     public String getId() {

@@ -17,6 +17,7 @@ import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.adapter.WishListAdapter;
 import com.company.wishlist.events.FriendSelectedEvent;
+import com.company.wishlist.model.User;
 import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.AuthUtils;
 import com.firebase.client.DataSnapshot;
@@ -36,6 +37,8 @@ import butterknife.OnClick;
  */
 public class WishListFragment extends DebugFragment {
 
+    private static final String LOG_TAG = WishListFragment.class.getSimpleName();
+
     public static final int MY_WISH_LIST_MODE = 0;
     public static final int WISH_LIST_MODE = 1;
     public static final int GIFT_LIST_MODE = 2;
@@ -48,11 +51,11 @@ public class WishListFragment extends DebugFragment {
 
     @Bind(R.id.fab) FloatingActionMenu mFab;
 
-    public static WishListFragment newInstance(int mode, String friendId) {
+    public static WishListFragment newInstance(int mode, User user) {
         WishListFragment fragment = new WishListFragment();
         Bundle args = new Bundle();
         args.putInt(MODE, mode);
-        args.putString(FriendListAdapter.FRIEND_ID, friendId);
+        args.putSerializable(User.class.getSimpleName(), user);
         fragment.setArguments(args);
         return fragment;
     }
@@ -80,16 +83,16 @@ public class WishListFragment extends DebugFragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);//TODO: may be not bind if mFab is not visible?
 
-        Bundle bundle = getArguments();
-        this.mode = bundle.getInt(MODE);
-        String friendId = bundle.getString(FriendListAdapter.FRIEND_ID);
+        this.mode = getArguments().getInt(MODE);
 
         adapter = new WishListAdapter(getContext(), getView(), mode == MY_WISH_LIST_MODE ? GIFT_LIST_MODE : mode);
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
-        onFriendSelectedEvent(new FriendSelectedEvent(friendId));
+        User user = (User) getArguments().getSerializable(User.class.getSimpleName());
+        Log.e(LOG_TAG, user.getId());
+        onFriendSelectedEvent(new FriendSelectedEvent(user));
 
         if (mode == WISH_LIST_MODE) mFab.setVisibility(View.GONE);
         else {
@@ -128,13 +131,14 @@ public class WishListFragment extends DebugFragment {
 
     @Subscribe
     public void onFriendSelectedEvent(FriendSelectedEvent event) {
-        final Fragment fragment = this;
-        final String friendId = event.getFriendId();
+        final Fragment fragment = this;//TODO: remove this
+        final String friendId = event.getFriend().getId();
+        Log.e(LOG_TAG, "onFriendSelectedEvent("+ friendId + ")");
         switch (mode) {
             case WISH_LIST_MODE:
                 adapter.onFriendSelected(friendId); return;
             case MY_WISH_LIST_MODE:
-                if (!event.getFriendId().equals(AuthUtils.getCurrentUser().getId())) return;
+                if (!event.getFriend().getId().equals(AuthUtils.getCurrentUser().getId())) return;//TODO: equals check hash, but not ID
             case GIFT_LIST_MODE:
                 WishList.getFirebaseRef()
                         .orderByChild("forUser")

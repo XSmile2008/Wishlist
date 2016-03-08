@@ -1,7 +1,6 @@
 package com.company.wishlist.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +11,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
 import com.company.wishlist.events.FriendSelectedEvent;
-import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.User;
 import com.company.wishlist.util.CropCircleTransformation;
 
@@ -31,8 +29,6 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
 
     private Context context;
     private List<User> friends;
-
-    public static String FRIEND_ID = "friend_id";
 
     public FriendListAdapter(Context context, List<User> friends) {
         this.context = context;
@@ -63,13 +59,6 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
         notifyDataSetChanged();
     }
 
-    public User getFriendById(String id) {
-        for (User user : friends) {
-            if (user.getId().equals(id)) return user;
-        }
-        throw new IllegalArgumentException(String.format("User with id(%s) not found in friend list", id));
-    }
-
     public class Holder extends RecyclerView.ViewHolder {
 
         @Bind(R.id.friend_avatar_iv)
@@ -83,9 +72,8 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String friendId = friends.get(getAdapterPosition()).getId();
-                    ((IOnFriendSelectedListener) context).onFriendSelected(friendId);
-                    EventBus.getDefault().post(new FriendSelectedEvent(friendId));
+                    User user = friends.get(getAdapterPosition());
+                    EventBus.getDefault().post(new FriendSelectedEvent(user));
                 }
             });
         }

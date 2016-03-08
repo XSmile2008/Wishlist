@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import com.company.wishlist.R;
 import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.adapter.WishListPageViewAdapter;
+import com.company.wishlist.model.User;
 import com.company.wishlist.view.CustomViewPager;
 
 import butterknife.Bind;
@@ -28,9 +29,9 @@ public class TabbedWishListFragment extends DebugFragment {
     @Bind(R.id.tab_layout) TabLayout tabLayout;
     @Bind(R.id.view_pager) CustomViewPager viewPager;
 
-    public static TabbedWishListFragment newInstance(String friendId) {
+    public static TabbedWishListFragment newInstance(User friend) {
         Bundle args = new Bundle();
-        args.putString(FriendListAdapter.FRIEND_ID, friendId);
+        args.putSerializable(User.class.getSimpleName(), friend);
         TabbedWishListFragment fragment = new TabbedWishListFragment();
         fragment.setArguments(args);
         return fragment;
@@ -46,7 +47,8 @@ public class TabbedWishListFragment extends DebugFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-        wishListPageViewAdapter = new WishListPageViewAdapter(getChildFragmentManager(), getArguments().getString(FriendListAdapter.FRIEND_ID));
+        User user = (User) getArguments().getSerializable(User.class.getSimpleName());
+        wishListPageViewAdapter = new WishListPageViewAdapter(getChildFragmentManager(), user);
         viewPager.setAdapter(wishListPageViewAdapter);
         viewPager.setPagingEnabled(false);
         tabLayout.setupWithViewPager(viewPager);

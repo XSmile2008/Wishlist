@@ -1,9 +1,17 @@
 package com.company.wishlist.util;
 
+import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 
+import com.bumptech.glide.DrawableRequestBuilder;
+import com.bumptech.glide.Glide;
 import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 
 import java.io.IOException;
@@ -33,11 +41,11 @@ public class CloudinaryUtil {
     }
 
     public static void upload(String url) {
-        new AsyncUploader().execute(url);
+        new AsyncUploader(null).execute(url);
     }
 
     public static void upload(InputStream inputStream) {
-        new AsyncUploader().execute(inputStream);
+        new AsyncUploader(null).execute(inputStream);
     }
 
     public static void upload(String url, IOnDoneListener listener) {
@@ -67,20 +75,41 @@ public class CloudinaryUtil {
         }.execute();
     }
 
+    public static String getThumbURl(String publicId, int wight, int height) {
+        Transformation transformation = new Transformation().width(wight).height(height).crop("lfill");
+        return getInstance().url().transformation(transformation).format("jpg").generate(publicId);
+    }
+
+    public static void loadCircleThumb(final Context context, final ImageView imageView, final String publicId, @Nullable @DrawableRes final Integer placeholder) {
+        ViewTreeObserver observer = imageView.getViewTreeObserver();
+        observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            public boolean onPreDraw() {
+                imageView.getViewTreeObserver().removeOnPreDrawListener(this);
+                DrawableRequestBuilder builder = Glide
+                        .with(context)
+                        .load(CloudinaryUtil.getThumbURl(publicId, imageView.getWidth(), imageView.getHeight()))
+                        .bitmapTransform(new CropCircleTransformation(Glide.get(context).getBitmapPool()));
+                if (placeholder != null) builder.placeholder(placeholder);
+                builder.into(imageView);
+                return true;
+            }
+        });
+    }
+
+    //TODO: try use loaders
     private static class AsyncUploader extends AsyncTask<Object, Void, Void> {
 
         IOnDoneListener listener;
 
-        public AsyncUploader() {}
-
-        public AsyncUploader(IOnDoneListener listener) {
+        public AsyncUploader(@Nullable IOnDoneListener listener) {
             this.listener = listener;
         }
 
         @Override
         protected Void doInBackground(Object... params) {
             try {
-                Map map = CloudinaryUtil.getInstance().uploader().upload(params[0], ObjectUtils.emptyMap());
+                Map options = ObjectUtils.emptyMap();
+                Map map = CloudinaryUtil.getInstance().uploader().upload(params[0], options);
                 if (listener != null) listener.onDone(map);
             } catch (IOException e) {
                 e.printStackTrace();

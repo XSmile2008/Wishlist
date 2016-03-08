@@ -9,6 +9,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -117,15 +118,10 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
         //Init view
         editTextTitle.setText(editWishBean.getTitle());
         editTextComment.setText(editWishBean.getComment());
-        if (editWishBean.getPicture() == null) {
-            imageView.setImageResource(R.drawable.gift_icon);
-        } else {
-            Glide.with(getApplicationContext())
-                    .load(CloudinaryUtil.getInstance().url().generate(editWishBean.getPicture()))
-                    .bitmapTransform(new CropCircleTransformation(Glide.get(getApplicationContext()).getBitmapPool()))
-                    .into(imageView);
-        }
+        CloudinaryUtil.loadCircleThumb(this, imageView, editWishBean.getPicture(), R.drawable.gift_icon);
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -255,18 +251,9 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
             if (ConnectionUtil.isConnected()) {
                 CloudinaryUtil.IOnDoneListener listener = new CloudinaryUtil.IOnDoneListener() {
                     @Override
-                    public void onDone(final Map<String, Object> imgInfo) {//TODO: check it
-                        new Handler(getApplicationContext().getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                String url = (String) imgInfo.get("url");
-                                Glide.with(getApplicationContext())
-                                        .load(url).crossFade()
-                                        .bitmapTransform(new CropCircleTransformation(Glide.get(getApplicationContext()).getBitmapPool()))
-                                        .into(imageView);
-                                editWishBean.setPicture((String) imgInfo.get("public_id"));
-                            }
-                        });
+                    public void onDone(final Map<String, Object> imgInfo) {
+                        editWishBean.setPicture((String) imgInfo.get("public_id"));
+                        CloudinaryUtil.loadCircleThumb(getApplicationContext(), imageView, editWishBean.getPicture(), R.drawable.gift_icon);
                     }
                 };
                 try {

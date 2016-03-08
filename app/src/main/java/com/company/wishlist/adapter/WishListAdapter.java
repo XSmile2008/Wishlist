@@ -7,7 +7,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -365,16 +367,8 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         }
 
         public void onBind(Wish wish) {
-            Log.e(LOG_TAG, ".Holder.OnBind()");
-            if (wish.getPicture() == null) {
-                imageView.setImageResource(R.drawable.gift_icon);//TODO: default circle image
-            } else {
-                Log.d(LOG_TAG, ".Holder.LoadImage: " + wish.getPicture());
-                Glide.with(context)
-                        .load(CloudinaryUtil.getInstance().url().generate(wish.getPicture()))
-                        .bitmapTransform(new CropCircleTransformation(Glide.get(context).getBitmapPool()))
-                        .into(imageView);
-            }
+            CloudinaryUtil.loadCircleThumb(context, imageView, wish.getPicture(), R.drawable.gift_icon);
+
             textViewTitle.setText(wish.getTitle());
             textViewComment.setText(wish.getComment());
 

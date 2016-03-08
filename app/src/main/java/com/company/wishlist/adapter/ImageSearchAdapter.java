@@ -1,6 +1,8 @@
 package com.company.wishlist.adapter;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +13,8 @@ import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
 import com.company.wishlist.util.social.pinterest.PinterestUtil;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.Bind;
@@ -24,11 +28,18 @@ public class ImageSearchAdapter extends RecyclerView.Adapter<ImageSearchAdapter.
 
     private Context mContext;
     private IOnPictureSelectedListener mListener;
-    private List<String> mItems;
+    private List<String> mItems = new ArrayList<>();
 
-    public ImageSearchAdapter(Context context, IOnPictureSelectedListener listener) {
+    public ImageSearchAdapter(Context context, IOnPictureSelectedListener listener, String query) {
         this.mContext = context;
         this.mListener = listener;
+        loadPictures(query);
+    }
+
+    public ImageSearchAdapter(Context context, IOnPictureSelectedListener listener, List<String> urls) {
+        this.mContext = context;
+        this.mListener = listener;
+        this.mItems = urls;
     }
 
     @Override
@@ -49,13 +60,30 @@ public class ImageSearchAdapter extends RecyclerView.Adapter<ImageSearchAdapter.
         return mItems.size();
     }
 
-    public void getPictures(String query) {
-        PinterestUtil.getImagesAsLinks(new PinterestUtil.PinterestOnLoadEvent() {
+    public List<String> getItems() {
+        return mItems;
+    }
+
+    public void loadPictures(String query) {
+        final ProgressDialog progressDialog = new ProgressDialog(mContext);
+        progressDialog.setTitle(R.string.app_name);
+        progressDialog.setMessage(mContext.getResources().getString(R.string.message_loading_pints_dialog));
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        PinterestUtil.getImagesAsLinks(new PinterestUtil.IOnDoneListener() {
             @Override
-            public void onSuccess(final List<String> urls) {
+            public void onDone(final List<String> urls) {
                 if (null != urls && urls.size() > 0) {
-                    mItems = urls;
-                    notifyDataSetChanged();
+                    new Handler(mContext.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Collections.shuffle(urls);
+                            mItems = urls;
+                            notifyDataSetChanged();
+                            progressDialog.dismiss();
+                        }
+                    });
                 }
             }
         }, query);
@@ -72,7 +100,7 @@ public class ImageSearchAdapter extends RecyclerView.Adapter<ImageSearchAdapter.
 
         @OnClick(R.id.ivIcon)
         public void onClick() {
-            mListener.onPictureSelected(mItems.get(getAdapterPosition()));
+            mListener.onPictureSelected(PinterestUtil.getOriginal(mItems.get(getAdapterPosition())));
         }
 
     }

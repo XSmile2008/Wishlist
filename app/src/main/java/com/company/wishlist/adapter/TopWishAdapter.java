@@ -27,13 +27,13 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 
-public class TopWishListAdapter extends RecyclerView.Adapter<TopWishListAdapter.Holder> {
+public class TopWishAdapter extends RecyclerView.Adapter<TopWishAdapter.Holder> {
 
     private Context context;
     private Set<Wish> wishes;
     private String wishListId;
 
-    public TopWishListAdapter(Context context, String wishListId) {
+    public TopWishAdapter(Context context, String wishListId) {
         this.context = context;
         this.wishes = new HashSet<>();
         this.wishListId = wishListId;
@@ -76,14 +76,7 @@ public class TopWishListAdapter extends RecyclerView.Adapter<TopWishListAdapter.
         }
 
         public void onBind(Wish wish) {
-            if (wish.getPicture() == null) {
-                imageView.setImageResource(R.drawable.gift_icon);//TODO: default circle image
-            } else {
-                Glide.with(context)
-                        .load(CloudinaryUtil.getInstance().url().generate(wish.getPicture()))
-                        .bitmapTransform(new CropCircleTransformation(Glide.get(context).getBitmapPool()))
-                        .into(imageView);
-            }
+            CloudinaryUtil.loadCircleThumb(context, imageView, wish.getPicture(), R.drawable.gift_icon);
             textViewTitle.setText(wish.getTitle());
             textViewComment.setText(wish.getComment());
         }

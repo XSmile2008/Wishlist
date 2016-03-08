@@ -24,7 +24,7 @@ public class ConnectionUtil {
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
-    public class ConectivityReceiver extends BroadcastReceiver {
+    public class ConnectivityReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {

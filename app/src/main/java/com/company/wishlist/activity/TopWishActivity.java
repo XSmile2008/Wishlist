@@ -12,7 +12,7 @@ import android.view.MenuItem;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.DebugActivity;
-import com.company.wishlist.adapter.TopWishListAdapter;
+import com.company.wishlist.adapter.TopWishAdapter;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.util.ConnectionUtil;
@@ -28,8 +28,8 @@ import butterknife.ButterKnife;
 
 public class TopWishActivity extends DebugActivity {
 
-    private TopWishListAdapter adapter;
-    private AlertDialog progressDialog;
+    private TopWishAdapter adapter;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,36 +44,24 @@ public class TopWishActivity extends DebugActivity {
         actionBar.setTitle(getString(R.string.top_wish_activity_title));
         actionBar.setHomeButtonEnabled(true);
 
+        //Init recycler view
         String wishListId = getIntent().getExtras().getString(WishListFragment.WISH_LIST_ID);
-        adapter = new TopWishListAdapter(this, wishListId);
+        adapter = new TopWishAdapter(this, wishListId);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        progressDialog = new ProgressDialog.Builder(this)
-                .setTitle(R.string.app_name)
-                .setMessage(R.string.message_load_wish_progress_dialog)
-                .setCancelable(false).show();
+        //Start progress dialog
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle(R.string.app_name);
+        progressDialog.setMessage(this.getResources().getString(R.string.message_loading_pints_dialog));
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
 
+        //Load wishes
         if (ConnectionUtil.isConnected()) {
-            loadWishes(new ValueEventListener() {
-
-                List<Wish> wishes = new CopyOnWriteArrayList<Wish>();
-
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                        wishes.add(postSnapshot.getValue(Wish.class));
-                    }
-                    Collections.shuffle(wishes);
-                    adapter.addAll(wishes);
-                    progressDialog.dismiss();
-                }
-
-                @Override
-                public void onCancelled(FirebaseError firebaseError) {}
-
-            });
+            loadWishes();
         } else {
             progressDialog.dismiss();
             new AlertDialog.Builder(this)
@@ -89,12 +77,28 @@ public class TopWishActivity extends DebugActivity {
                     })
                     .show();
         }
-
     }
 
-    private void loadWishes(ValueEventListener event) {
+    private void loadWishes() {
         //todo write nice query to get random wishes
-        Wish.getFirebaseRef().addValueEventListener(event);
+        Wish.getFirebaseRef().addValueEventListener(new ValueEventListener() {
+
+            List<Wish> wishes = new CopyOnWriteArrayList<>();
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    wishes.add(postSnapshot.getValue(Wish.class));
+                }
+                Collections.shuffle(wishes);
+                adapter.addAll(wishes);
+                progressDialog.dismiss();
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {}
+
+        });
     }
 
     @Override

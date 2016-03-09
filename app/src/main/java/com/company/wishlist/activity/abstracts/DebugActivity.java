@@ -1,21 +1,16 @@
 package com.company.wishlist.activity.abstracts;
 
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+
+import com.akexorcist.localizationactivity.LocalizationActivity;
 
 /**
  * Created by vladstarikov on 07.01.16.
  */
-public abstract class DebugActivity extends AppCompatActivity{
+public abstract class DebugActivity extends LocalizationActivity{
 
     String LOG_TAG = this.getClass().getSimpleName();
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.d(LOG_TAG, "onCreate()");
-    }
 
     @Override
     protected void onStop() {
@@ -33,12 +28,6 @@ public abstract class DebugActivity extends AppCompatActivity{
     protected void onPause() {
         super.onPause();
         Log.d(LOG_TAG, "onPause()");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(LOG_TAG, "onResume()");
     }
 
     @Override

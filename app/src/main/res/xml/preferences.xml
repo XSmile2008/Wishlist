@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <Preference
-        android:title="Logout"
-        android:summary="Logout from account" >
+        android:title="@string/settings_logout"
+        android:summary="@string/settings_logout_summary" >
         <intent
             android:targetPackage="com.company.wishlist"
             android:targetClass="com.company.wishlist.activity.LoginActivity"
             android:action="LOGOUT" />
     </Preference>
-    <Preference android:title="Clean Wishes" android:key="remove_wish"
-        android:summary="Delete all own soft removed wishes from system">
+    <Preference android:title="@string/settings_clear_wishes_title" android:key="remove_wish"
+        android:summary="@string/settings_clean_wish_summary">
     </Preference>
 
     <PreferenceCategory android:title="@string/settings_notification_title">
@@ -23,4 +23,13 @@
             android:entryValues="@array/notificationRepeatValues" />
 
     </PreferenceCategory>
+
+
+        <ListPreference
+            android:title="@string/language"
+            android:key="@string/lang_key"
+            android:defaultValue="en"
+            android:entries="@array/languageEntries"
+            android:entryValues="@array/languageValues" />
+
 </PreferenceScreen>

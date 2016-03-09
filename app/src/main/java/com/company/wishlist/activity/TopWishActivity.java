@@ -32,7 +32,7 @@ public class TopWishActivity extends DebugActivity {
     private AlertDialog progressDialog;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
         setContentView(R.layout.activity_top_wish);

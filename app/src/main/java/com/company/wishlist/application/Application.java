@@ -19,5 +19,4 @@ public class Application extends android.app.Application {
         FacebookSdk.sdkInitialize(getApplicationContext());
         new ConnectionUtil(this);
     }
-
 }

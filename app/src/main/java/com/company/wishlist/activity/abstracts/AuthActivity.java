@@ -16,14 +16,14 @@ public abstract class AuthActivity extends DebugActivity {
     private ConnectionUtil connection = new ConnectionUtil(this);
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         checkAuth();
         processFirebaseLogin();
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         checkAuth();
         if (null != this.getIntent().getExtras()) {

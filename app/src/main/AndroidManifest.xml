@@ -15,6 +15,7 @@
         android:label="@string/app_name"
         android:largeHeap="true"
         android:supportsRtl="true"
+        android:configChanges="locale"
         android:theme="@style/AppTheme.NoActionBar">
 
         <!-- Meta-data section-->

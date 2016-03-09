@@ -1,10 +1,14 @@
 package com.company.wishlist.activity;
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -24,28 +28,63 @@ import com.company.wishlist.activity.abstracts.AuthActivity;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.AuthUtils;
+import com.company.wishlist.util.LanguageHelper;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
+import java.util.Locale;
+
 /**
  * Created by v.odahovskiy on 15.01.2016.
  */
-public class SettingsActivity extends AuthActivity {
+public class SettingsActivity extends AuthActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String REMOVE_WISH_PREFS_KEY = "remove_wish";
 
+    private static Context context;
     //TODO: add query that destroy all soft-removed wishes for this user
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         getDelegate().installViewFactory();
         getDelegate().onCreate(savedInstanceState);
         super.onCreate(savedInstanceState);
-
+        context = this;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.lang_key))) {
+            String language = sharedPreferences.getString(key, "en");
+            //persistValue(sharedPreferences, key, language);
+            setLanguage(language);
+            /*LanguageHelper.setUpLnaguage(language);
+            ((SettingsActivity) context).recreate();*/
+        }
+    }
+
+    private void persistValue(SharedPreferences sharedPreferences, String key, String language) {
+        SharedPreferences.Editor es = sharedPreferences.edit();
+        es.putString(key, language);
+        es.commit();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        PreferenceManager
+                .getDefaultSharedPreferences(getBaseContext()).unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        PreferenceManager
+                .getDefaultSharedPreferences(getBaseContext()).registerOnSharedPreferenceChangeListener(this);
     }
 
     public static class MyPreferenceFragment extends PreferenceFragment {
@@ -61,8 +100,8 @@ public class SettingsActivity extends AuthActivity {
                 if (preference.getKey().equals(REMOVE_WISH_PREFS_KEY)) {
                     new AlertDialog.Builder(getActivity())
                             .setIcon(android.R.drawable.ic_dialog_alert)
-                            .setTitle("Message")
-                            .setMessage("After push Yes your removed wishes will be deleted.")
+                            .setTitle(getResources().getString(R.string.settings_dialog_message))
+                            .setMessage(getResources().getString(R.string.settings_clear_dialog_message))
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                                 @Override
@@ -74,8 +113,9 @@ public class SettingsActivity extends AuthActivity {
                             .setNegativeButton(android.R.string.no, null)
                             .show();
                 }
-            }catch (Exception e){e.printStackTrace();}
-            finally {
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
                 return super.onPreferenceTreeClick(preferenceScreen, preference);
             }
         }
@@ -148,87 +188,4 @@ public class SettingsActivity extends AuthActivity {
         super.onBackPressed();
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
-
-    private AppCompatDelegate mDelegate;
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        getDelegate().onPostCreate(savedInstanceState);
-    }
-
-    public ActionBar getSupportActionBar() {
-        return getDelegate().getSupportActionBar();
-    }
-
-    public void setSupportActionBar(@Nullable Toolbar toolbar) {
-        getDelegate().setSupportActionBar(toolbar);
-    }
-
-    @NonNull
-    @Override
-    public MenuInflater getMenuInflater() {
-        return getDelegate().getMenuInflater();
-    }
-
-    @Override
-    public void setContentView(@LayoutRes int layoutResID) {
-        getDelegate().setContentView(layoutResID);
-    }
-
-    @Override
-    public void setContentView(View view) {
-        getDelegate().setContentView(view);
-    }
-
-    @Override
-    public void setContentView(View view, ViewGroup.LayoutParams params) {
-        getDelegate().setContentView(view, params);
-    }
-
-    @Override
-    public void addContentView(View view, ViewGroup.LayoutParams params) {
-        getDelegate().addContentView(view, params);
-    }
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        getDelegate().onPostResume();
-    }
-
-    @Override
-    protected void onTitleChanged(CharSequence title, int color) {
-        super.onTitleChanged(title, color);
-        getDelegate().setTitle(title);
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        getDelegate().onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        getDelegate().onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        getDelegate().onDestroy();
-    }
-
-    public void invalidateOptionsMenu() {
-        getDelegate().invalidateOptionsMenu();
-    }
-
-   /* private AppCompatDelegate getDelegate() {
-        if (mDelegate == null) {
-            mDelegate = AppCompatDelegate.create(this, null);
-        }
-        return mDelegate;
-    }*/
 }

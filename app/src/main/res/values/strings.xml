@@ -11,7 +11,7 @@
 
     <string name="undo">Undo</string>
     <string name="my_friends">My friends</string>
-    <string name="login_with_facebook">Login with Facebook</string>
+    <string name="login_with_facebook">Log in with Facebook</string>
 
     <!-- Actions-->
     <string name="action_settings">Settings</string>
@@ -78,4 +78,23 @@
         <item>120</item>
         <item>180</item>
     </string-array>
+
+    <string-array name="languageEntries">
+        <item>English</item>
+        <item>Ukrainian</item>
+        <item>Russian</item>
+    </string-array>
+    <string-array name="languageValues">
+        <item>en</item>
+        <item>uk</item>
+        <item>ru</item>
+    </string-array>
+    <string name="settings_dialog_message">Message</string>
+    <string name="settings_clear_dialog_message">After push Yes your removed wishes will be deleted</string>
+    <string name="settings_logout">Logout</string>
+    <string name="settings_logout_summary">Logout from accout</string>
+    <string name="settings_clear_wishes_title">Clean wishes</string>
+    <string name="settings_clean_wish_summary">Delete all own soft removed wishes from system</string>
+    <string name="language">Language</string>
+    <string name="lang_key">key_language</string>
 </resources>

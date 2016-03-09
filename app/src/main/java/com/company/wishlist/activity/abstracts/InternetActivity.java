@@ -23,7 +23,7 @@ public class InternetActivity extends DebugActivity {
     private ConnectionUtil connection = new ConnectionUtil(this);
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (this.getClass() == InternetActivity.class) {
             setContentView(R.layout.activity_internet);
@@ -49,7 +49,7 @@ public class InternetActivity extends DebugActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         checkConnection();
     }

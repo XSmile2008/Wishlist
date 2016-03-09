@@ -1,6 +1,7 @@
 package com.company.wishlist.activity;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -28,6 +29,7 @@ import com.company.wishlist.model.User;
 import com.company.wishlist.service.NotificationService;
 import com.company.wishlist.util.ConnectionUtil;
 import com.company.wishlist.util.CropCircleTransformation;
+import com.company.wishlist.util.LanguageHelper;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -60,7 +62,7 @@ public class MainActivity extends AuthActivity implements IOnFriendSelectedListe
     //@Bind(R.id.collapsing_toolbar) CollapsingToolbarLayout collapsingToolbarLayout;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -88,7 +90,7 @@ public class MainActivity extends AuthActivity implements IOnFriendSelectedListe
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         showMyWishList();//TODO: save current state
         refreshUserDataUi();
@@ -196,5 +198,4 @@ public class MainActivity extends AuthActivity implements IOnFriendSelectedListe
                     .commit();
         }
     }
-
 }

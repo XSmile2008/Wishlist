@@ -1,0 +1,99 @@
+<resources>
+    <string name="app_name">Список бажань</string>
+    <string name="app_slogan">Ваші бажання стануть реальністю…</string>
+    <string name="firebase_url">https://appwishlist.firebaseio.com</string>
+    <string name="my_wish_list">Мій список бажань</string>
+    <string name="app_id">1657942407822584</string>
+    <string name="facebook_permissions">public_profile, email, user_birthday, user_friends</string>
+
+    <string name="choose_image">Обери зображення</string>
+    <string name="choose_image_error_text">Проблеми з завантаженням зображень</string>
+
+    <string name="undo">Назад</string>
+    <string name="my_friends">Мої друзі</string>
+    <string name="login_with_facebook">Увійти з facebook</string>
+
+    <!-- Actions-->
+    <string name="action_settings">Настройки</string>
+    <string name="action_remove">Видалити</string>
+    <string name="action_reserve">Зарезервувати</string>
+    <string name="action_unreserve">Зняти резервування</string>
+    <!-- Actions end-->
+
+    <!-- Drawer-->
+    <string name="toggle_open_drawer">Відчинити</string>
+    <string name="toggle_close_drawer">Зачинити</string>
+    <!-- Drawer end-->
+
+    <!-- Messages-->
+    <string name="message_unreserve">Впевнені в резервуванні бажання?</string>
+    <string name="message_wish_removed">Бажання  %1$s видалено! </string>
+    <string name="message_wish_restored">Бажання  %1$s відновлено! </string>
+    <string name="message_loading_pints_dialog">Йде завдантаження зображень…</string>
+    <string name="message_load_wish_progress_dialog">Йде завантаження бажань..</string>
+    <string name="message_remove_wish_dialog">Ви впевнені у видаленні бажання?</string>
+    <!-- Messages end-->
+
+    <!-- Connection-->
+    <string name="internet_connection">Інтернет звязок</string>
+    <string name="no_connection">Нема зєднання</string>
+    <string name="no_internet_connection">Інтернет не працює, будь-ласка перевір зєднання!</string>
+    <string name="check_connection">Будь ласка перевір зєднання!</string>
+    <!-- Connection end-->
+
+    <string name="at_first_persist">Для початку збережи</string>
+    <string name="top_wish_activity_title">Кращі бажання</string>
+
+    <!--  Notifications -->
+    <string name="notification_service_title">Сповіщення про резервацію</string>
+    <string name="notification_action_text">Не сповіщати</string>
+    <string name="notification_reserve_text">Не забудь за %1$s!</string>
+    <!--  Notifications end-->
+
+    <!--  Settings -->
+    <string name="settings_notification_title">Сповіщення</string>
+    <string name="settings_notification_reserve">Сповіщення про резерезвацію</string>
+    <string name="settings_notification_reserve_repeat">Частота повторення</string>
+    <string name="settings_notification_reserve_repeat_key">notification_reserve</string>
+    <!--  Settings end-->
+
+    <string-array name="notificationRepeatEntries">
+        <item>5 хвилин</item>
+        <item>10 хвилин</item>
+        <item>15 хвилин</item>
+        <item>30 хвилин</item>
+        <item>45 хвилин</item>
+        <item>1 годин</item>
+        <item>2 годин</item>
+        <item>3 годин</item>
+    </string-array>
+
+    <string-array name="notificationRepeatValues">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>30</item>
+        <item>45</item>
+        <item>60</item>
+        <item>120</item>
+        <item>180</item>
+    </string-array>
+
+    <string-array name="languageEntries">
+        <item>Англійська</item>
+        <item>Українська</item>
+        <item>Російська</item>
+    </string-array>
+    <string-array name="languageValues">
+        <item>en</item>
+        <item>uk</item>
+        <item>ru</item>
+    </string-array>
+    <string name="settings_dialog_message">Повідомлення</string>
+    <string name="settings_clear_dialog_message">Після підтвердження всі бажання будуть видалені</string>
+    <string name="settings_logout">Вихід</string>
+    <string name="settings_logout_summary">Вихід з акаунту</string>
+    <string name="settings_clear_wishes_title">Почистити бажання</string>
+    <string name="settings_clean_wish_summary">Очистити видалені бажання з системи</string>
+    <string name="language">Мова</string>
+</resources>

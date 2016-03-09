@@ -76,7 +76,7 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
     private CalendarDatePickerDialogFragment reservedDateDialog;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wish_edit);
         ButterKnife.bind(this);

@@ -3,7 +3,6 @@ package com.company.wishlist.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,7 +13,6 @@ import android.view.ViewGroup;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.TopWishActivity;
 import com.company.wishlist.activity.WishEditActivity;
-import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.adapter.WishListAdapter;
 import com.company.wishlist.events.FriendSelectedEvent;
 import com.company.wishlist.model.User;
@@ -85,15 +83,17 @@ public class WishListFragment extends DebugFragment {
 
         this.mode = getArguments().getInt(MODE);
 
+        //Init RecyclerView
         adapter = new WishListAdapter(getContext(), getView(), mode == MY_WISH_LIST_MODE ? GIFT_LIST_MODE : mode);
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
+        //Init selected friend
         User user = (User) getArguments().getSerializable(User.class.getSimpleName());
-        Log.e(LOG_TAG, user.getId());
         onFriendSelectedEvent(new FriendSelectedEvent(user));
 
+        //Init FAB menu
         if (mode == WISH_LIST_MODE) mFab.setVisibility(View.GONE);
         else {
             mFab.setClickable(false);
@@ -131,9 +131,7 @@ public class WishListFragment extends DebugFragment {
 
     @Subscribe
     public void onFriendSelectedEvent(FriendSelectedEvent event) {
-        final Fragment fragment = this;//TODO: remove this
         final String friendId = event.getFriend().getId();
-        Log.e(LOG_TAG, "onFriendSelectedEvent("+ friendId + ")");
         switch (mode) {
             case WISH_LIST_MODE:
                 adapter.onFriendSelected(friendId); return;
@@ -146,7 +144,7 @@ public class WishListFragment extends DebugFragment {
                         .addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                Log.d(LOG_TAG, getId() + " - " + fragment.hashCode() + ".onDataChange(" + dataSnapshot + ")");
+                                Log.d(LOG_TAG, getId()  + ".onDataChange(" + dataSnapshot + ")");
                                 for (DataSnapshot wishListDS : dataSnapshot.getChildren()) {
                                     if (wishListDS.getValue(WishList.class).getOwner().equals(AuthUtils.getCurrentUser().getId())) {
                                         wishListId = wishListDS.getKey();

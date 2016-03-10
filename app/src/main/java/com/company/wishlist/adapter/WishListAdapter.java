@@ -1,7 +1,6 @@
 package com.company.wishlist.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -15,12 +14,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.sectionedrecyclerview.SectionedRecyclerViewAdapter;
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 import com.company.wishlist.R;
-import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
-import com.company.wishlist.interfaces.IWishItemAdapter;
 import com.company.wishlist.model.Reservation;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
@@ -47,7 +45,7 @@ import butterknife.OnClick;
 /**
  * Created by vladstarikov on 08.01.16.
  */
-public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder> implements IOnFriendSelectedListener, IWishItemAdapter {
+public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapter.Holder> implements IOnFriendSelectedListener {
 
     private static String LOG_TAG = WishListAdapter.class.getSimpleName();
     private static int NOT_FIND = -1;//TODO:
@@ -60,11 +58,12 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
     private List<Query> queriesWish = new ArrayList<>();
 
     private Map<String, WishList> wishLists = new HashMap<>();
-    private List<Wish> wishes = new ArrayList<>();
     private Wish wishBackUp;
     private String friendId;
 
     private SwipeLayout swipedItem;
+
+    private Sections sections = new Sections();
 
     /**
      * @param context context that will be used in this adapter
@@ -74,62 +73,51 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         this.context = context;
         this.rootView = rootView;
         this.mode = mode;
+        sections.add(new Section("Reserved by me"));
+        sections.add(new Section("Not reserved"));
+        sections.add(new Section("Reserved by another users"));
     }
 
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.wish_list_item, parent, false));
+        switch (viewType) {
+            case VIEW_TYPE_HEADER:
+                return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.section, parent, false));
+            case VIEW_TYPE_ITEM:
+                return new HolderWish(LayoutInflater.from(parent.getContext()).inflate(R.layout.wish_list_item, parent, false));
+        }
+        return null;
     }
 
     @Override
-    public void onBindViewHolder(Holder holder, int position) {
-        holder.onBind(wishes.get(position));
+    public void onBindHeaderViewHolder(Holder holder, int section) {
+        ((TextView) holder.itemView).setText(sections.get(section).getTitle());
     }
 
     @Override
-    public int getItemCount() {
-        return wishes.size();
-    }
-
-    class WishComparator implements java.util.Comparator<Wish> {
-
-        public int graduateByReservation(Wish wish) {
-            if (wish.getReservation() == null) return 1;
-            else if (wish.getReservation().getByUser().equals(AuthUtils.getCurrentUser().getId())) return 2;
-            else return 0;
-        }
-
-        @Override
-        public int compare(Wish left, Wish right) {
-            int gradLeft = graduateByReservation(left);
-            int gradRight = graduateByReservation(right);
-            if (gradLeft < gradRight) return -1;
-            else if (gradLeft > gradRight) return 1;
-            else return right.getTitle().toLowerCase().compareTo(left.getTitle().toLowerCase());//TODO: may be use Collator
-        }
-
-    }
-
-    private int findPositionForWish(Wish wish) {
-        WishComparator comparator = new WishComparator();
-        for (int i = 0; i < wishes.size(); i++) {
-            if (comparator.compare(wish, wishes.get(i)) >= 0) return i;
-        }
-        return wishes.size();
-    }
-
-    private int findWishIndexById(String id) {
-        for (int i = 0; i < wishes.size(); i++) {
-            if (wishes.get(i).getId().equals(id)) return i;
-        }
-        return NOT_FIND;
+    public void onBindViewHolder(Holder holder, int section, int relativePosition, int absolutePosition) {
+        ((HolderWish) holder).onBind(section, relativePosition);
     }
 
     @Override
-    public void reserveWish(final int position) {
-        if (wishes.get(position).isReserved()) {
-            wishes.get(position).unreserve();
-            Toast.makeText(context, "item " + position + " unreserved", Toast.LENGTH_SHORT).show();
+    public int getSectionCount() {
+        return sections.size();
+    }
+
+    @Override
+    public int getItemCount(int section) {
+        return sections.get(section).size();
+    }
+
+    /*vvvvvvvvvvvvvvvvvvvvvvv
+     * IWishItemAdapter start
+     */
+
+    public void reserveWish(int section, int relativePosition) {
+        final Wish wish = sections.get(section).get(relativePosition);
+        if (wish.isReserved()) {
+            wish.unreserve();
+            Toast.makeText(context, "wish " + wish.getTitle() + " unreserved", Toast.LENGTH_SHORT).show();
         } else {
             CalendarDatePickerDialogFragment reservedDateDialog = new CalendarDatePickerDialogFragment();
             reservedDateDialog.setFirstDayOfWeek(Calendar.MONDAY);
@@ -138,19 +126,18 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             reservedDateDialog.setOnDateSetListener(new CalendarDatePickerDialogFragment.OnDateSetListener() {
                 @Override
                 public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
-                    wishes.get(position).reserve(AuthUtils.getCurrentUser().getId(), dialog.getSelectedDay().getDateInMillis());
-                    Toast.makeText(context, "item " + position + " reserved", Toast.LENGTH_SHORT).show();
+                    wish.reserve(AuthUtils.getCurrentUser().getId(), dialog.getSelectedDay().getDateInMillis());
+                    Toast.makeText(context, "item " + wish.getTitle() + " reserved", Toast.LENGTH_SHORT).show();
                 }
             });
             reservedDateDialog.show(((AppCompatActivity) context).getSupportFragmentManager(), "DATE_PICKER");//TODO: check casting
         }
     }
 
-    @Override
-    public void removeWish(int position) {
-        wishBackUp = wishes.get(position);
+    public void removeWish(int section, int relativePosition) {
+        wishBackUp = sections.get(section).get(relativePosition);
         wishBackUp.softRemove();
-        Snackbar.make(rootView, context.getString(R.string.message_wish_removed, position), Snackbar.LENGTH_LONG)
+        Snackbar.make(rootView, context.getString(R.string.message_wish_removed, wishBackUp.getTitle()), Snackbar.LENGTH_LONG)
                 .setAction(R.string.undo, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -160,18 +147,25 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
                 .show();
     }
 
-    @Override
     public void restoreWish() {
         Toast.makeText(context, "restore", Toast.LENGTH_SHORT).show();
         notifyDataSetChanged();
         wishBackUp.softRestore();
     }
 
+    /*
+     * IWishItemAdapter end
+     *^^^^^^^^^^^^^^^^^^^^^*/
+
+    /*vvvvvvvvvvvvvvvvvvvvvvv
+     * Firebase query start
+     */
+
     @Override
     public void onFriendSelected(String id) {
         Log.d(LOG_TAG, "onFriendSelected(" + id + ")");
         this.friendId = id;
-        wishes.clear();
+        sections.clearSections();
         for (Query query : queriesWish) query.removeEventListener(listenersWish);//remove all unused listeners
         getWishLists(id);
         notifyDataSetChanged();
@@ -241,8 +235,9 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
                     (wishLists.get(wish.getWishListId()).getOwner().equals(friendId) ||
                             wish.isReserved() ||
                             mode == WishListFragment.GIFT_LIST_MODE)) {
-                wishes.add(findPositionForWish(wish), wish);
-                notifyDataSetChanged();
+                int dest = sections.getDestSection(wish);
+                sections.get(dest).add(wish);
+                notifyItemInserted(sections.absoluteIndexById(wish.getId()));//TODO: test
             }
             Log.d(LOG_TAG, "Wish.onChildAdded()" + wish.toString());
         }
@@ -251,32 +246,36 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         public void onChildChanged(DataSnapshot dataSnapshot, String prevKey) {
             Wish wish = dataSnapshot.getValue(Wish.class);
             wish.setId(dataSnapshot.getKey());
-            int index = findWishIndexById(wish.getId());
+            int index = sections.absoluteIndexById(wish.getId());
             if (!wish.isRemoved() &&
                     (wishLists.get(wish.getWishListId()).getOwner().equals(friendId) ||
                             wish.isReserved() ||
                             mode == WishListFragment.GIFT_LIST_MODE)) {
                 wish.setReservation(dataSnapshot.child("reservation").getValue(Reservation.class));
                 if (index != NOT_FIND) {//change
-                    wishes.remove(index);
-                    wishes.add(findPositionForWish(wish), wish);
+                    sections.removeById(wish.getId());
+                    int dest = sections.getDestSection(wish);
+                    sections.get(dest).add(wish);
+                    notifyItemMoved(index, sections.absoluteIndexById(wish.getId()));//TODO: test
                 } else {//soft-restore
-                    wishes.add(findPositionForWish(wish), wish);
+                    int dest = sections.getDestSection(wish);
+                    sections.get(dest).add(wish);
+                    notifyItemInserted(sections.absoluteIndexById(wish.getId()));//TODO: test
+//                    notifyDataSetChanged();
                 }
-                notifyDataSetChanged();
             } else if (index != NOT_FIND) {//soft-remove
-                wishes.remove(index);
-                notifyDataSetChanged();
+                sections.removeById(wish.getId());
+                notifyItemRemoved(index);
             }
             Log.d(LOG_TAG, "Wish.onChildChanged()" + wish.toString());
         }
 
         @Override
         public void onChildRemoved(DataSnapshot dataSnapshot) {
-            int index = findWishIndexById(dataSnapshot.getKey());
+            int index = sections.removeById(dataSnapshot.getKey());
             if (index != NOT_FIND) {
-                wishes.remove(index);
-                notifyDataSetChanged();
+                notifyItemRemoved(index);//TODO: check it!
+                //notifyDataSetChanged();
             }
             Log.d(LOG_TAG, "Wish.onChildRemoved()" + dataSnapshot.getValue(Wish.class).toString());
         }
@@ -292,8 +291,113 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         }
 
     }
+    /*
+     * Firebase query end
+     *^^^^^^^^^^^^^^^^^^^^^*/
+
+    /*vvvvvvvvvvvvvvvvvvvvv
+     * Sections start
+     */
+
+    public class Sections extends ArrayList<Section> {
+
+        public void clearSections() {
+            for (Section section : this) {
+                section.clear();
+            }
+        }
+
+        public int getDestSection(Wish wish) {//TODO: rename
+            if (wish.getReservation() == null) return 1;
+            else if (wish.getReservation().getByUser().equals(AuthUtils.getCurrentUser().getId())) return 2;
+            else return 0;
+        }
+
+        public int sectionIndexById(String id) {
+            for (int i = 0; i < this.size(); i++) {
+                if (this.get(i).indexById(id) != NOT_FIND) return i;
+            }
+            return NOT_FIND;
+        }
+
+        public int absoluteIndexById(String id) {
+            int absoluteIndex = 0;
+            for (Section section : this) {
+                int sectionIndex = section.indexById(id);
+                if (sectionIndex != NOT_FIND) return absoluteIndex + sectionIndex;
+                absoluteIndex += section.size();
+            }
+            return NOT_FIND;
+        }
+
+        public int removeById(String id) {
+            int absoluteIndex = 0;
+            for (Section section : this) {
+                int sectionIndex = section.indexById(id);
+                if (sectionIndex != NOT_FIND) {
+                    section.remove(sectionIndex);
+                    return absoluteIndex + sectionIndex;
+                }
+                absoluteIndex += section.size();
+            }
+            return NOT_FIND;
+        }
+
+    }
+
+    public class Section extends ArrayList<Wish> {
+
+        private String title;
+
+        public Section(String title) {
+            this.title = title;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public int indexById(String id) {
+            for (int i = 0; i < this.size(); i++) {
+                if (this.get(i).getId().equals(id)) return i;
+            }
+            return NOT_FIND;
+        }
+
+        @Override
+        public boolean add(Wish wish) {
+            for (int i = 0; i < this.size(); i++) {
+                if (wish.getTitle().compareTo(this.get(i).getTitle()) <= 0) {
+                    this.add(i, wish);
+                    return true;
+                }
+            }
+            return super.add(wish);//TODO: check
+        }
+
+    }
+
+    /*
+     * Sections end
+     *^^^^^^^^^^^^^^^^^^^*/
+
+    /*vvvvvvvvvvvvvvvvvvvvv
+     * Holders start
+     */
 
     public class Holder extends RecyclerView.ViewHolder {
+
+        public Holder(View itemView) {
+            super(itemView);
+        }
+
+    }
+
+    public class HolderWish extends Holder {
 
         @Bind(R.id.swipe_layout) SwipeLayout swipeLayout;
 
@@ -309,7 +413,10 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         @Bind(R.id.bottom_view_reserve) ViewGroup bottomViewReserve;
         @Bind(R.id.text_view_reserve) TextView textViewReserve;
 
-        public Holder(View itemView) {
+        int section;
+        int reletivePosition;
+
+        public HolderWish(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
@@ -320,7 +427,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
                 public void onOpen(SwipeLayout layout) {
                     Log.d("swipe", "onOpen");
                     if (layout.getDragEdge() == SwipeLayout.DragEdge.Left) {
-                        removeWish(getAdapterPosition());
+                        removeWish(section, reletivePosition);
                     } else {
 //                        swipeLayout.setSwipeEnabled(false);//TODO
 //                        swipeLayout.setOnTouchListener(new View.OnTouchListener() {
@@ -350,7 +457,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
                     if (swipedItem != null && !swipeLayout.equals(swipedItem)) swipedItem.close();
                     swipedItem = swipeLayout;
                     if (layout.getDragEdge() == SwipeLayout.DragEdge.Right)
-                        textViewReserve.setText(wishes.get(getAdapterPosition()).isReserved() ? R.string.action_unreserve : R.string.action_reserve);
+                        textViewReserve.setText(sections.get(section).get(reletivePosition).isReserved() ? R.string.action_unreserve : R.string.action_reserve);
                 }
 
                 @Override
@@ -362,7 +469,11 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
             });
         }
 
-        public void onBind(Wish wish) {
+        public void onBind(int section, int reletivePosition) {
+            this.section = section;
+            this.reletivePosition = reletivePosition;
+            Wish wish = sections.get(section).get(reletivePosition);
+
             CloudinaryUtil.loadCircleThumb(context, imageView, wish.getPicture(), R.drawable.gift_icon);
 
             textViewTitle.setText(wish.getTitle());
@@ -387,20 +498,25 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.Holder
         @OnClick({R.id.card_view, R.id.bottom_view_reserve})
         public void onClick(View v) {
             if (swipedItem != null) swipedItem.close();
-            swipedItem = null;
+//            swipedItem = null;//TODO: remove
             switch (v.getId()) {
                 case R.id.card_view:
-                    Intent intent = new Intent(context, WishEditActivity.class)
-                            .setAction(WishEditActivity.ACTION_EDIT)
-                            .putExtra("Wish", wishes.get(getAdapterPosition()));
-                    context.startActivity(intent);
+                    Toast.makeText(context, String.valueOf(getAdapterPosition()) + " -> " + sections.get(section).get(reletivePosition).getTitle(), Toast.LENGTH_LONG).show();
+//                    Intent intent = new Intent(context, WishEditActivity.class)
+//                            .setAction(WishEditActivity.ACTION_EDIT)
+//                            .putExtra("Wish", wishes.get(getAdapterPosition()));
+//                    context.startActivity(intent);
                     break;
                 case R.id.bottom_view_reserve:
-                    reserveWish(getAdapterPosition());
+                    reserveWish(this.section, this.reletivePosition);
                     break;
             }
         }
 
     }
+
+    /*
+     * Holders end
+     *^^^^^^^^^^^^^^^^^^^*/
 
 }

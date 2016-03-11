@@ -1,12 +1,13 @@
 package com.company.wishlist.adapter;
 
 import android.content.Context;
-import android.graphics.Color;
+import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 import com.afollestad.sectionedrecyclerview.SectionedRecyclerViewAdapter;
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 import com.company.wishlist.R;
+import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.interfaces.IOnFriendSelectedListener;
 import com.company.wishlist.model.Reservation;
@@ -48,7 +50,7 @@ import butterknife.OnClick;
 public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapter.Holder> implements IOnFriendSelectedListener {
 
     private static String LOG_TAG = WishListAdapter.class.getSimpleName();
-    private static int NOT_FIND = -1;//TODO:
+    private static int NOT_FIND = -1;
 
     private Context context;
     private View rootView;
@@ -80,13 +82,8 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
 
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
-        switch (viewType) {
-            case VIEW_TYPE_HEADER:
-                return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.section, parent, false));
-            case VIEW_TYPE_ITEM:
-                return new HolderWish(LayoutInflater.from(parent.getContext()).inflate(R.layout.wish_list_item, parent, false));
-        }
-        return null;
+        int layout = viewType == VIEW_TYPE_HEADER ? R.layout.section : R.layout.wish_list_item;
+        return new Holder(LayoutInflater.from(parent.getContext()).inflate(layout, parent, false));
     }
 
     @Override
@@ -96,7 +93,7 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
 
     @Override
     public void onBindViewHolder(Holder holder, int section, int relativePosition, int absolutePosition) {
-        ((HolderWish) holder).onBind(section, relativePosition);
+        holder.onBind(section, relativePosition);
     }
 
     @Override
@@ -130,7 +127,7 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
                     Toast.makeText(context, "item " + wish.getTitle() + " reserved", Toast.LENGTH_SHORT).show();
                 }
             });
-            reservedDateDialog.show(((AppCompatActivity) context).getSupportFragmentManager(), "DATE_PICKER");//TODO: check casting
+            reservedDateDialog.show(((AppCompatActivity) context).getSupportFragmentManager(), "DATE_PICKER");
         }
     }
 
@@ -149,7 +146,6 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
 
     public void restoreWish() {
         Toast.makeText(context, "restore", Toast.LENGTH_SHORT).show();
-        notifyDataSetChanged();
         wishBackUp.softRestore();
     }
 
@@ -235,9 +231,8 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
                     (wishLists.get(wish.getWishListId()).getOwner().equals(friendId) ||
                             wish.isReserved() ||
                             mode == WishListFragment.GIFT_LIST_MODE)) {
-                int dest = sections.getDestSection(wish);
-                sections.get(dest).add(wish);
-                notifyItemInserted(sections.absoluteIndexById(wish.getId()));//TODO: test
+                Pair<Integer, Integer> pos = sections.putWish(wish);
+                notifyItemInserted(sections.getAbsolutePosition(pos));
             }
             Log.d(LOG_TAG, "Wish.onChildAdded()" + wish.toString());
         }
@@ -246,36 +241,36 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
         public void onChildChanged(DataSnapshot dataSnapshot, String prevKey) {
             Wish wish = dataSnapshot.getValue(Wish.class);
             wish.setId(dataSnapshot.getKey());
-            int index = sections.absoluteIndexById(wish.getId());
             if (!wish.isRemoved() &&
                     (wishLists.get(wish.getWishListId()).getOwner().equals(friendId) ||
                             wish.isReserved() ||
                             mode == WishListFragment.GIFT_LIST_MODE)) {
                 wish.setReservation(dataSnapshot.child("reservation").getValue(Reservation.class));
-                if (index != NOT_FIND) {//change
-                    sections.removeById(wish.getId());
-                    int dest = sections.getDestSection(wish);
-                    sections.get(dest).add(wish);
-                    notifyItemMoved(index, sections.absoluteIndexById(wish.getId()));//TODO: test
+                Pair<Integer, Integer> oldPos = sections.findWish(wish);
+                if (oldPos != null) {//change
+                    int absoluteOld = sections.getAbsolutePosition(oldPos);
+                    Pair<Integer, Integer> pos = sections.putWish(wish);
+                    int absoluteNew = sections.getAbsolutePosition(pos);
+                    notifyItemMoved(absoluteOld, absoluteNew);
+                    notifyItemChanged(absoluteNew);
                 } else {//soft-restore
-                    int dest = sections.getDestSection(wish);
-                    sections.get(dest).add(wish);
-                    notifyItemInserted(sections.absoluteIndexById(wish.getId()));//TODO: test
-//                    notifyDataSetChanged();
+                    Pair<Integer, Integer> pos = sections.putWish(wish);
+                    notifyItemInserted(sections.getAbsolutePosition(pos));
                 }
-            } else if (index != NOT_FIND) {//soft-remove
-                sections.removeById(wish.getId());
-                notifyItemRemoved(index);
+            } else {//soft-remove
+                Pair<Integer, Integer> pos = sections.removeWish(wish);
+                if (pos != null) notifyItemRemoved(sections.getAbsolutePosition(pos));
             }
             Log.d(LOG_TAG, "Wish.onChildChanged()" + wish.toString());
         }
 
         @Override
         public void onChildRemoved(DataSnapshot dataSnapshot) {
-            int index = sections.removeById(dataSnapshot.getKey());
-            if (index != NOT_FIND) {
-                notifyItemRemoved(index);//TODO: check it!
-                //notifyDataSetChanged();
+            Wish wish = dataSnapshot.getValue(Wish.class);
+            wish.setId(dataSnapshot.getKey());
+            Pair<Integer, Integer> oldPos = sections.removeWish(wish);
+            if (oldPos != null) {
+                notifyItemRemoved(sections.getAbsolutePosition(oldPos));
             }
             Log.d(LOG_TAG, "Wish.onChildRemoved()" + dataSnapshot.getValue(Wish.class).toString());
         }
@@ -299,6 +294,7 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
      * Sections start
      */
 
+    //TODO: write doc for this class
     public class Sections extends ArrayList<Section> {
 
         public void clearSections() {
@@ -307,40 +303,63 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
             }
         }
 
-        public int getDestSection(Wish wish) {//TODO: rename
+        public int getDestSection(Wish wish) {
             if (wish.getReservation() == null) return 1;
-            else if (wish.getReservation().getByUser().equals(AuthUtils.getCurrentUser().getId())) return 2;
+            else if (!wish.getReservation().getByUser().equals(AuthUtils.getCurrentUser().getId())) return 2;
             else return 0;
         }
 
-        public int sectionIndexById(String id) {
-            for (int i = 0; i < this.size(); i++) {
-                if (this.get(i).indexById(id) != NOT_FIND) return i;
-            }
-            return NOT_FIND;
+        public int getAbsolutePosition(Pair<Integer, Integer> relativePos) {
+            return getAbsolutePosition(relativePos.first, relativePos.second);
         }
 
-        public int absoluteIndexById(String id) {
-            int absoluteIndex = 0;
-            for (Section section : this) {
-                int sectionIndex = section.indexById(id);
-                if (sectionIndex != NOT_FIND) return absoluteIndex + sectionIndex;
-                absoluteIndex += section.size();
+        public int getAbsolutePosition(int section, int relativePosition) {
+            int offset = 0;
+            for (int i = 0; i < section; i++) {
+                offset += this.get(i).size() + 1;//add previous section size plus one for section header
             }
-            return NOT_FIND;
+            return offset + relativePosition + 1;
         }
 
-        public int removeById(String id) {
-            int absoluteIndex = 0;
-            for (Section section : this) {
-                int sectionIndex = section.indexById(id);
-                if (sectionIndex != NOT_FIND) {
-                    section.remove(sectionIndex);
-                    return absoluteIndex + sectionIndex;
+        public Pair<Integer, Integer> getRelativePosition(int absolutePosition) {
+            int offset = 0;
+            int section;
+            for (section = 0; section < this.size(); section++) {
+                if (offset + this.get(section).size() + 1 > absolutePosition) break;
+                offset += this.get(section).size() + 1;
+            }
+            return new Pair<>(section, absolutePosition - offset - 1);
+        }
+
+        public Pair<Integer, Integer> findWish(Wish wish) {
+            for (int section = 0; section < this.size(); section++) {
+                int relativePosition = this.get(section).findWish(wish);
+                if (relativePosition != NOT_FIND) {
+                    return new Pair<>(section, relativePosition);
                 }
-                absoluteIndex += section.size();
             }
-            return NOT_FIND;
+            return null;
+        }
+
+        public Pair<Integer, Integer> putWish(Wish wish) {
+            Pair<Integer, Integer> oldPos = findWish(wish);
+            if (oldPos != null) {
+                this.get(oldPos.first).remove(oldPos.second.intValue());//remove wish from old pos
+            }
+            int section = getDestSection(wish);
+            int relativePosition = this.get(section).putWish(wish);
+            return new Pair<>(section, relativePosition);
+        }
+
+        public Pair<Integer, Integer> removeWish(Wish wish) {
+            for (int section = 0; section < this.size(); section++) {
+                int relativePosition = this.get(section).findWish(wish);
+                if (relativePosition != NOT_FIND) {
+                    this.get(section).remove(relativePosition);
+                    return new Pair<>(section, relativePosition);
+                }
+            }
+            return null;
         }
 
     }
@@ -361,22 +380,22 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
             this.title = title;
         }
 
-        public int indexById(String id) {
+        public int findWish(Wish wish) {
             for (int i = 0; i < this.size(); i++) {
-                if (this.get(i).getId().equals(id)) return i;
+                if (this.get(i).getId().equals(wish.getId())) return i;
             }
             return NOT_FIND;
         }
 
-        @Override
-        public boolean add(Wish wish) {
+        public int putWish(Wish wish) {
             for (int i = 0; i < this.size(); i++) {
                 if (wish.getTitle().compareTo(this.get(i).getTitle()) <= 0) {
                     this.add(i, wish);
-                    return true;
+                    return i;
                 }
             }
-            return super.add(wish);//TODO: check
+            super.add(wish);
+            return this.size() - 1;
         }
 
     }
@@ -390,14 +409,6 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
      */
 
     public class Holder extends RecyclerView.ViewHolder {
-
-        public Holder(View itemView) {
-            super(itemView);
-        }
-
-    }
-
-    public class HolderWish extends Holder {
 
         @Bind(R.id.swipe_layout) SwipeLayout swipeLayout;
 
@@ -413,11 +424,9 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
         @Bind(R.id.bottom_view_reserve) ViewGroup bottomViewReserve;
         @Bind(R.id.text_view_reserve) TextView textViewReserve;
 
-        int section;
-        int reletivePosition;
-
-        public HolderWish(View itemView) {
+        public Holder(View itemView) {
             super(itemView);
+            if (itemView.getId() != R.id.swipe_layout) return;
             ButterKnife.bind(this, itemView);
             swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
             swipeLayout.addDrag(SwipeLayout.DragEdge.Right, bottomViewReserve);
@@ -425,9 +434,10 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
             swipeLayout.addSwipeListener(new SimpleSwipeListener() {
                 @Override
                 public void onOpen(SwipeLayout layout) {
-                    Log.d("swipe", "onOpen");
+//                    Log.d("swipe", "onOpen");
                     if (layout.getDragEdge() == SwipeLayout.DragEdge.Left) {
-                        removeWish(section, reletivePosition);
+                        Pair<Integer, Integer> pos = sections.getRelativePosition(getAdapterPosition());
+                        removeWish(pos.first, pos.second);
                     } else {
 //                        swipeLayout.setSwipeEnabled(false);//TODO
 //                        swipeLayout.setOnTouchListener(new View.OnTouchListener() {
@@ -446,33 +456,35 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
 
                 @Override
                 public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
-                    //Log.d("swipe", "onUpdate");
+//                    Log.d("swipe", "onUpdate");
                     float alpha = Math.abs((float) leftOffset / (float) bottomViewReserve.getWidth());//TODO:
                     layout.getCurrentBottomView().setAlpha(alpha);
                 }
 
                 @Override
                 public void onStartOpen(SwipeLayout layout) {
-                    Log.e("swipe", "onStartOpen");
-                    if (swipedItem != null && !swipeLayout.equals(swipedItem)) swipedItem.close();
+//                    Log.e("swipe", "onStartOpen");
+                    if (swipedItem != null && !swipeLayout.equals(swipedItem)) {
+                        swipedItem.close();
+                    }
                     swipedItem = swipeLayout;
-                    if (layout.getDragEdge() == SwipeLayout.DragEdge.Right)
-                        textViewReserve.setText(sections.get(section).get(reletivePosition).isReserved() ? R.string.action_unreserve : R.string.action_reserve);
+                    if (layout.getDragEdge() == SwipeLayout.DragEdge.Right) {
+                        Pair<Integer, Integer> pos = sections.getRelativePosition(getAdapterPosition());
+                        textViewReserve.setText(sections.get(pos.first).get(pos.second).isReserved() ? R.string.action_unreserve : R.string.action_reserve);
+                    }
                 }
 
                 @Override
                 public void onClose(SwipeLayout layout) {
-                    Log.d("swipe", "onClose");
+//                    Log.d("swipe", "onClose");
                     if (swipeLayout.equals(swipedItem)) swipedItem = null;
                 }
 
             });
         }
 
-        public void onBind(int section, int reletivePosition) {
-            this.section = section;
-            this.reletivePosition = reletivePosition;
-            Wish wish = sections.get(section).get(reletivePosition);
+        public void onBind(int section, int relativePosition) {
+            Wish wish = sections.get(section).get(relativePosition);
 
             CloudinaryUtil.loadCircleThumb(context, imageView, wish.getPicture(), R.drawable.gift_icon);
 
@@ -481,14 +493,12 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
 
             if (wish.isReserved()) {
                 if (wish.getReservation().getByUser().equals(AuthUtils.getCurrentUser().getId())) {
-                    textViewStatus.setText("Reserved by me");//TODO:
+                    textViewStatus.setText(R.string.reserved_by_me);
                     swipeLayout.setRightSwipeEnabled(true);
-                } else {
-                    // by another user
-                    textViewStatus.setText("Reserved");//TODO: purpose right only Reserved, cause we don't know who present the gift, it should be secret for all
+                } else {// by another user
+                    textViewStatus.setText(R.string.reserved);//TODO: if wish list mode == MY_WISH_LIST enable swipe and enable swipe
                     swipeLayout.setRightSwipeEnabled(false);
                 }
-                textViewStatus.setTextColor(Color.RED);
             } else {
                 textViewStatus.setText("");
                 swipeLayout.setRightSwipeEnabled(true);
@@ -498,17 +508,19 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
         @OnClick({R.id.card_view, R.id.bottom_view_reserve})
         public void onClick(View v) {
             if (swipedItem != null) swipedItem.close();
-//            swipedItem = null;//TODO: remove
+            swipedItem = null;//required
+            Pair<Integer, Integer> pos = sections.getRelativePosition(getAdapterPosition());
             switch (v.getId()) {
                 case R.id.card_view:
-                    Toast.makeText(context, String.valueOf(getAdapterPosition()) + " -> " + sections.get(section).get(reletivePosition).getTitle(), Toast.LENGTH_LONG).show();
-//                    Intent intent = new Intent(context, WishEditActivity.class)
-//                            .setAction(WishEditActivity.ACTION_EDIT)
-//                            .putExtra("Wish", wishes.get(getAdapterPosition()));
-//                    context.startActivity(intent);
+                    String test = getAdapterPosition() + " -> " + sections.get(pos.first).get(pos.second).getTitle() + " @" + pos.first + ", " + pos.second;
+                    Toast.makeText(context, test, Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(context, WishEditActivity.class)
+                            .setAction(WishEditActivity.ACTION_EDIT)
+                            .putExtra("Wish", sections.get(pos.first).get(pos.second));
+                    context.startActivity(intent);
                     break;
                 case R.id.bottom_view_reserve:
-                    reserveWish(this.section, this.reletivePosition);
+                    reserveWish(pos.first, pos.second);
                     break;
             }
         }

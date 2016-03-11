@@ -160,7 +160,7 @@ public class Wish implements Serializable {
     @JsonIgnore
     public void softRestore() {
         this.softRestore(null);
-        new Notification().create(null, this);
+//        new Notification().create(null, this);//TODO: null pointer exception inside
     }
 
     /**

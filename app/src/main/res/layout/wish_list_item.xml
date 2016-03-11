@@ -90,7 +90,8 @@
                     style="@style/SmallText"
                     android:layout_alignParentBottom="true"
                     android:layout_alignParentRight="true"
-                    android:textAllCaps="true" />
+                    android:textAllCaps="true"
+                    android:textColor="@color/colorAccentDark" />
 
             </RelativeLayout>
 

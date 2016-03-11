@@ -54,8 +54,8 @@ public class MainActivity extends AuthActivity  {
 
     //NavigationDrawer
     @Nullable DrawerLayout drawer;
-    @Bind(R.id.profile_user_avatar_iw) ImageView userAvatarView;
-    @Bind(R.id.profile_user_name_tv) TextView profileUserName;
+    @Bind(R.id.image_view_avatar) ImageView userAvatarView;
+    @Bind(R.id.text_view_user_name) TextView profileUserName;
     @Bind(R.id.connectivity_status) View connectivityStatus;
     @Bind(R.id.recycler_view_friends) RecyclerView recyclerViewFriends;
 

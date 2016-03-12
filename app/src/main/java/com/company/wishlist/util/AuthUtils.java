@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 public class AuthUtils {
 
     private final static String USER_PREFS = "USER_DATA";
+    private final static String FIRST_OPEN = "FIRST_OPEN";
     private static Firebase firebase = FirebaseRoot.get();
     private static User currentUser;
     private static AuthData data;
@@ -58,6 +59,7 @@ public class AuthUtils {
 
     public static void unauth() {
         firebase.unauth();
+        clearPreferences();
     }
 
     public static User getCurrentUser() {
@@ -102,5 +104,20 @@ public class AuthUtils {
         if (null == userJson) return null;
 
         return new Gson().fromJson(userJson, User.class);
+    }
+
+    private static void clearPreferences() {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit().clear();
+    }
+
+    public static void firstOpen() {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit().putBoolean(FIRST_OPEN, false).commit();
+    }
+
+    public static boolean isFirstOpen() {
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getBoolean(FIRST_OPEN, true);
     }
 }

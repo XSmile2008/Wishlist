@@ -209,7 +209,7 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
 
     private void discardChanges() {
         if (editWishBean.isPictureChanged()) {
-            CloudinaryUtil.destroy(editWishBean.getPicture());//destroy new image on cloud
+            CloudinaryUtil.destroy(editWishBean.getPicture());//destroy new_wish image on cloud
         }
     }
 

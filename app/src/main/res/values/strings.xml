@@ -81,4 +81,12 @@
         <item>120</item>
         <item>180</item>
     </string-array>
+
+
+    <!-- intro -->
+    <string name="first_intro_title">Welcome to wish list</string>
+    <string name="first_intro_content">This steps will help to know how it is working!</string>
+
+    <!-- intro end -->
+
 </resources>

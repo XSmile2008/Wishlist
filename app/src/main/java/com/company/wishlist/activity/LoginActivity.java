@@ -34,7 +34,6 @@ import butterknife.ButterKnife;
 public class LoginActivity extends DebugActivity {
 
     private static String TAG = LoginActivity.class.getSimpleName();
-    public static final String AUTH_TOKEN_EXTRA = "AUTH_TOKEN_EXTRA";
     public static final String ACTION_LOGOUT = "LOGOUT";
 
     private AuthData mAuthData;//Data from the authenticated user
@@ -51,6 +50,7 @@ public class LoginActivity extends DebugActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        startIntro();
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
@@ -81,6 +81,12 @@ public class LoginActivity extends DebugActivity {
             startMainActivity();
         } else {
             logOut();
+        }
+    }
+
+    private void startIntro() {
+        if (AuthUtils.isFirstOpen()) {
+            startActivity(new Intent(this, IntroActivity.class));
         }
     }
 
@@ -119,7 +125,7 @@ public class LoginActivity extends DebugActivity {
     private void startMainActivity() {
         startActivity(new Intent(getApplicationContext(), MainActivity.class)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));//TODO: no animation if user already be authorized, and do animation when new user auth
+                .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));//TODO: no animation if user already be authorized, and do animation when new_wish user auth
         finish();
     }
 

@@ -96,7 +96,7 @@ public class Wish implements Serializable {
     }
 
     /**
-     * push new item to database and create unique ID
+     * push new_wish item to database and create unique ID
      *
      * @return generated id for this Wish
      */
@@ -106,7 +106,7 @@ public class Wish implements Serializable {
     }
 
     /**
-     * push new item to database and create unique ID
+     * push new_wish item to database and create unique ID
      *
      * @param listener onCompleteListener
      * @return generated id for this Wish
@@ -160,7 +160,7 @@ public class Wish implements Serializable {
     @JsonIgnore
     public void softRestore() {
         this.softRestore(null);
-//        new Notification().create(null, this);//TODO: null pointer exception inside
+//        new_wish Notification().create(null, this);//TODO: null pointer exception inside
     }
 
     /**

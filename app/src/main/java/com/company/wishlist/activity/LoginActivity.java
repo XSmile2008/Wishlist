@@ -63,7 +63,7 @@ public class LoginActivity extends DebugActivity {
                 if (ConnectionUtil.isConnected()) {
                     loginButton.callOnClick();
                 } else {
-                    Toast.makeText(getApplicationContext(), R.string.no_connection, Toast.LENGTH_LONG).show();//TODO:
+                    Snackbar.make(findViewById(R.id.coordinator_layout_login), getString(R.string.no_internet_connection), Snackbar.LENGTH_LONG).show();
                 }
             }
         });

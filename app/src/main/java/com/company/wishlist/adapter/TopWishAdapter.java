@@ -9,14 +9,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.TopWishActivity;
 import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.util.CloudinaryUtil;
-import com.company.wishlist.util.CropCircleTransformation;
 
 import java.util.HashSet;
 import java.util.List;
@@ -76,7 +74,7 @@ public class TopWishAdapter extends RecyclerView.Adapter<TopWishAdapter.Holder> 
         }
 
         public void onBind(Wish wish) {
-            CloudinaryUtil.loadCircleThumb(context, imageView, wish.getPicture(), R.drawable.gift_icon);
+            CloudinaryUtil.loadThumb(context, imageView, wish.getPicture(), R.drawable.gift_icon, true);
             textViewTitle.setText(wish.getTitle());
             textViewComment.setText(wish.getComment());
         }

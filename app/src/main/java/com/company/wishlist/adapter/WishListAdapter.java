@@ -486,7 +486,7 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
         public void onBind(int section, int relativePosition) {
             Wish wish = sections.get(section).get(relativePosition);
 
-            CloudinaryUtil.loadCircleThumb(context, imageView, wish.getPicture(), R.drawable.gift_icon);
+            CloudinaryUtil.loadThumb(context, imageView, wish.getPicture(), R.drawable.gift_icon, true);
 
             textViewTitle.setText(wish.getTitle());
             textViewComment.setText(wish.getComment());

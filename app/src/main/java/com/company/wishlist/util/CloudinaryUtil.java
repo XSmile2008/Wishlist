@@ -80,15 +80,14 @@ public class CloudinaryUtil {
         return getInstance().url().transformation(transformation).format("jpg").generate(publicId);
     }
 
-    public static void loadCircleThumb(final Context context, final ImageView imageView, final String publicId, @Nullable @DrawableRes final Integer placeholder) {
+    public static void loadThumb(final Context context, final ImageView imageView, final String publicId, @Nullable @DrawableRes final Integer placeholder, final boolean circle) {
         ViewTreeObserver observer = imageView.getViewTreeObserver();
         observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             public boolean onPreDraw() {
                 imageView.getViewTreeObserver().removeOnPreDrawListener(this);
-                DrawableRequestBuilder builder = Glide
-                        .with(context)
-                        .load(CloudinaryUtil.getThumbURl(publicId, imageView.getWidth(), imageView.getHeight()))
-                        .bitmapTransform(new CropCircleTransformation(Glide.get(context).getBitmapPool()));
+                DrawableRequestBuilder builder = Glide.with(context)
+                        .load(CloudinaryUtil.getThumbURl(publicId, imageView.getWidth(), imageView.getHeight()));
+                if (circle) builder.bitmapTransform(new CropCircleTransformation(Glide.get(context).getBitmapPool()));
                 if (placeholder != null) builder.placeholder(placeholder);
                 builder.into(imageView);
                 return true;

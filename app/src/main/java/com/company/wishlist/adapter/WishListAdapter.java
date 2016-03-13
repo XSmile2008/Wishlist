@@ -440,7 +440,7 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
                         removeWish(pos.first, pos.second);
                     } else {
 //                        swipeLayout.setSwipeEnabled(false);//TODO
-//                        swipeLayout.setOnTouchListener(new_wish View.OnTouchListener() {
+//                        swipeLayout.setOnTouchListener(new View.OnTouchListener() {
 //                            @Override
 //                            public boolean onTouch(View v, MotionEvent event) {
 //                                if (event.getAction() == MotionEvent.ACTION_UP) {

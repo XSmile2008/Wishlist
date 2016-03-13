@@ -8,7 +8,6 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.DebugActivity;
@@ -50,7 +49,14 @@ public class LoginActivity extends DebugActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!AuthUtils.isDisconnected() && !isLogout(getIntent())) {
+            startMainActivity();
+        } else {
+            logOut();
+        }
         startIntro();
+
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
@@ -63,7 +69,7 @@ public class LoginActivity extends DebugActivity {
                 if (ConnectionUtil.isConnected()) {
                     loginButton.callOnClick();
                 } else {
-                    Snackbar.make(findViewById(R.id.coordinator_layout_login), getString(R.string.no_internet_connection), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(findViewById(R.id.coordinator_layout), getString(R.string.no_internet_connection), Snackbar.LENGTH_LONG).show();
                 }
             }
         });
@@ -76,12 +82,6 @@ public class LoginActivity extends DebugActivity {
                 onFacebookAccessTokenChange(currentAccessToken);
             }
         };
-
-        if (!AuthUtils.isDisconnected() && !isLogout(getIntent())) {
-            startMainActivity();
-        } else {
-            logOut();
-        }
     }
 
     private void startIntro() {
@@ -125,7 +125,7 @@ public class LoginActivity extends DebugActivity {
     private void startMainActivity() {
         startActivity(new Intent(getApplicationContext(), MainActivity.class)
                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));//TODO: no animation if user already be authorized, and do animation when new_wish user auth
+                .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));//TODO: no animation if user already be authorized, and do animation when new user auth
         finish();
     }
 

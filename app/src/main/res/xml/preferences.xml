@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <Preference
-        android:title="Logout"
-        android:summary="Logout from account" >
-        <intent
-            android:targetPackage="com.company.wishlist"
-            android:targetClass="com.company.wishlist.activity.LoginActivity"
-            android:action="LOGOUT" />
+        android:key="logout"
+        android:summary="Logout from account"
+        android:title="Logout">
     </Preference>
-    <Preference android:title="Clean Wishes" android:key="remove_wish"
-        android:summary="Delete all own soft removed wishes from system">
-    </Preference>
+    <Preference
+        android:key="remove_wish"
+        android:summary="Delete all own soft removed wishes from system"
+        android:title="Clean Wishes"/>
 
     <PreferenceCategory android:title="@string/settings_notification_title">
 
         <ListPreference
-            android:title="@string/settings_notification_reserve"
-            android:summary="@string/settings_notification_reserve_repeat"
-            android:key="@string/settings_notification_reserve_repeat_key"
             android:defaultValue="60"
             android:entries="@array/notificationRepeatEntries"
-            android:entryValues="@array/notificationRepeatValues" />
+            android:entryValues="@array/notificationRepeatValues"
+            android:key="@string/settings_notification_reserve_repeat_key"
+            android:summary="@string/settings_notification_reserve_repeat"
+            android:title="@string/settings_notification_reserve" />
 
     </PreferenceCategory>
 </PreferenceScreen>

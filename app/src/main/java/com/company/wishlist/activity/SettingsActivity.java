@@ -1,8 +1,10 @@
 package com.company.wishlist.activity;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
@@ -20,7 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.company.wishlist.R;
-import com.company.wishlist.activity.abstracts.AuthActivity;
+import com.company.wishlist.activity.abstracts.DebugActivity;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.AuthUtils;
@@ -32,11 +34,10 @@ import com.firebase.client.ValueEventListener;
 /**
  * Created by v.odahovskiy on 15.01.2016.
  */
-public class SettingsActivity extends AuthActivity {
+public class SettingsActivity extends DebugActivity {
 
+    private static final String LOGOUT = "logout";
     private static final String REMOVE_WISH_PREFS_KEY = "remove_wish";
-
-    //TODO: add query that destroy all soft-removed wishes for this user
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,24 +59,34 @@ public class SettingsActivity extends AuthActivity {
         @Override
         public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
             try {
-                if (preference.getKey().equals(REMOVE_WISH_PREFS_KEY)) {
-                    new AlertDialog.Builder(getActivity())
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .setTitle("Message")
-                            .setMessage("After push Yes your removed wishes will be deleted.")
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                switch (preference.getKey()) {
+                    case LOGOUT:
+                        Intent intent = new Intent(getActivity().getApplicationContext(), LoginActivity.class)
+                                .setAction("LOGOUT")
+                                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);//TODO: fix bug
+                        startActivity(intent);
+                        getActivity().finish();
+                        break;
+                    case REMOVE_WISH_PREFS_KEY:
+                        new AlertDialog.Builder(getActivity())
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setTitle("Message")
+                                .setMessage("After push Yes your removed wishes will be deleted.")
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    removeUserWishes();
-                                }
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        removeUserWishes();
+                                    }
 
-                            })
-                            .setNegativeButton(android.R.string.no, null)
-                            .show();
+                                })
+                                .setNegativeButton(android.R.string.no, null)
+                                .show();
+                        break;
                 }
-            }catch (Exception e){e.printStackTrace();}
-            finally {
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
                 return super.onPreferenceTreeClick(preferenceScreen, preference);
             }
         }
@@ -92,7 +103,7 @@ public class SettingsActivity extends AuthActivity {
                                 Wish.getFirebaseRef()
                                         .orderByChild("wishListId")
                                         .equalTo(wishListDS.getKey())
-                                        .addChildEventListener(new ChildEventListener() {
+                                        .addChildEventListener(new ChildEventListener() {//TODO: use addListenerForSingleValueEvent
 
                                             @Override
                                             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -131,7 +142,6 @@ public class SettingsActivity extends AuthActivity {
         }
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -149,7 +159,7 @@ public class SettingsActivity extends AuthActivity {
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
-    private AppCompatDelegate mDelegate;
+    private AppCompatDelegate mDelegate;//TODO:
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {

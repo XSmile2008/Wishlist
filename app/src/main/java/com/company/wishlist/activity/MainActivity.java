@@ -2,6 +2,7 @@ package com.company.wishlist.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
@@ -46,18 +47,23 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AuthActivity  {
+public class MainActivity extends AuthActivity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private FriendListAdapter friendListAdapter;
 
     //NavigationDrawer
-    @Nullable DrawerLayout drawer;
-    @Bind(R.id.image_view_avatar) ImageView userAvatarView;
-    @Bind(R.id.text_view_user_name) TextView profileUserName;
-    @Bind(R.id.connectivity_status) View connectivityStatus;
-    @Bind(R.id.recycler_view_friends) RecyclerView recyclerViewFriends;
+    @Nullable
+    DrawerLayout drawer;
+    @Bind(R.id.image_view_avatar)
+    ImageView userAvatarView;
+    @Bind(R.id.text_view_user_name)
+    TextView profileUserName;
+    @Bind(R.id.connectivity_status)
+    View connectivityStatus;
+    @Bind(R.id.recycler_view_friends)
+    RecyclerView recyclerViewFriends;
 
     private User selectedFriend;
 
@@ -86,7 +92,7 @@ public class MainActivity extends AuthActivity  {
         recyclerViewFriends.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).build());
 
         //Start service
-        startService(new Intent(this, NotificationService.class));
+        startNotificationService();
 
         if (savedInstanceState != null) {
             User friend = (User) savedInstanceState.getSerializable(User.class.getSimpleName());
@@ -97,6 +103,13 @@ public class MainActivity extends AuthActivity  {
             }
         } else {
             showMyWishList();
+        }
+    }
+
+    private void startNotificationService() {
+        boolean enabled = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.notification_enabled_key), false);
+        if (enabled) {
+            startService(new Intent(this, NotificationService.class));
         }
     }
 

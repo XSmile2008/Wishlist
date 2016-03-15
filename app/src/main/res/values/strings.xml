@@ -58,6 +58,8 @@
     <string name="settings_notification_reserve">Reserve notification</string>
     <string name="settings_notification_reserve_repeat">Repeat frequency</string>
     <string name="settings_notification_reserve_repeat_key">notification_reserve</string>
+    <string name="notification_enabled_key">notification_service_enable</string>
+    <string name="clear_wishes_key">clearn_wishes</string>
     <!--  Settings end-->
 
     <string-array name="notificationRepeatEntries">

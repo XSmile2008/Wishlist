@@ -58,7 +58,6 @@ public class NotificationService extends Service {
                 .getString(getString(R.string.settings_notification_reserve_repeat_key), null);
 
         int period = s != null ? 1000 * 60 * Integer.valueOf(s) : TASK_REPEAT;
-
         if (timer != null) {
             timer.cancel();
             timer.purge();

@@ -8,11 +8,16 @@
             android:targetClass="com.company.wishlist.activity.LoginActivity"
             android:action="LOGOUT" />
     </Preference>
-    <Preference android:title="Clean Wishes" android:key="remove_wish"
+    <Preference android:title="Clean Wishes" android:key="@string/clear_wishes_key"
         android:summary="Delete all own soft removed wishes from system">
     </Preference>
 
+
     <PreferenceCategory android:title="@string/settings_notification_title">
+
+        <SwitchPreference
+            android:key="@string/notification_enabled_key"
+            android:title="Enable" />
 
         <ListPreference
             android:title="@string/settings_notification_reserve"
@@ -20,7 +25,9 @@
             android:key="@string/settings_notification_reserve_repeat_key"
             android:defaultValue="60"
             android:entries="@array/notificationRepeatEntries"
-            android:entryValues="@array/notificationRepeatValues" />
+            android:entryValues="@array/notificationRepeatValues"
+            android:dependency="@string/notification_enabled_key"
+            />
 
     </PreferenceCategory>
 </PreferenceScreen>

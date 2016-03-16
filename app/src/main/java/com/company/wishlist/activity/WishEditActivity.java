@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -29,13 +30,26 @@ import com.company.wishlist.util.CloudinaryUtil;
 import com.company.wishlist.util.ConnectionUtil;
 import com.company.wishlist.util.CropCircleTransformation;
 import com.company.wishlist.util.DialogUtil;
+import com.company.wishlist.util.social.TwitterUtils;
+import com.company.wishlist.util.social.pinterest.PinterestUtil;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Length;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.internal.TwitterApi;
+import com.twitter.sdk.android.core.models.Tweet;
+import com.twitter.sdk.android.core.services.StatusesService;
+import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +83,9 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
     @Length(min = 2)
     EditText editTextComment;
 
+    @Bind(R.id.twittercb)
+    CheckBox twitterChekbox;
+
     @Bind(R.id.coordinator_layout)
     CoordinatorLayout coordinatorLayout;
 
@@ -88,6 +105,10 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
         actionBar.setTitle(getIntent().getAction().equals(ACTION_CREATE) ? "New wish" : "Edit wish");
+
+        if (!TwitterUtils.isConnected() || getIntent().getAction().equals(ACTION_EDIT)) {
+            twitterChekbox.setVisibility(View.GONE);
+        }
 
         //Setup validator
         validator = new Validator(this);
@@ -120,7 +141,6 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
         editTextComment.setText(editWishBean.getComment());
         CloudinaryUtil.loadCircleThumb(this, imageView, editWishBean.getPicture(), R.drawable.gift_icon);
     }
-
 
 
     @Override
@@ -200,11 +220,30 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
         editWishBean.setTitle(editTextTitle.getText().toString());
         if (getIntent().getAction().equals(ACTION_CREATE) || getIntent().getAction().equals(ACTION_TAKE_FROM_TOP)) {
             editWishBean.push();
+            sendTweet();
         } else if (getIntent().getAction().equals(ACTION_EDIT)) {
             Wish.getFirebaseRef().child(editWishBean.getId()).updateChildren(editWishBean.toMap());
         }
         Toast.makeText(this, editWishBean.getTitle(), Toast.LENGTH_SHORT).show();
         finish();
+    }
+
+    private void sendTweet() {
+        if (TwitterUtils.isConnected() && twitterChekbox.isChecked()) {
+            TwitterUtils.tweet(String.format("I have a new wish, it is %s!", editWishBean.getTitle()), new Callback<Tweet>() {
+                @Override
+                public void success(Result<Tweet> tweetResult) {
+                    Toast.makeText(getApplicationContext(), "Tweet successful published",
+                            Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void failure(TwitterException e) {
+                    Toast.makeText(getApplicationContext(), "Problem with tweet sending",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     private void discardChanges() {

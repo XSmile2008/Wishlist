@@ -44,6 +44,11 @@
             android:layout_marginLeft="@dimen/default_margin_medium"
             android:text="@string/action_reserve" />
 
+        <ImageButton
+            android:id="@+id/ib_twitter_share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/twitter_cb_true_35"/>
     </LinearLayout>
     <!-- Bottom View Reserve End-->
 

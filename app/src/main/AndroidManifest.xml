@@ -23,6 +23,10 @@
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/app_id" />
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="f343a38b53417f7538bf503031d7d9fe7f9dd27c" />
+
         <!-- Activity section-->
 
         <activity

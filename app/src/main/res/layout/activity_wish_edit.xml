@@ -49,6 +49,15 @@
 
         </LinearLayout>
 
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Share"
+            android:button="@drawable/twitter_check_box"
+            android:id="@+id/twittercb"
+            android:layout_gravity="center_horizontal"
+            android:checked="false" />
+
         <EditText
             android:id="@+id/edit_text_title"
             android:layout_width="match_parent"

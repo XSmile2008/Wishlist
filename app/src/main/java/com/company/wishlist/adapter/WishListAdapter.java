@@ -1,8 +1,10 @@
 package com.company.wishlist.adapter;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +13,8 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +30,8 @@ import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.CloudinaryUtil;
+import com.company.wishlist.util.DialogUtil;
+import com.company.wishlist.util.social.TwitterUtils;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.firebase.client.ChildEventListener;
@@ -33,6 +39,12 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.models.Tweet;
+
+import org.jsoup.helper.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -505,10 +517,17 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
             }
         }
 
+        @OnClick(R.id.ib_twitter_share)
+        public void twitterShare(View v){
+            Pair<Integer, Integer> pos = sections.getRelativePosition(getAdapterPosition());
+            String message = context.getString(R.string.message_default_tweet_wish, sections.get(pos.first).get(pos.second).getTitle());
+            DialogUtil.showSendTweetDialog(message, context);
+            closeSwimeMenu();
+        }
+
         @OnClick({R.id.card_view, R.id.bottom_view_reserve})
         public void onClick(View v) {
-            if (swipedItem != null) swipedItem.close();
-            swipedItem = null;//required
+            closeSwimeMenu();
             Pair<Integer, Integer> pos = sections.getRelativePosition(getAdapterPosition());
             switch (v.getId()) {
                 case R.id.card_view:
@@ -525,6 +544,11 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
             }
         }
 
+    }
+
+    private void closeSwimeMenu() {
+        if (swipedItem != null) swipedItem.close();
+        swipedItem = null;//required
     }
 
     /*

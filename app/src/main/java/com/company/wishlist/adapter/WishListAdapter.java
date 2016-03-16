@@ -435,11 +435,13 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
         @Bind(R.id.bottom_view_remove) ViewGroup bottomViewRemove;
         @Bind(R.id.bottom_view_reserve) ViewGroup bottomViewReserve;
         @Bind(R.id.text_view_reserve) TextView textViewReserve;
+        @Bind(R.id.ib_twitter_share) ImageButton twitterShare;
 
         public Holder(View itemView) {
             super(itemView);
             if (itemView.getId() != R.id.swipe_layout) return;
             ButterKnife.bind(this, itemView);
+
             swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
             swipeLayout.addDrag(SwipeLayout.DragEdge.Right, bottomViewReserve);
             if (mode == WishListFragment.GIFT_LIST_MODE) swipeLayout.addDrag(SwipeLayout.DragEdge.Left, bottomViewRemove);
@@ -496,6 +498,12 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
         }
 
         public void onBind(int section, int relativePosition) {
+            if (!TwitterUtils.isConnected()){
+                twitterShare.setVisibility(View.GONE);
+            }else {
+                twitterShare.setVisibility(View.VISIBLE);
+            }
+
             Wish wish = sections.get(section).get(relativePosition);
 
             CloudinaryUtil.loadCircleThumb(context, imageView, wish.getPicture(), R.drawable.gift_icon);

@@ -108,7 +108,7 @@ public class SettingsActivity extends AuthActivity {
             if (!TwitterUtils.isConnected()) {
                 twitterLoginButton.performClick();
             } else {
-                DialogUtil.alertShow("Logout", "A you sure?", getActivity(), new DialogInterface.OnClickListener() {
+                DialogUtil.alertShow("Logout from Twitter", "Are you sure?", getActivity(), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         TwitterUtils.logout();

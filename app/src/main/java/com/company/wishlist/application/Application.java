@@ -2,6 +2,7 @@ package com.company.wishlist.application;
 
 import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.ConnectionUtil;
+import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.firebase.client.Firebase;
 import com.twitter.sdk.android.Twitter;
@@ -26,6 +27,7 @@ public class Application extends android.app.Application {
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
         Fabric.with(this, new Twitter(authConfig),);
         Fabric.with(this, new TwitterCore(authConfig), new TweetComposer());
+        Fabric.with(this, new Crashlytics());
         Firebase.getDefaultConfig().setPersistenceEnabled(true);
         Firebase.setAndroidContext(this);
         AuthUtils.setAndroidContext(this);

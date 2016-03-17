@@ -1,19 +1,18 @@
 package com.company.wishlist.adapter;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -31,6 +30,7 @@ import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.CloudinaryUtil;
 import com.company.wishlist.util.DialogUtil;
+import com.company.wishlist.util.social.SocialShare;
 import com.company.wishlist.util.social.TwitterUtils;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
@@ -39,12 +39,6 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
-import com.twitter.sdk.android.core.Callback;
-import com.twitter.sdk.android.core.Result;
-import com.twitter.sdk.android.core.TwitterException;
-import com.twitter.sdk.android.core.models.Tweet;
-
-import org.jsoup.helper.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -101,6 +95,7 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
     @Override
     public void onBindHeaderViewHolder(Holder holder, int section) {
         ((TextView) holder.itemView).setText(sections.get(section).getTitle());
+
     }
 
     @Override
@@ -435,12 +430,45 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
         @Bind(R.id.bottom_view_remove) ViewGroup bottomViewRemove;
         @Bind(R.id.bottom_view_reserve) ViewGroup bottomViewReserve;
         @Bind(R.id.text_view_reserve) TextView textViewReserve;
-        @Bind(R.id.ib_twitter_share) ImageButton twitterShare;
+        @Bind(R.id.ib_twitter_share) ImageButton shareImageBtn;
 
         public Holder(View itemView) {
             super(itemView);
             if (itemView.getId() != R.id.swipe_layout) return;
             ButterKnife.bind(this, itemView);
+            shareImageBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Pair<Integer, Integer> pos = sections.getRelativePosition(getAdapterPosition());
+                    final String message = context.getString(R.string.message_default_tweet_wish, sections.get(pos.first).get(pos.second).getTitle());
+
+                    PopupMenu popup = new PopupMenu(context, v);
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            Toast.makeText(context, getAdapterPosition() + ": " + item, Toast.LENGTH_SHORT).show();
+                            switch (item.getItemId()) {
+                                case R.id.action_facebook:
+                                    DialogUtil.showShareDialog(message, context, SocialShare.Social.FACEBOOK);
+                                    closeSwimeMenu();
+                                    break;
+                                case R.id.action_twitter:
+                                    DialogUtil.showShareDialog(message, context, SocialShare.Social.TWITTER);
+                                    closeSwimeMenu();
+                                    break;
+                            }
+                            return false;
+                        }
+                    });
+                    popup.inflate(R.menu.menu_social_share);
+                    if (!TwitterUtils.isConnected()) {
+                        popup.getMenu().findItem(R.id.action_twitter).setEnabled(false);
+                    }else {
+                        popup.getMenu().findItem(R.id.action_twitter).setEnabled(true);
+                    }
+                        popup.show();
+                }
+            });
 
             swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
             swipeLayout.addDrag(SwipeLayout.DragEdge.Right, bottomViewReserve);
@@ -498,11 +526,6 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
         }
 
         public void onBind(int section, int relativePosition) {
-            if (!TwitterUtils.isConnected()){
-                twitterShare.setVisibility(View.GONE);
-            }else {
-                twitterShare.setVisibility(View.VISIBLE);
-            }
 
             Wish wish = sections.get(section).get(relativePosition);
 
@@ -523,14 +546,6 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
                 textViewStatus.setText("");
                 swipeLayout.setRightSwipeEnabled(true);
             }
-        }
-
-        @OnClick(R.id.ib_twitter_share)
-        public void twitterShare(View v){
-            Pair<Integer, Integer> pos = sections.getRelativePosition(getAdapterPosition());
-            String message = context.getString(R.string.message_default_tweet_wish, sections.get(pos.first).get(pos.second).getTitle());
-            DialogUtil.showSendTweetDialog(message, context);
-            closeSwimeMenu();
         }
 
         @OnClick({R.id.card_view, R.id.bottom_view_reserve})

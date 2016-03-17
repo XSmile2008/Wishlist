@@ -6,7 +6,7 @@ import android.preference.PreferenceManager;
 
 import com.company.wishlist.model.FirebaseRoot;
 import com.company.wishlist.model.User;
-import com.company.wishlist.util.social.FacebookUtil;
+import com.company.wishlist.util.social.FacebookUtils;
 import com.facebook.Profile;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
@@ -51,7 +51,7 @@ public class AuthUtils {
     }
 
     private static void saveUser(AuthData authData) {
-        currentUser = FacebookUtil.build(authData);
+        currentUser = FacebookUtils.build(authData);
         User.getFirebaseRef().child(currentUser.getId()).setValue(currentUser);
         saveUserToPreferences(currentUser);
     }

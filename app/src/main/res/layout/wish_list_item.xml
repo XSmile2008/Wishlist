@@ -48,7 +48,7 @@
             android:id="@+id/ib_twitter_share"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/twitter_cb_true_35"/>
+            android:background="@drawable/ic_share_grey_600_24dp"/>
     </LinearLayout>
     <!-- Bottom View Reserve End-->
 

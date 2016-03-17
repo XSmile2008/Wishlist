@@ -14,6 +14,7 @@ import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.DebugActivity;
 import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.ConnectionUtil;
+import com.company.wishlist.util.social.TwitterUtils;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -105,6 +106,7 @@ public class LoginActivity extends DebugActivity {
     private void logOut() {
         AuthUtils.unauth();
         LoginManager.getInstance().logOut();
+        TwitterUtils.logout();
     }
 
     private void showErrorDialog(String message) {

@@ -4,12 +4,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,7 +16,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialogFragment;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.DebugActivity;
@@ -28,28 +25,20 @@ import com.company.wishlist.model.Wish;
 import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.CloudinaryUtil;
 import com.company.wishlist.util.ConnectionUtil;
-import com.company.wishlist.util.CropCircleTransformation;
 import com.company.wishlist.util.DialogUtil;
+import com.company.wishlist.util.social.SocialShare;
+import com.company.wishlist.util.social.SocialShareUtils;
 import com.company.wishlist.util.social.TwitterUtils;
-import com.company.wishlist.util.social.pinterest.PinterestUtil;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Length;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
-import com.twitter.sdk.android.Twitter;
-import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterException;
-import com.twitter.sdk.android.core.internal.TwitterApi;
 import com.twitter.sdk.android.core.models.Tweet;
-import com.twitter.sdk.android.core.services.StatusesService;
-import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -220,7 +209,7 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
         editWishBean.setTitle(editTextTitle.getText().toString());
         if (getIntent().getAction().equals(ACTION_CREATE) || getIntent().getAction().equals(ACTION_TAKE_FROM_TOP)) {
             editWishBean.push();
-            sendTweet();
+            share(SocialShare.Social.TWITTER);
         } else if (getIntent().getAction().equals(ACTION_EDIT)) {
             Wish.getFirebaseRef().child(editWishBean.getId()).updateChildren(editWishBean.toMap());
         }
@@ -228,21 +217,25 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
         finish();
     }
 
-    private void sendTweet() {
+    private void share(SocialShare.Social social) {
         if (TwitterUtils.isConnected() && twitterChekbox.isChecked()) {
-            TwitterUtils.tweet(String.format("I have a new wish, it is %s!", editWishBean.getTitle()), new Callback<Tweet>() {
-                @Override
-                public void success(Result<Tweet> tweetResult) {
-                    Toast.makeText(getApplicationContext(), "Tweet successful published",
-                            Toast.LENGTH_SHORT).show();
-                }
+            if (ConnectionUtil.isConnected()) {
+                SocialShareUtils.ref().share(String.format("I have a new wish, it is %s!", editWishBean.getTitle()), social, new SocialShare.Callback() {
+                    @Override
+                    public void success() {
+                        Toast.makeText(getApplicationContext(), "Tweet successful published",
+                                Toast.LENGTH_SHORT).show();
+                    }
 
-                @Override
-                public void failure(TwitterException e) {
-                    Toast.makeText(getApplicationContext(), "Problem with tweet sending",
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
+                    @Override
+                    public void failure(Throwable e) {
+                        Toast.makeText(getApplicationContext(), "Problem with share sending",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                Toast.makeText(this, "Check internet connection for sharing", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

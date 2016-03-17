@@ -29,7 +29,7 @@ public class TwitterUtils {
         }
     }
 
-    public static void tweet(String message, Callback<Tweet> callback) {
+    public static void share(String message, Callback<Tweet> callback) {
         final StatusesService statusesService = Twitter.getInstance().getApiClient().getStatusesService();
         statusesService.update(message, null, null, null, null, null, null, null, null, callback);
     }

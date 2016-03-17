@@ -2,9 +2,20 @@ package com.company.wishlist.util.social;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 
 import com.company.wishlist.activity.LoginActivity;
 import com.company.wishlist.model.User;
+import com.facebook.AccessToken;
+import com.facebook.FacebookCallback;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
+import com.facebook.share.ShareApi;
+import com.facebook.share.Sharer;
+import com.facebook.share.internal.ShareFeedContent;
+import com.facebook.share.model.ShareContent;
+import com.facebook.share.model.ShareOpenGraphContent;
 import com.firebase.client.AuthData;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -14,7 +25,7 @@ import java.util.Map;
 /**
  * Created by v.odahovskiy on 12.01.2016.
  */
-public class FacebookUtil {
+public class FacebookUtils {
 
     public static User build(AuthData authData) {
         Map<String, Object> cachedUserProfile = (Map<String, Object>) authData.getProviderData().get("cachedUserProfile");
@@ -36,4 +47,15 @@ public class FacebookUtil {
         context.startActivity(logoutIntent);
     }
 
+    public static void share(String message, GraphRequest.Callback callback) {
+        Bundle params = new Bundle();
+        params.putString("message", message);
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/me/feed",
+                params,
+                HttpMethod.POST,
+                callback
+        ).executeAsync();
+    }
 }

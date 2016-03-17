@@ -10,13 +10,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.company.wishlist.R;
-import com.company.wishlist.activity.MainActivity;
-import com.company.wishlist.model.Wish;
-import com.company.wishlist.util.social.TwitterUtils;
-import com.twitter.sdk.android.core.Callback;
-import com.twitter.sdk.android.core.Result;
+import com.company.wishlist.util.social.SocialShare;
+import com.company.wishlist.util.social.SocialShareUtils;
 import com.twitter.sdk.android.core.TwitterException;
-import com.twitter.sdk.android.core.models.Tweet;
 
 import org.jsoup.helper.StringUtil;
 
@@ -25,10 +21,10 @@ import org.jsoup.helper.StringUtil;
  */
 public class DialogUtil {
 
-    public static void alertShow(String title, String message, Context context){
+    public static void alertShow(String title, String message, Context context) {
         AlertDialog alertDialog = new AlertDialog.Builder(context).create();
-        alertDialog.setTitle(null != title? title :"WishList");
-        alertDialog.setMessage(null != message? message : "");
+        alertDialog.setTitle(null != title ? title : "WishList");
+        alertDialog.setMessage(null != message ? message : "");
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Close",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
@@ -38,7 +34,7 @@ public class DialogUtil {
         alertDialog.show();
     }
 
-    public static void alertShow(String title, String message, Context context, DialogInterface.OnClickListener onClickListener){
+    public static void alertShow(String title, String message, Context context, DialogInterface.OnClickListener onClickListener) {
         new AlertDialog.Builder(context)
                 .setTitle(title)
                 .setMessage(message)
@@ -48,7 +44,7 @@ public class DialogUtil {
                 .show();
     }
 
-    public static ProgressDialog progressDialog(String title, String message, Context context){
+    public static ProgressDialog progressDialog(String title, String message, Context context) {
         ProgressDialog dialog = new ProgressDialog(context);
         dialog.setTitle(title);
         dialog.setMessage(message);
@@ -56,7 +52,7 @@ public class DialogUtil {
         return dialog;
     }
 
-    public static void showSendTweetDialog(String message, final Context context){
+    public static void showShareDialog(String message, final Context context, final SocialShare.Social social) {
         LayoutInflater li = LayoutInflater.from(context);
         View promptsView = li.inflate(R.layout.share_tweet_dialog, null);
 
@@ -70,24 +66,22 @@ public class DialogUtil {
 
         alertDialogBuilder
                 .setCancelable(false)
-                .setPositiveButton("Tweet",
+                .setPositiveButton("Share",
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,int id) {
-                                // get user input and set it to result
-                                // edit text
-                                String message =  userInput.getText().toString().trim();
-                                if (StringUtil.isBlank(message)){
+                            public void onClick(DialogInterface dialog, int id) {
+                                String message = userInput.getText().toString().trim();
+                                if (StringUtil.isBlank(message)) {
                                     Toast.makeText(context, "Should be not empty", Toast.LENGTH_SHORT).show();
-                                }else {
-                                    TwitterUtils.tweet(message, new Callback<Tweet>() {
+                                } else {
+                                    SocialShareUtils.ref().share(message, social, new SocialShare.Callback() {
                                         @Override
-                                        public void success(Result<Tweet> result) {
-                                            Toast.makeText(context, "Tweet shared successful", Toast.LENGTH_SHORT).show();
+                                        public void success() {
+                                            Toast.makeText(context, "Message shared successful", Toast.LENGTH_SHORT).show();
                                         }
 
                                         @Override
-                                        public void failure(TwitterException e) {
-                                            Toast.makeText(context, "Problem with sharing tweet.", Toast.LENGTH_SHORT).show();
+                                        public void failure(Throwable error) {
+                                            Toast.makeText(context, "Problem with sharing message.", Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                 }
@@ -96,7 +90,7 @@ public class DialogUtil {
                         })
                 .setNegativeButton("Cancel",
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,int id) {
+                            public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
                             }
                         });

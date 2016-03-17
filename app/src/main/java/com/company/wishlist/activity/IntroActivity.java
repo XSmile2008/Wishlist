@@ -1,5 +1,6 @@
 package com.company.wishlist.activity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
@@ -9,8 +10,8 @@ import com.company.wishlist.util.AuthUtils;
 import com.github.paolorotolo.appintro.AppIntro;
 import com.github.paolorotolo.appintro.AppIntroFragment;
 
-
 public class IntroActivity extends AppIntro {
+
     @Override
     public void init(Bundle savedInstanceState) {
         addSlide(AppIntroFragment.newInstance(getString(R.string.first_intro_title), getString(R.string.first_intro_content),
@@ -44,6 +45,7 @@ public class IntroActivity extends AppIntro {
     @Override
     public void onSkipPressed() {
         AuthUtils.firstOpen();
+        startActivity(new Intent(getApplicationContext(), LoginActivity.class));
         finish();
     }
 
@@ -55,6 +57,7 @@ public class IntroActivity extends AppIntro {
     @Override
     public void onDonePressed() {
         AuthUtils.firstOpen();
+        startActivity(new Intent(getApplicationContext(), LoginActivity.class));
         finish();
     }
 
@@ -62,4 +65,5 @@ public class IntroActivity extends AppIntro {
     public void onSlideChanged() {
 
     }
+
 }

@@ -49,13 +49,14 @@ public class LoginActivity extends DebugActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (!AuthUtils.isDisconnected() && !isLogout(getIntent())) {
-            startMainActivity();
-        } else {
+        if (ACTION_LOGOUT.equals(getIntent().getAction())) {
             logOut();
+        } else if (!AuthUtils.isDisconnected()) {//TODO: fix bug that isDisconnected return false
+            startMainActivity();
+        } else if (AuthUtils.isFirstOpen()) {
+            startActivity(new Intent(this, IntroActivity.class));
+            finish();
         }
-        startIntro();
 
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
@@ -84,12 +85,6 @@ public class LoginActivity extends DebugActivity {
         };
     }
 
-    private void startIntro() {
-        if (AuthUtils.isFirstOpen()) {
-            startActivity(new Intent(this, IntroActivity.class));
-        }
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -104,15 +99,6 @@ public class LoginActivity extends DebugActivity {
         mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    private boolean isLogout(Intent intent) {
-        return null != intent.getAction() && intent.getAction().equals(ACTION_LOGOUT);
-    }
-
-    private void logOut() {
-        AuthUtils.unauth();
-        LoginManager.getInstance().logOut();
-    }
-
     private void showErrorDialog(String message) {
         new AlertDialog.Builder(this)
                 .setTitle("Error")
@@ -120,6 +106,11 @@ public class LoginActivity extends DebugActivity {
                 .setPositiveButton(android.R.string.ok, null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+    }
+
+    private void logOut() {
+        AuthUtils.unauth();
+        LoginManager.getInstance().logOut();
     }
 
     private void startMainActivity() {

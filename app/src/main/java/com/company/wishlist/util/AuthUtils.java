@@ -59,6 +59,7 @@ public class AuthUtils {
 
     public static void unauth() {
         firebase.unauth();
+        data = firebase.getAuth();//TODO: check it
         clearPreferences();
     }
 

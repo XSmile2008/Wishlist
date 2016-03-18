@@ -2,45 +2,23 @@ package com.company.wishlist.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.AuthActivity;
-import com.company.wishlist.activity.abstracts.DebugActivity;
 import com.company.wishlist.model.Wish;
-import com.company.wishlist.model.WishList;
 import com.company.wishlist.service.NotificationService;
 import com.company.wishlist.util.AuthUtils;
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
-
-import butterknife.BindString;
 
 /**
  * Created by v.odahovskiy on 15.01.2016.
  */
 public class SettingsActivity extends AuthActivity {
-
-    @BindString(R.string.clear_wishes_key) String CLEAR_WISHES;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +46,7 @@ public class SettingsActivity extends AuthActivity {
                         .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);//TODO: fix bug
                 startActivity(intent);
                 getActivity().finish();
-            } else if (key.equals(getString(R.string.clear_wishes_key)))
+            } else if (key.equals(getString(R.string.clear_wishes_key))) {
                 new AlertDialog.Builder(getActivity())
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle("Message")
@@ -83,7 +61,7 @@ public class SettingsActivity extends AuthActivity {
 
                         })
                         .show();
-            else if (key.equals(getString(R.string.notification_enabled_key))) {
+            } else if (key.equals(getString(R.string.notification_enabled_key))) {
                 boolean enabled = preference.getSharedPreferences().getBoolean(getString(R.string.notification_enabled_key), false);
                 if (enabled) {
                     getActivity().startService(new Intent(getActivity(), NotificationService.class));

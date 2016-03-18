@@ -21,11 +21,12 @@ public class ImageSearchActivity extends DebugActivity implements ImageSearchAda
 
     public static final String QUERY = "com.company.wishlist.activity.QUERY";
     public static final String RESULT_DATA = "com.company.wishlist.activity.RESULT_DATA";
-
-    ImageSearchAdapter adapter;
+    private static final String RESULT_ITEMS = "RESULT_ITEMS";
 
     @Bind(R.id.recyclerView)
     RecyclerView recyclerView;
+
+    ImageSearchAdapter imageSearchAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +46,12 @@ public class ImageSearchActivity extends DebugActivity implements ImageSearchAda
         actionBar.setTitle(String.format("Results for query:%s", query));
 
         RecyclerView.LayoutManager layoutManager = new GridAutofitLayoutManager(this, (int) getResources().getDimension(R.dimen.image_size_large_large));
-        if (savedInstanceState != null && savedInstanceState.getStringArrayList("Items") != null) {
-            adapter = new ImageSearchAdapter(this, this, savedInstanceState.getStringArrayList("Items"));
+        if (savedInstanceState != null && savedInstanceState.getStringArrayList(RESULT_ITEMS) != null) {
+            imageSearchAdapter = new ImageSearchAdapter(this, this, savedInstanceState.getStringArrayList(RESULT_ITEMS));
         } else {
-            adapter = new ImageSearchAdapter(this, this, query);
+            imageSearchAdapter = new ImageSearchAdapter(this, this, query);
         }
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(imageSearchAdapter);
         recyclerView.setLayoutManager(layoutManager);
     }
 
@@ -67,7 +68,7 @@ public class ImageSearchActivity extends DebugActivity implements ImageSearchAda
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putStringArrayList("Items", (ArrayList<String>) adapter.getItems());
+        outState.putStringArrayList(RESULT_ITEMS, (ArrayList<String>) imageSearchAdapter.getItems());
     }
 
     @Override

@@ -23,7 +23,6 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-
 public class TopWishAdapter extends RecyclerView.Adapter<TopWishAdapter.Holder> {
 
     private Context context;
@@ -37,7 +36,7 @@ public class TopWishAdapter extends RecyclerView.Adapter<TopWishAdapter.Holder> 
     }
 
     private Wish getByIndex(int index) {
-        return wishes.get(index);//TODO: optimize this
+        return wishes.get(index);
     }
 
     @Override

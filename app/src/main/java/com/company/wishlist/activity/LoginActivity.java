@@ -35,15 +35,12 @@ public class LoginActivity extends DebugActivity {
     private static String TAG = LoginActivity.class.getSimpleName();
     public static final String ACTION_LOGOUT = "LOGOUT";
 
-    private AuthData mAuthData;//Data from the authenticated user
-    private CallbackManager mFacebookCallbackManager;//The callback manager for Facebook
-    private AccessTokenTracker mFacebookAccessTokenTracker;//Used to track user logging in/out off Facebook
-
+    private AuthData mAuthData;
+    private CallbackManager mFacebookCallbackManager;
+    private AccessTokenTracker mFacebookAccessTokenTracker;
     private android.app.AlertDialog progressDialog;
 
-    @Bind(R.id.custom_login_button)
-    Button customLoginButton;
-
+    @Bind(R.id.custom_login_button) Button customLoginButton;
     LoginButton loginButton;
 
     @Override
@@ -88,7 +85,6 @@ public class LoginActivity extends DebugActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // if user logged in with Facebook, stop tracking their token
         if (mFacebookAccessTokenTracker != null) {
             mFacebookAccessTokenTracker.stopTracking();
         }

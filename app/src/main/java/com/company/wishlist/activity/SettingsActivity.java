@@ -2,10 +2,12 @@ package com.company.wishlist.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -26,6 +28,7 @@ import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
 import com.company.wishlist.service.NotificationService;
 import com.company.wishlist.util.AuthUtils;
+import com.company.wishlist.util.DialogUtil;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
@@ -57,37 +60,32 @@ public class SettingsActivity extends AuthActivity {
         @Override
         public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
             String key = preference.getKey();
-            try {
-                if (key.equals(getString(R.string.clear_wishes_key)))
-                    new AlertDialog.Builder(getActivity())
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .setTitle("Message")
-                            .setMessage("After push Yes your removed wishes will be deleted.")
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Wish.clearAllSoftRemovedForUser(AuthUtils.getCurrentUser().getId());
-                                }
+            if (key.equals(getString(R.string.clear_wishes_key))) {
+                showClearWishesDialog();
+            }else if (key.equals(getString(R.string.notification_enabled_key))) {
+                boolean enabled = preference.getSharedPreferences().getBoolean(getString(R.string.notification_enabled_key), false);
+                startOrStopNotificationService(enabled);
+            }
+            return super.onPreferenceTreeClick(preferenceScreen, preference);
+        }
 
-                            })
-                            .setNegativeButton(android.R.string.no, null)
-                            .show();
-                else if (key.equals(getString(R.string.notification_enabled_key))) {
-                    boolean enabled = preference.getSharedPreferences().getBoolean(getString(R.string.notification_enabled_key), false);
-                    if (enabled) {
-                        getActivity().startService(new Intent(getActivity(), NotificationService.class));
-                    } else {
-                        getActivity().stopService(new Intent(getActivity(), NotificationService.class));
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                return super.onPreferenceTreeClick(preferenceScreen, preference);
+        private void startOrStopNotificationService(boolean enabled) {
+            if (enabled) {
+                getActivity().startService(new Intent(getActivity(), NotificationService.class));
+            } else {
+                getActivity().stopService(new Intent(getActivity(), NotificationService.class));
             }
         }
 
+        private void showClearWishesDialog() {
+            DialogUtil.alertShow("Message", "After push Yes your removed wishes will be deleted.", getActivity(), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Wish.clearAllSoftRemovedForUser(AuthUtils.getCurrentUser().getId());
+                }
+            });
+        }
     }
 
 

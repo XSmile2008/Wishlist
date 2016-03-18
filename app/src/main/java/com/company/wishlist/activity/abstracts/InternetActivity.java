@@ -20,17 +20,17 @@ import java.net.URL;
  */
 public class InternetActivity extends DebugActivity {
 
-    private ConnectionUtil connection = new ConnectionUtil(this);
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (this.getClass() == InternetActivity.class) {
             setContentView(R.layout.activity_internet);
+
             findViewById(R.id.retry_internet_conn).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (connection.isConnected()) {
+                    if (ConnectionUtil.isConnected()) {
                         try {
                             Log.d("nyan", "Connection established, running " + getIntent().getStringExtra("class"));
                             Intent intent = new Intent(getApplicationContext(), Class.forName(getIntent().getStringExtra("class")))
@@ -55,7 +55,7 @@ public class InternetActivity extends DebugActivity {
     }
 
     public void checkConnection() {
-        if (!connection.isConnected() && this.getClass() != InternetActivity.class) {
+        if (!ConnectionUtil.isConnected() && this.getClass() != InternetActivity.class) {
             startActivity(new Intent(this, InternetActivity.class)
                     .putExtra("class", this.getClass().getName())
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));

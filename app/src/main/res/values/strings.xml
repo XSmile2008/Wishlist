@@ -23,6 +23,7 @@
     <string name="action_remove">Remove</string>
     <string name="action_reserve">Reserve</string>
     <string name="action_unreserve">Unreserve</string>
+    <string name="action_share">Share</string>
     <!-- Actions end-->
 
     <!-- Drawer-->

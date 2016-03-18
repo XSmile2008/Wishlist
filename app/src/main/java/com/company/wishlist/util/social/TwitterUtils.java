@@ -1,11 +1,7 @@
 package com.company.wishlist.util.social;
 
-import android.widget.Toast;
-
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;
-import com.twitter.sdk.android.core.Result;
-import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.core.services.StatusesService;
 

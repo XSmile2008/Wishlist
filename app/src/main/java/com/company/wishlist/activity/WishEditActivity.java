@@ -1,16 +1,22 @@
 package com.company.wishlist.activity;
 
+import android.animation.Animator;
+import android.annotation.TargetApi;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
+import android.view.ViewTreeObserver;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -33,9 +39,6 @@ import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Length;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
-import com.twitter.sdk.android.core.Result;
-import com.twitter.sdk.android.core.TwitterException;
-import com.twitter.sdk.android.core.models.Tweet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -87,6 +90,10 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wish_edit);
         ButterKnife.bind(this);
+
+        if (savedInstanceState == null) {
+            circleRevealAnimation();
+        }
 
         //Setup ActionBar
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
@@ -164,6 +171,30 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
     public void onBackPressed() {
         super.onBackPressed();
         discardChanges();
+    }
+
+    @Deprecated
+    public void circleRevealAnimation() {
+        final View rootLayout = findViewById(R.id.coordinator_layout);
+        ViewTreeObserver viewTreeObserver = rootLayout.getViewTreeObserver();
+        if (viewTreeObserver.isAlive()) {
+            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                        DisplayMetrics displayMetrics = new DisplayMetrics();
+                        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                        float finalRadius = Math.max(displayMetrics.widthPixels, displayMetrics.heightPixels);
+
+                        Animator circularReveal = ViewAnimationUtils.createCircularReveal(rootLayout, 645, 870, 0, finalRadius);
+                        circularReveal.setDuration(1000);
+                        circularReveal.start();
+                    }
+                    rootLayout.setVisibility(View.VISIBLE);
+                    rootLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                }
+            });
+        }
     }
 
     /*vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv

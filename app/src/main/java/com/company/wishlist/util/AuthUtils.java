@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import com.company.wishlist.model.FirebaseRoot;
 import com.company.wishlist.model.User;
 import com.company.wishlist.util.social.FacebookUtils;
+import com.facebook.login.LoginManager;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -59,6 +60,7 @@ public class AuthUtils {
     public static void unauth() {
         firebase.unauth();
         data = firebase.getAuth();//TODO: check it
+        LoginManager.getInstance().logOut();
         clearPreferences();
     }
 

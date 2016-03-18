@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <Preference
-        android:summary="Logout from account"
-        android:title="Logout">
-        <intent
-            android:action="LOGOUT"
-            android:targetClass="com.company.wishlist.activity.LoginActivity"
-            android:targetPackage="com.company.wishlist" />
-    </Preference>
+
+    <PreferenceCategory android:title="Profile">
+
+        <Preference
+            android:key="logout"
+            android:summary="Logout from account"
+            android:title="Logout" />
+
+        <Preference
+            android:key="@string/twitter_button_key"
+            android:summary="@string/twitter_not_connected"
+            android:title="Twitter" />
+
+    </PreferenceCategory>
+
     <Preference
         android:key="@string/clear_wishes_key"
         android:summary="Delete all own soft removed wishes from system"
-        android:title="Clean Wishes"></Preference>
-
+        android:title="Clean Wishes" />
 
     <PreferenceCategory android:title="@string/settings_notification_title">
 
@@ -31,9 +37,4 @@
 
     </PreferenceCategory>
 
-
-    <Preference
-        android:key="@string/twitter_button_key"
-        android:summary="@string/twitter_not_connected"
-        android:title="Twitter" />
 </PreferenceScreen>

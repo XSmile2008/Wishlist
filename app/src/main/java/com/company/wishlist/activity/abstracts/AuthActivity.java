@@ -35,7 +35,7 @@ public abstract class AuthActivity extends DebugActivity {
     }
 
     private void processFirebaseLogin() {
-        if (connection.isConnected()) {
+        if (ConnectionUtil.isConnected()) {
             if (AuthUtils.isDisconnected()) {
                 AuthUtils.auth("facebook", AccessToken.getCurrentAccessToken().getToken(), null);
             }

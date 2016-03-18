@@ -8,13 +8,11 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.DebugActivity;
 import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.ConnectionUtil;
-import com.company.wishlist.util.social.TwitterUtils;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -35,23 +33,28 @@ import butterknife.ButterKnife;
 public class LoginActivity extends DebugActivity {
 
     private static String TAG = LoginActivity.class.getSimpleName();
-    public static final String AUTH_TOKEN_EXTRA = "AUTH_TOKEN_EXTRA";
     public static final String ACTION_LOGOUT = "LOGOUT";
 
-    private AuthData mAuthData;//Data from the authenticated user
-    private CallbackManager mFacebookCallbackManager;//The callback manager for Facebook
-    private AccessTokenTracker mFacebookAccessTokenTracker;//Used to track user logging in/out off Facebook
-
+    private AuthData mAuthData;
+    private CallbackManager mFacebookCallbackManager;
+    private AccessTokenTracker mFacebookAccessTokenTracker;
     private android.app.AlertDialog progressDialog;
 
-    @Bind(R.id.custom_login_button)
-    Button customLoginButton;
-
+    @Bind(R.id.custom_login_button) Button customLoginButton;
     LoginButton loginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (ACTION_LOGOUT.equals(getIntent().getAction())) {
+            logOut();
+        } else if (!AuthUtils.isDisconnected()) {//TODO: fix bug that isDisconnected return false
+            startMainActivity();
+        } else if (AuthUtils.isFirstOpen()) {
+            startActivity(new Intent(this, IntroActivity.class));
+            finish();
+        }
+
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
@@ -64,7 +67,7 @@ public class LoginActivity extends DebugActivity {
                 if (ConnectionUtil.isConnected()) {
                     loginButton.callOnClick();
                 } else {
-                    Toast.makeText(getApplicationContext(), R.string.no_connection, Toast.LENGTH_LONG).show();//TODO:
+                    Snackbar.make(findViewById(R.id.coordinator_layout), getString(R.string.no_internet_connection), Snackbar.LENGTH_LONG).show();
                 }
             }
         });
@@ -77,18 +80,11 @@ public class LoginActivity extends DebugActivity {
                 onFacebookAccessTokenChange(currentAccessToken);
             }
         };
-
-        if (!AuthUtils.isDisconnected() && !isLogout(getIntent())) {
-            startMainActivity();
-        } else {
-            logOut();
-        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // if user logged in with Facebook, stop tracking their token
         if (mFacebookAccessTokenTracker != null) {
             mFacebookAccessTokenTracker.stopTracking();
         }
@@ -99,16 +95,6 @@ public class LoginActivity extends DebugActivity {
         mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    private boolean isLogout(Intent intent) {
-        return null != intent.getAction() && intent.getAction().equals(ACTION_LOGOUT);
-    }
-
-    private void logOut() {
-        AuthUtils.unauth();
-        LoginManager.getInstance().logOut();
-        TwitterUtils.logout();
-    }
-
     private void showErrorDialog(String message) {
         new AlertDialog.Builder(this)
                 .setTitle("Error")
@@ -116,6 +102,11 @@ public class LoginActivity extends DebugActivity {
                 .setPositiveButton(android.R.string.ok, null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+    }
+
+    private void logOut() {
+        AuthUtils.unauth();
+        LoginManager.getInstance().logOut();
     }
 
     private void startMainActivity() {

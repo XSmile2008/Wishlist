@@ -1,21 +1,12 @@
 package com.company.wishlist.util.social;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 
-import com.company.wishlist.activity.LoginActivity;
 import com.company.wishlist.model.User;
 import com.facebook.AccessToken;
-import com.facebook.FacebookCallback;
 import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
-import com.facebook.share.ShareApi;
-import com.facebook.share.Sharer;
-import com.facebook.share.internal.ShareFeedContent;
-import com.facebook.share.model.ShareContent;
-import com.facebook.share.model.ShareOpenGraphContent;
+import com.facebook.Profile;
 import com.firebase.client.AuthData;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -35,16 +26,12 @@ public class FacebookUtils {
         return user;
     }
 
-    public static void processFacebookLogin(Context context) {
-        Intent i = new Intent(context, LoginActivity.class);
-        context.startActivity(i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK));
-    }
-
-    public static void processFacebookLogout(Context context) {
-        Intent logoutIntent = new Intent(context, LoginActivity.class);
-        logoutIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        logoutIntent.setAction(LoginActivity.ACTION_LOGOUT);
-        context.startActivity(logoutIntent);
+    public static User getUserFromProfile() {
+        User user = new User();
+        user.setId(Profile.getCurrentProfile().getId());
+        user.setDisplayName(String.format("%s %s", Profile.getCurrentProfile().getFirstName(), Profile.getCurrentProfile().getLastName()));
+        user.setProvider("facebook");
+        return user;
     }
 
     public static void share(String message, GraphRequest.Callback callback) {

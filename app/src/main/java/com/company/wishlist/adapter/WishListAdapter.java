@@ -165,12 +165,12 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
      */
 
     @Override
-    public void onFriendSelected(String id) {
-        Log.d(LOG_TAG, "onFriendSelected(" + id + ")");
-        this.friendId = id;
+    public void onFriendSelected(String friendId) {
+        Log.d(LOG_TAG, "onFriendSelected(" + friendId + ")");
+        this.friendId = friendId;
         sections.clearSections();
         for (Query query : queriesWish) query.removeEventListener(listenersWish);//remove all unused listeners
-        getWishLists(id);
+        getWishLists(friendId);
         notifyDataSetChanged();
     }
 
@@ -529,7 +529,7 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
 
             Wish wish = sections.get(section).get(relativePosition);
 
-            CloudinaryUtil.loadCircleThumb(context, imageView, wish.getPicture(), R.drawable.gift_icon);
+            CloudinaryUtil.loadThumb(context, imageView, wish.getPicture(), R.drawable.gift_icon, true);
 
             textViewTitle.setText(wish.getTitle());
             textViewComment.setText(wish.getComment());

@@ -3,15 +3,11 @@ package com.company.wishlist.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.company.wishlist.R;
-import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.adapter.WishListPageViewAdapter;
 import com.company.wishlist.model.User;
 import com.company.wishlist.view.CustomViewPager;
@@ -50,7 +46,7 @@ public class TabbedWishListFragment extends DebugFragment {
         User user = (User) getArguments().getSerializable(User.class.getSimpleName());
         wishListPageViewAdapter = new WishListPageViewAdapter(getChildFragmentManager(), user);
         viewPager.setAdapter(wishListPageViewAdapter);
-        viewPager.setPagingEnabled(false);
+        viewPager.setSwiping(false);
         tabLayout.setupWithViewPager(viewPager);
     }
 

@@ -5,6 +5,6 @@ package com.company.wishlist.interfaces;
  */
 public interface IOnFriendSelectedListener {
 
-    void onFriendSelected(String id);
+    void onFriendSelected(String friendId);
 
 }

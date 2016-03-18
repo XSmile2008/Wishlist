@@ -62,9 +62,10 @@
     <string name="settings_notification_reserve_repeat">Repeat frequency</string>
     <string name="settings_notification_reserve_repeat_key">notification_reserve</string>
     <string name="notification_enabled_key">notification_service_enable</string>
-    <string name="clear_wishes_key">clearn_wishes</string>
     <string name="twitter_button_key">twitter_login_btn</string>
     <string name="twitter_not_connected">Not connected</string>
+    <string name="clear_wishes_key">clean_wishes</string>
+    <string name="logout_key">logout</string>
     <!--  Settings end-->
 
     <string-array name="notificationRepeatEntries">
@@ -88,4 +89,11 @@
         <item>120</item>
         <item>180</item>
     </string-array>
+
+    <!-- intro -->
+    <string name="first_intro_title">Welcome to wish list</string>
+    <string name="first_intro_content">This steps will help to know how it is working!</string>
+
+    <!-- intro end -->
+
 </resources>

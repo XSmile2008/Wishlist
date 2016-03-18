@@ -9,38 +9,34 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.TopWishActivity;
 import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.util.CloudinaryUtil;
-import com.company.wishlist.util.CropCircleTransformation;
+import com.company.wishlist.component.IndexedHashSet;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-
 public class TopWishAdapter extends RecyclerView.Adapter<TopWishAdapter.Holder> {
 
     private Context context;
-    private Set<Wish> wishes;
+    private IndexedHashSet<Wish> wishes;
     private String wishListId;
 
     public TopWishAdapter(Context context, String wishListId) {
         this.context = context;
-        this.wishes = new HashSet<>();
+        this.wishes = new IndexedHashSet<>();
         this.wishListId = wishListId;
     }
 
     private Wish getByIndex(int index) {
-        return (Wish) wishes.toArray()[index];//TODO: optimize this
+        return wishes.get(index);
     }
 
     @Override
@@ -76,7 +72,7 @@ public class TopWishAdapter extends RecyclerView.Adapter<TopWishAdapter.Holder> 
         }
 
         public void onBind(Wish wish) {
-            CloudinaryUtil.loadCircleThumb(context, imageView, wish.getPicture(), R.drawable.gift_icon);
+            CloudinaryUtil.loadThumb(context, imageView, wish.getPicture(), R.drawable.gift_icon, true);
             textViewTitle.setText(wish.getTitle());
             textViewComment.setText(wish.getComment());
         }

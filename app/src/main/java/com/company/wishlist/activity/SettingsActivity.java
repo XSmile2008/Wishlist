@@ -2,40 +2,21 @@ package com.company.wishlist.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
-import android.widget.Toast;
 
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.AuthActivity;
 import com.company.wishlist.model.Wish;
-import com.company.wishlist.model.WishList;
 import com.company.wishlist.service.NotificationService;
 import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.DialogUtil;
 import com.company.wishlist.util.social.TwitterUtils;
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
-import com.twitter.sdk.android.Twitter;
+
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterException;
@@ -68,7 +49,7 @@ public class SettingsActivity extends AuthActivity {
             addPreferencesFromResource(R.xml.preferences);
             twitterLoginButton = new TwitterLoginButton(getActivity());
 
-            twitterPreference = (Preference) getPreferenceManager()
+            twitterPreference = getPreferenceManager()
                     .findPreference(getString(R.string.twitter_button_key));
 
             twitterPreference.setSummary(TwitterUtils.userName());
@@ -89,22 +70,27 @@ public class SettingsActivity extends AuthActivity {
         @Override
         public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, final Preference preference) {
             String key = preference.getKey();
-            try {
-                if (key.equals(getString(R.string.clear_wishes_key)))
-                    clearWishesAction();
-                else if (key.equals(getString(R.string.notification_enabled_key))) {
-                    notificationEnableAction(preference);
-                } else if (key.equals(getString(R.string.twitter_button_key))) {
-                    twitterAuthAction();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                return super.onPreferenceTreeClick(preferenceScreen, preference);
+            if (key.equals(getString(R.string.logout_key))) {
+                actionLogout();
+            } else if (key.equals(getString(R.string.clear_wishes_key))) {
+                actionClearWishes();
+            } else if (key.equals(getString(R.string.notification_enabled_key))) {
+                actionNotificationEnable(preference);
+            } else if (key.equals(getString(R.string.twitter_button_key))) {
+                actionTwitterAuth();
             }
+            return super.onPreferenceTreeClick(preferenceScreen, preference);
         }
 
-        private void twitterAuthAction() {
+        private void actionLogout() {
+            Intent intent = new Intent(getActivity().getApplicationContext(), LoginActivity.class)
+                    .setAction("LOGOUT")
+                    .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);//TODO: fix bug
+            startActivity(intent);
+            getActivity().finish();
+        }
+
+        private void actionTwitterAuth() {
             if (!TwitterUtils.isConnected()) {
                 twitterLoginButton.performClick();
             } else {
@@ -118,7 +104,7 @@ public class SettingsActivity extends AuthActivity {
             }
         }
 
-        private void notificationEnableAction(Preference preference) {
+        private void actionNotificationEnable(Preference preference) {
             boolean enabled = preference.getSharedPreferences().getBoolean(getString(R.string.notification_enabled_key), false);
             if (enabled) {
                 getActivity().startService(new Intent(getActivity(), NotificationService.class));
@@ -127,11 +113,12 @@ public class SettingsActivity extends AuthActivity {
             }
         }
 
-        private void clearWishesAction() {
+        private void actionClearWishes() {
             new AlertDialog.Builder(getActivity())
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle("Message")
                     .setMessage("After push Yes your removed wishes will be deleted.")
+                    .setNegativeButton(android.R.string.no, null)
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                         @Override
@@ -140,12 +127,10 @@ public class SettingsActivity extends AuthActivity {
                         }
 
                     })
-                    .setNegativeButton(android.R.string.no, null)
                     .show();
         }
 
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

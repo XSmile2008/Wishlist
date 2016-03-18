@@ -128,7 +128,7 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
         //Init view
         editTextTitle.setText(editWishBean.getTitle());
         editTextComment.setText(editWishBean.getComment());
-        CloudinaryUtil.loadCircleThumb(this, imageView, editWishBean.getPicture(), R.drawable.gift_icon);
+        CloudinaryUtil.loadThumb(this, imageView, editWishBean.getPicture(), R.drawable.gift_icon, true);
     }
 
 
@@ -285,7 +285,7 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
                     @Override
                     public void onDone(final Map<String, Object> imgInfo) {
                         editWishBean.setPicture((String) imgInfo.get("public_id"));
-                        CloudinaryUtil.loadCircleThumb(getApplicationContext(), imageView, editWishBean.getPicture(), R.drawable.gift_icon);
+                        CloudinaryUtil.loadThumb(getApplicationContext(), imageView, editWishBean.getPicture(), R.drawable.gift_icon, true);
                     }
                 };
                 try {

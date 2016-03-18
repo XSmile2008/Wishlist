@@ -73,7 +73,7 @@ public class TopWishAdapter extends RecyclerView.Adapter<TopWishAdapter.Holder> 
         }
 
         public void onBind(Wish wish) {
-            CloudinaryUtil.loadCircleThumb(context, imageView, wish.getPicture(), R.drawable.gift_icon);
+            CloudinaryUtil.loadThumb(context, imageView, wish.getPicture(), R.drawable.gift_icon, true);
             textViewTitle.setText(wish.getTitle());
             textViewComment.setText(wish.getComment());
         }

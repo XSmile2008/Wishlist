@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:name=".application.Application"
@@ -28,6 +29,12 @@
             android:value="@string/app_id" />
 
         <!-- Activity section-->
+
+        <activity
+            android:name=".activity.IntroActivity"
+            android:label="@string/app_name"
+            android:theme="@style/FullscreenTheme">
+        </activity>
 
         <activity
             android:name="com.facebook.FacebookActivity"

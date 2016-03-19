@@ -95,7 +95,7 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
         reservedDateDialog = new CalendarDatePickerDialogFragment();
         reservedDateDialog.setFirstDayOfWeek(Calendar.MONDAY);
         reservedDateDialog.setRetainInstance(true);
-        reservedDateDialog.setThemeDark(true);
+        reservedDateDialog.setThemeDark(false);
         reservedDateDialog.setDateRange(DateUtil.getToday(), null);
 
         //Init bean

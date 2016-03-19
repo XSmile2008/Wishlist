@@ -120,7 +120,7 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
             CalendarDatePickerDialogFragment reservedDateDialog = new CalendarDatePickerDialogFragment();
             reservedDateDialog.setFirstDayOfWeek(Calendar.MONDAY);
             reservedDateDialog.setRetainInstance(true);
-            reservedDateDialog.setThemeDark(true);
+            reservedDateDialog.setThemeDark(false);
             reservedDateDialog.setDateRange(DateUtil.getToday(), null);
             reservedDateDialog.setOnDateSetListener(new CalendarDatePickerDialogFragment.OnDateSetListener() {
                 @Override

@@ -26,6 +26,7 @@ import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.CloudinaryUtil;
+import com.company.wishlist.util.DateUtil;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.firebase.client.ChildEventListener;
@@ -120,6 +121,7 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
             reservedDateDialog.setFirstDayOfWeek(Calendar.MONDAY);
             reservedDateDialog.setRetainInstance(true);
             reservedDateDialog.setThemeDark(true);
+            reservedDateDialog.setDateRange(DateUtil.getToday(), null);
             reservedDateDialog.setOnDateSetListener(new CalendarDatePickerDialogFragment.OnDateSetListener() {
                 @Override
                 public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {

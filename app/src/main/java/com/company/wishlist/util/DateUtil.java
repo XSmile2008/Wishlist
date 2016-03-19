@@ -1,5 +1,7 @@
 package com.company.wishlist.util;
 
+import com.codetroopers.betterpickers.calendardatepicker.MonthAdapter;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -32,6 +34,11 @@ public class DateUtil {
         cal.set(Calendar.MILLISECOND, 0);
 
         return cal.getTimeInMillis();
+    }
+
+    public static MonthAdapter.CalendarDay getToday(){
+        MonthAdapter.CalendarDay today = new MonthAdapter.CalendarDay(System.currentTimeMillis());
+        return today;
     }
 
     private static boolean isSameDay(Calendar cal1, Calendar cal2) {

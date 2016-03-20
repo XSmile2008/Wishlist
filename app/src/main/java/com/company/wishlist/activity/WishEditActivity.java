@@ -41,7 +41,7 @@ import com.company.wishlist.util.CloudinaryUtil;
 import com.company.wishlist.util.ConnectionUtil;
 import com.company.wishlist.util.DateUtil;
 import com.company.wishlist.util.DialogUtil;
-import com.company.wishlist.util.social.SocialShare;
+import com.company.wishlist.util.social.share.ShareStrategy;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Length;
@@ -299,10 +299,10 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
         finish();
     }
 
-    private void share(SocialShare.Social social) {
+    private void share() {
 //        if (TwitterUtils.isConnected() && twitterChekbox.isChecked()) {
 //            if (ConnectionUtil.isConnected()) {
-//                SocialShareUtils.ref().share(String.format("I have a new wish, it is %s!", editWishBean.getTitle()), social, new SocialShare.Callback() {
+//                SocialShareUtils.ref().share(String.format("I have a new wish, it is %s!", editWishBean.getTitle()), social, new ShareStrategy.SharingCallback() {
 //                    @Override
 //                    public void success() {
 //                        Toast.makeText(getApplicationContext(), "Tweet successful published",

@@ -30,10 +30,12 @@ import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.CloudinaryUtil;
 import com.company.wishlist.util.DateUtil;
-import com.company.wishlist.util.social.SocialShare;
-import com.company.wishlist.util.social.SocialShareUtils;
+import com.company.wishlist.util.social.share.ShareStrategy;
 import com.company.wishlist.util.social.TwitterUtils;
 
+import com.company.wishlist.util.social.share.SocialSharing;
+import com.company.wishlist.util.social.share.impl.FacebookSharing;
+import com.company.wishlist.util.social.share.impl.TwitterSharing;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 
@@ -450,11 +452,14 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
         @Bind(R.id.button_share)
         Button buttonShare;
 
+        private SocialSharing socialSharing;
+
         public Holder(View itemView) {
             super(itemView);
             if (itemView.getId() != R.id.swipe_layout) return;
             ButterKnife.bind(this, itemView);
 
+            socialSharing = new SocialSharing(context);
             swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
             swipeLayout.addDrag(SwipeLayout.DragEdge.Right, bottomViewReserve);
             if (mode == WishListFragment.GIFT_LIST_MODE)
@@ -553,6 +558,7 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
                     break;
                 case R.id.button_share:
                     final String message = context.getString(R.string.message_default_tweet_wish, sections.get(pos.first).get(pos.second).getTitle());
+                    socialSharing.setMessage(message);
                     PopupMenu popup = new PopupMenu(context, v);
                     popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
@@ -560,12 +566,13 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
                             Toast.makeText(context, getAdapterPosition() + ": " + item, Toast.LENGTH_SHORT).show();
                             switch (item.getItemId()) {
                                 case R.id.action_facebook:
-                                    SocialShareUtils.showShareDialog(message, context, SocialShare.Social.FACEBOOK);
+                                    socialSharing.setShareStrategy(new FacebookSharing());
                                     break;
                                 case R.id.action_twitter:
-                                    SocialShareUtils.showShareDialog(message, context, SocialShare.Social.TWITTER);
+                                    socialSharing.setShareStrategy(new TwitterSharing());
                                     break;
                             }
+                            socialSharing.share();
                             closeSwipeMenu();
                             return false;
                         }

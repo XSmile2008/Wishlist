@@ -2,14 +2,16 @@ package com.company.wishlist.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.firebase.client.Firebase;
+import com.firebase.client.annotations.NotNull;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 /**
  * Created by v.odahovskiy on 06.01.2016.
  */
-public class User implements Serializable{
+public class User implements Serializable , Comparable<User>{
 
     @JsonIgnore@SerializedName("id") private String id;
     @SerializedName("name") private String displayName;
@@ -111,5 +113,9 @@ public class User implements Serializable{
                 ", gender='" + gender + '\'' +
                 '}';
     }
-    
+
+    @Override
+    public int compareTo(@NotNull User another) {
+        return getDisplayName().compareToIgnoreCase(another.getDisplayName());
+    }
 }

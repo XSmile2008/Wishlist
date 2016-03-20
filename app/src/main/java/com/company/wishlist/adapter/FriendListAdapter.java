@@ -17,6 +17,7 @@ import com.company.wishlist.util.CropCircleTransformation;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.Bind;
@@ -32,7 +33,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
 
     public FriendListAdapter(Context context, List<User> friends) {
         this.context = context;
-        this.friends = (null != friends) ? friends : new ArrayList<User>();
+        setFriends(friends);
     }
 
     @Override
@@ -55,7 +56,11 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
     }
 
     public void setFriends(List<User> friends) {
+        if (null == friends) {
+            friends = new ArrayList<>();
+        }
         this.friends = friends;
+        Collections.sort(friends);
         notifyDataSetChanged();
     }
 

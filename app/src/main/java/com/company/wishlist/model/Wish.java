@@ -115,7 +115,7 @@ public class Wish implements Serializable {
     @JsonIgnore
     public String push(Firebase.CompletionListener listener) {
         Firebase wishTable = getFirebaseRef();
-        this.id = wishTable.push().getKey();//TODO: may be will be better if set generated id to this.id
+        this.id = wishTable.push().getKey();
         if (reservation == null) {
             wishTable.child(id).setValue(this, listener);
         } else {
@@ -314,34 +314,28 @@ public class Wish implements Serializable {
 
     @JsonIgnore
     public Map<String, Object> toMap() {
-        Map<String, Object> hashMap = new HashMap<>();
-        if (wishListId != null) hashMap.put("wishListId", wishListId);
-        if (title != null) hashMap.put("title", title);
-        if (comment != null) hashMap.put("comment", comment);
-        if (picture != null) hashMap.put("picture", comment);
-        if (isReceived != null) hashMap.put("isReceived", isReceived);
-        if (reservation != null) hashMap.put("reservation", reservation);
-        return hashMap;
+        Map<String, Object> map = new HashMap<>();
+        if (wishListId != null) map.put("wishListId", wishListId);
+        if (title != null) map.put("title", title);
+        if (comment != null) map.put("comment", comment);
+        if (picture != null) map.put("picture", comment);
+        if (isReceived != null) map.put("isReceived", isReceived);
+        if (reservation != null) map.put("reservation", reservation);
+        return map;
     }
 
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Wish)) return false;
-
-        Wish wish = (Wish) o;
-
-        if (title != null ? !title.equals(wish.title) : wish.title != null) return false;
-        return !(picture != null ? !picture.equals(wish.picture) : wish.picture != null);
-
+        return (o != null) && (o instanceof Wish) && (this.hashCode() == o.hashCode());
     }
 
     @Override
     public int hashCode() {
-        int result = title != null ? title.hashCode() : 0;
-        result = 31 * result + (picture != null ? picture.hashCode() : 0);
-        return result;
+        int titleHash = title != null ? title.hashCode() : 0;
+        int commentHash = comment != null ? comment.hashCode() : 0;
+        int pictureHash = picture != null ? picture.hashCode() : 0;
+        return titleHash + commentHash + pictureHash;
     }
 
     @Override

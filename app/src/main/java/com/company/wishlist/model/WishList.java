@@ -3,10 +3,12 @@ package com.company.wishlist.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.firebase.client.Firebase;
 
+import java.io.Serializable;
+
 /**
  * Created by vladstarikov on 07.01.16.
  */
-public class WishList {
+public class WishList implements Serializable {
 
     @JsonIgnore String id;
     String owner;
@@ -50,7 +52,8 @@ public class WishList {
 
     @JsonIgnore
     public String push() {
-        return push(null);
+        this.id = push(null);
+        return this.id;
     }
 
     @JsonIgnore

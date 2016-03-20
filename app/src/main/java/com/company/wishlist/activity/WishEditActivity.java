@@ -8,10 +8,16 @@ import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.InputFilter;
+import android.text.InputType;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,7 +33,9 @@ import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.DebugActivity;
 import com.company.wishlist.bean.EditWishBean;
 import com.company.wishlist.fragment.WishListFragment;
+import com.company.wishlist.model.Reservation;
 import com.company.wishlist.model.Wish;
+import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.CloudinaryUtil;
 import com.company.wishlist.util.ConnectionUtil;
@@ -57,6 +65,7 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int RESULT_IMAGE_SELECT = 2;
     private static final String DATE_DIALOG = "DATE_PICKER";
+    public static final String ACTION_READ = "com.company.wishlist.ACTION_READ";
     public static final String ACTION_EDIT = "com.company.wishlist.ACTION_EDIT";
     public static final String ACTION_CREATE = "com.company.wishlist.ACTION_CREATE";
     public static final String ACTION_TAKE_FROM_TOP = "com.company.wishlist.ACTION_TAKE_FROM_TOP";
@@ -80,6 +89,9 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
     @Bind(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbarLayout;
 
+    @Bind(R.id.fab)
+    FloatingActionButton fab;
+
     private EditWishBean editWishBean;//TODO: test if edit wish bean contains correct data after screen rotate
     private Validator validator;
     private CalendarDatePickerDialogFragment reservedDateDialog;
@@ -97,10 +109,6 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
         actionBar.setHomeButtonEnabled(true);
         actionBar.setTitle(getIntent().getAction().equals(ACTION_CREATE) ? "New wish" : "Edit wish");
 
-//        if (!TwitterUtils.isConnected() || getIntent().getAction().equals(ACTION_EDIT)) {
-//            twitterChekbox.setVisibility(View.GONE);
-//        }
-
         //Setup validator
         validator = new Validator(this);
         validator.setValidationListener(this);
@@ -109,26 +117,14 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
         reservedDateDialog = new CalendarDatePickerDialogFragment();
         reservedDateDialog.setFirstDayOfWeek(Calendar.MONDAY);
         reservedDateDialog.setRetainInstance(true);
-        reservedDateDialog.setThemeDark(false);
         reservedDateDialog.setDateRange(DateUtil.getToday(), null);
 
-        //Init bean
-        switch (getIntent().getAction()) {
-            case ACTION_CREATE:
-                editWishBean = new EditWishBean(new Wish());
-                editWishBean.setWishListId(getIntent().getStringExtra(WishListFragment.WISH_LIST_ID));
-                break;
-            case ACTION_EDIT:
-                editWishBean = new EditWishBean((Wish) getIntent().getSerializableExtra(Wish.class.getSimpleName()));
-                break;
-            case ACTION_TAKE_FROM_TOP:
-                editWishBean = new EditWishBean((Wish) getIntent().getSerializableExtra(Wish.class.getSimpleName()));
-                editWishBean.setId(null);
-                editWishBean.setWishListId(getIntent().getStringExtra(WishListFragment.WISH_LIST_ID));
-                break;
-        }
+        //Get wish and wishlist
+        Wish wish = (Wish) getIntent().getSerializableExtra(Wish.class.getSimpleName());
+        WishList wishList = (WishList) getIntent().getSerializableExtra(WishList.class.getSimpleName());
+        editWishBean = new EditWishBean(wish);
 
-        //Init view
+        //Init fields and image
         editTextTitle.setText(editWishBean.getTitle());
         editTextComment.setText(editWishBean.getComment());
         if (editWishBean.getPicture() != null) {//TODO: load optimized image
@@ -140,14 +136,59 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
             imageView.setImageResource(R.drawable.wish_header);
         }
 
+        //Init bean
+        switch (getIntent().getAction()) {
+            case ACTION_CREATE:
+                editWishBean.setWishListId(wishList.getId());
+                break;
+            case ACTION_READ:
+                fab.setVisibility(View.GONE);
+                ActionMode.Callback callback = new ActionMode.Callback() {//TODO: temporally will be like this, ask a question on next lesson
+                    @Override
+                    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                        menu.removeItem(android.R.id.cut);
+                        menu.removeItem(android.R.id.paste);
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onDestroyActionMode(ActionMode mode) {
+
+                    }
+
+                };
+                editTextTitle.setInputType(InputType.TYPE_NULL);
+                editTextTitle.setTextIsSelectable(true);
+                editTextTitle.setCustomSelectionActionModeCallback(callback);
+                editTextComment.setInputType(InputType.TYPE_NULL);
+                editTextComment.setTextIsSelectable(true);
+                editTextComment.setMinLines(8);
+                editTextComment.setCustomSelectionActionModeCallback(callback);
+                break;
+            case ACTION_TAKE_FROM_TOP:
+                editWishBean.setId(null);
+                editWishBean.setWishListId(wishList.getId());
+                break;
+        }
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_wish_edit, menu);
-        if (getIntent().getAction().equals(ACTION_CREATE)) {
-            menu.findItem(R.id.action_delete).setVisible(false);
+        menu.findItem(R.id.action_delete).setVisible(getIntent().getAction().equals(ACTION_EDIT));
+        if (editWishBean.isReserved() && !editWishBean.getReservation().getByUser().equals(AuthUtils.getCurrentUser().getId())) {
+            menu.findItem(R.id.action_reserve).setVisible(false);
         }
         return true;
     }
@@ -170,7 +211,6 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
             case R.id.action_share:
                 final String message = getString(R.string.message_default_tweet_wish, editWishBean.getTitle());
                 BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
-//                bottomSheetDialog.setContentView(findViewById(R.id.bottom_sheet));
                 bottomSheetDialog.setContentView(R.layout.bottom_sheet_share);
                 bottomSheetDialog.show();
         }
@@ -216,7 +256,7 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
             reservedDateDialog.setOnDateSetListener(new CalendarDatePickerDialogFragment.OnDateSetListener() {
                 @Override
                 public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
-                    editWishBean.reserve(AuthUtils.getCurrentUser().getId(), dialog.getSelectedDay().getDateInMillis());
+                    editWishBean.setReservation(new Reservation(AuthUtils.getCurrentUser().getId(), dialog.getSelectedDay().getDateInMillis()));
                     Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " reserved", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -224,7 +264,7 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
         } else {
             DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.message_unreserve), this, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    editWishBean.unreserve();
+                    editWishBean.setReservation(null);
                     Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " unreserved", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -243,14 +283,16 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
     }
 
     private void commitChanges() {
-        if (editWishBean.isPictureChanged() && editWishBean.getOriginalWish().getPicture() != null) {
-            CloudinaryUtil.destroy(editWishBean.getOriginalWish().getPicture());//destroy old image on cloud
+        if (!getIntent().getAction().equals(ACTION_READ)) {
+            if (editWishBean.isPictureChanged() && editWishBean.getOriginalWish().getPicture() != null) {
+                CloudinaryUtil.destroy(editWishBean.getOriginalWish().getPicture());//destroy old image on cloud
+            }
+            editWishBean.setComment(editTextComment.getText().toString().trim());
+            editWishBean.setTitle(editTextTitle.getText().toString().trim());
         }
-        editWishBean.setComment(editTextComment.getText().toString().trim());
-        editWishBean.setTitle(editTextTitle.getText().toString().trim());
         if (getIntent().getAction().equals(ACTION_CREATE) || getIntent().getAction().equals(ACTION_TAKE_FROM_TOP)) {
             editWishBean.push();
-        } else if (getIntent().getAction().equals(ACTION_EDIT)) {
+        } else  {
             Wish.getFirebaseRef().child(editWishBean.getId()).updateChildren(editWishBean.toMap());
         }
         Toast.makeText(this, editWishBean.getTitle(), Toast.LENGTH_SHORT).show();
@@ -328,6 +370,9 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                if (editWishBean.isPictureChanged() && editWishBean.getPicture() != null) {
+                                    CloudinaryUtil.destroy(editWishBean.getPicture());//if user pick image second time destroy old
+                                }
                                 editWishBean.setPicture((String) imgInfo.get("public_id"));
                                 Glide.with(getApplicationContext()) //TODO: load optimized image
                                         .load(CloudinaryUtil.getInstance().url().generate(editWishBean.getPicture()))

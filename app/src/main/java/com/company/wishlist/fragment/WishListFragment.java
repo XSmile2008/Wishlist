@@ -85,7 +85,7 @@ public class WishListFragment extends DebugFragment {
 
         //Init RecyclerView
         adapter = new WishListAdapter(getContext(), getView(), mode == MY_WISH_LIST_MODE ? GIFT_LIST_MODE : mode);
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
@@ -120,7 +120,8 @@ public class WishListFragment extends DebugFragment {
             case R.id.fab_add:
                 startActivity(new Intent(getContext(), WishEditActivity.class)
                         .setAction(WishEditActivity.ACTION_CREATE)
-                        .putExtra(WISH_LIST_ID, wishListId));
+                        .putExtra(WISH_LIST_ID, wishListId)
+                        .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
                 break;
             case R.id.fab_choose:
                 startActivity(new Intent(getContext(), TopWishActivity.class)

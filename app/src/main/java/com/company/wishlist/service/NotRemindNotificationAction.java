@@ -5,7 +5,6 @@ import android.app.NotificationManager;
 import android.content.Intent;
 
 import com.company.wishlist.model.Notification;
-import com.company.wishlist.model.Wish;
 
 public class NotRemindNotificationAction extends IntentService {
 

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPropertyAnimatorListener;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -48,7 +47,7 @@ public class FloatingActionMenuBehavior extends CoordinatorLayout.Behavior {
             if (Math.abs(translationY - this.mTranslationY) == (float) dependency.getHeight()) {
                 ViewCompat.animate(child)
                         .translationY(translationY)
-                        .setListener((ViewPropertyAnimatorListener) null);
+                        .setListener(null);
             } else {
                 ViewCompat.setTranslationY(child, translationY);
             }

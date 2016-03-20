@@ -14,11 +14,21 @@ import com.company.wishlist.activity.abstracts.AuthActivity;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.service.NotificationService;
 import com.company.wishlist.util.AuthUtils;
+import com.company.wishlist.util.DialogUtil;
+import com.company.wishlist.util.social.TwitterUtils;
+
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 /**
  * Created by v.odahovskiy on 15.01.2016.
  */
 public class SettingsActivity extends AuthActivity {
+
+    static TwitterLoginButton twitterLoginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,46 +41,101 @@ public class SettingsActivity extends AuthActivity {
     }
 
     public static class MyPreferenceFragment extends PreferenceFragment {
+        Preference twitterPreference;
+
         @Override
         public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
+            twitterLoginButton = new TwitterLoginButton(getActivity());
+
+            twitterPreference = getPreferenceManager()
+                    .findPreference(getString(R.string.twitter_button_key));
+
+            twitterPreference.setSummary(TwitterUtils.userName());
+
+            twitterLoginButton.setCallback(new Callback<TwitterSession>() {
+                @Override
+                public void success(Result<TwitterSession> result) {
+                    twitterPreference.setSummary(String.format("%s", result.data.getUserName()));
+                }
+
+                @Override
+                public void failure(TwitterException e) {
+
+                }
+            });
         }
 
         @Override
-        public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+        public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, final Preference preference) {
             String key = preference.getKey();
             if (key.equals(getString(R.string.logout_key))) {
-                Intent intent = new Intent(getActivity().getApplicationContext(), LoginActivity.class)
-                        .setAction("LOGOUT")
-                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);//TODO: fix bug
-                startActivity(intent);
-                getActivity().finish();
+                actionLogout();
             } else if (key.equals(getString(R.string.clear_wishes_key))) {
-                new AlertDialog.Builder(getActivity())
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setTitle("Message")
-                        .setMessage("After push Yes your removed wishes will be deleted.")
-                        .setNegativeButton(android.R.string.no, null)
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Wish.clearAllSoftRemovedForUser(AuthUtils.getCurrentUser().getId());
-                            }
-
-                        })
-                        .show();
+                actionClearWishes();
             } else if (key.equals(getString(R.string.notification_enabled_key))) {
-                boolean enabled = preference.getSharedPreferences().getBoolean(getString(R.string.notification_enabled_key), false);
-                if (enabled) {
-                    getActivity().startService(new Intent(getActivity(), NotificationService.class));
-                } else {
-                    getActivity().stopService(new Intent(getActivity(), NotificationService.class));
-                }
+                actionNotificationEnable(preference);
+            } else if (key.equals(getString(R.string.twitter_button_key))) {
+                actionTwitterAuth();
             }
             return super.onPreferenceTreeClick(preferenceScreen, preference);
         }
+
+        private void actionLogout() {
+            Intent intent = new Intent(getActivity().getApplicationContext(), LoginActivity.class)
+                    .setAction("LOGOUT")
+                    .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);//TODO: fix bug
+            startActivity(intent);
+            getActivity().finish();
+        }
+
+        private void actionTwitterAuth() {
+            if (!TwitterUtils.isConnected()) {
+                twitterLoginButton.performClick();
+            } else {
+                DialogUtil.alertShow("Logout from Twitter", "Are you sure?", getActivity(), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        TwitterUtils.logout();
+                        twitterPreference.setSummary(getString(R.string.twitter_not_connected));
+                    }
+                });
+            }
+        }
+
+        private void actionNotificationEnable(Preference preference) {
+            boolean enabled = preference.getSharedPreferences().getBoolean(getString(R.string.notification_enabled_key), false);
+            if (enabled) {
+                getActivity().startService(new Intent(getActivity(), NotificationService.class));
+            } else {
+                getActivity().stopService(new Intent(getActivity(), NotificationService.class));
+            }
+        }
+
+        private void actionClearWishes() {
+            new AlertDialog.Builder(getActivity())
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Message")
+                    .setMessage("After push Yes your removed wishes will be deleted.")
+                    .setNegativeButton(android.R.string.no, null)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Wish.clearAllSoftRemovedForUser(AuthUtils.getCurrentUser().getId());
+                        }
+
+                    })
+                    .show();
+        }
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        twitterLoginButton.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

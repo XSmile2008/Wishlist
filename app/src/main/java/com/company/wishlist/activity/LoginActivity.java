@@ -16,7 +16,6 @@ import com.company.wishlist.util.ConnectionUtil;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
-import com.facebook.login.LoginManager;
 import com.facebook.login.widget.LoginButton;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
@@ -47,7 +46,7 @@ public class LoginActivity extends DebugActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (ACTION_LOGOUT.equals(getIntent().getAction())) {
-            logOut();
+            AuthUtils.unauth();
         } else if (!AuthUtils.isDisconnected()) {//TODO: fix bug that isDisconnected return false
             startMainActivity();
         } else if (AuthUtils.isFirstOpen()) {
@@ -102,11 +101,6 @@ public class LoginActivity extends DebugActivity {
                 .setPositiveButton(android.R.string.ok, null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
-    }
-
-    private void logOut() {
-        AuthUtils.unauth();
-        LoginManager.getInstance().logOut();
     }
 
     private void startMainActivity() {

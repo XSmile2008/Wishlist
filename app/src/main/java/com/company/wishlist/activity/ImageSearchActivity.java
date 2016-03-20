@@ -23,7 +23,7 @@ public class ImageSearchActivity extends DebugActivity implements ImageSearchAda
     public static final String RESULT_DATA = "com.company.wishlist.activity.RESULT_DATA";
     private static final String RESULT_ITEMS = "RESULT_ITEMS";
 
-    @Bind(R.id.recyclerView)
+    @Bind(R.id.recycler_view)
     RecyclerView recyclerView;
 
     ImageSearchAdapter imageSearchAdapter;

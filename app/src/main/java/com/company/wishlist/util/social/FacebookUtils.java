@@ -1,6 +1,11 @@
 package com.company.wishlist.util.social;
 
+import android.os.Bundle;
+
 import com.company.wishlist.model.User;
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.HttpMethod;
 import com.facebook.Profile;
 import com.firebase.client.AuthData;
 import com.google.gson.Gson;
@@ -27,5 +32,17 @@ public class FacebookUtils {
         user.setDisplayName(String.format("%s %s", Profile.getCurrentProfile().getFirstName(), Profile.getCurrentProfile().getLastName()));
         user.setProvider("facebook");
         return user;
+    }
+
+    public static void share(String message, GraphRequest.Callback callback) {
+        Bundle params = new Bundle();
+        params.putString("message", message);
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/me/feed",
+                params,
+                HttpMethod.POST,
+                callback
+        ).executeAsync();
     }
 }

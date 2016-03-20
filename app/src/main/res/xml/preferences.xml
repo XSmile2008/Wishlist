@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <Preference
-        android:key="logout"
-        android:summary="Logout from account"
-        android:title="Logout"/>
+    <PreferenceCategory android:title="Profile">
+
+        <Preference
+            android:key="logout"
+            android:summary="Logout from account"
+            android:title="Logout" />
+
+        <Preference
+            android:key="@string/twitter_button_key"
+            android:summary="@string/twitter_not_connected"
+            android:title="Twitter" />
+
+    </PreferenceCategory>
 
     <Preference
         android:key="@string/clear_wishes_key"

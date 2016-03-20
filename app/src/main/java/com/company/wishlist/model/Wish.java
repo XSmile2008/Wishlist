@@ -2,7 +2,6 @@ package com.company.wishlist.model;
 
 import android.util.Log;
 
-import com.company.wishlist.util.AuthUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;

@@ -103,10 +103,10 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-    <style name="Transparent" parent="AppTheme.NoActionBar">
+    <!--<style name="Transparent" parent="AppTheme.NoActionBar">-->
         <!--<item name="android:windowNoTitle">true</item>-->
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-    </style>
+        <!--<item name="android:windowIsTranslucent">true</item>-->
+        <!--<item name="android:windowBackground">@android:color/transparent</item>-->
+    <!--</style>-->
 
 </resources>

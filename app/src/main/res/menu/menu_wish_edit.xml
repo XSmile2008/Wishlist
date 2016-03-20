@@ -8,21 +8,28 @@
         android:id="@+id/action_reserve"
         android:icon="@drawable/ic_favorite_white_24dp"
         android:orderInCategory="100"
-        app:showAsAction="always"
-        android:title="reserve" />
+        android:title="@string/action_reserve"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_share"
+        android:icon="@drawable/ic_share_white_24dp"
+        android:orderInCategory="100"
+        android:title="@string/action_share"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_delete"
         android:icon="@drawable/ic_delete_white_24dp"
         android:orderInCategory="100"
-        app:showAsAction="always"
-        android:title="delete" />
+        android:title="@string/action_remove"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_done"
         android:icon="@drawable/ic_done_white_24dp"
         android:orderInCategory="100"
-        app:showAsAction="always"
-        android:title="done" />
+        android:title="@string/done"
+        app:showAsAction="always" />
 
 </menu>

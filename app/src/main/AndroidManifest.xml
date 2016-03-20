@@ -65,7 +65,7 @@
         <activity
             android:name=".activity.SettingsActivity"
             android:theme="@style/AppTheme" />
-        <activity android:name=".activity.WishEditActivity" android:theme="@style/Transparent"/>
+        <activity android:name=".activity.WishEditActivity" />
         <activity android:name=".activity.TopWishActivity" />
         <activity android:name=".activity.ImageSearchActivity" />
 

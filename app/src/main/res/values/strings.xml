@@ -11,12 +11,16 @@
     <string name="choose_image">Choose an image</string>
     <string name="choose_image_error_text">Problem with taking a picture</string>
 
+    <string name="done">Done</string>
     <string name="undo">Undo</string>
     <string name="my_friends">My friends</string>
     <string name="login_with_facebook">Login with Facebook</string>
 
     <string name="reserved">Reserved</string>
     <string name="reserved_by_me">Reserved by me</string>
+
+    <string name="Title">Title</string>
+    <string name="Comment">Comment</string>
 
     <!-- Actions-->
     <string name="action_settings">Settings</string>

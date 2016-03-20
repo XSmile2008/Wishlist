@@ -6,14 +6,12 @@
 
     <item
         android:id="@+id/action_facebook"
-        android:icon="@drawable/com_facebook_button_icon"
         android:orderInCategory="100"
         app:showAsAction="always"
         android:title="Facebook" />
 
     <item
         android:id="@+id/action_twitter"
-        android:icon="@drawable/twitter_cb_true_35"
         android:orderInCategory="100"
         app:showAsAction="always"
         android:title="Twitter" />

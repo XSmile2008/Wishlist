@@ -47,7 +47,7 @@ public class TopWishActivity extends DebugActivity {
         //Init recycler view
         String wishListId = getIntent().getExtras().getString(WishListFragment.WISH_LIST_ID);
         adapter = new TopWishAdapter(this, wishListId);
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 

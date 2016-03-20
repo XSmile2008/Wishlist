@@ -3,10 +3,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:orientation="horizontal"
     tools:context=".activity.MainActivity">
 
     <FrameLayout
@@ -14,7 +14,11 @@
         android:layout_height="match_parent"
         android:background="@android:color/background_light"
         android:elevation="8dp">
-    <include layout="@layout/drawer" android:layout_width="240dp" android:layout_height="match_parent"/>
+
+        <include
+            layout="@layout/drawer"
+            android:layout_width="240dp"
+            android:layout_height="match_parent" />
     </FrameLayout>
 
     <android.support.design.widget.CoordinatorLayout
@@ -22,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include layout="@layout/toolbar_default"/>
+        <include layout="@layout/toolbar_default" />
 
         <FrameLayout
             android:id="@+id/container_wish_list"

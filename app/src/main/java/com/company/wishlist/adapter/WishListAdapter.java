@@ -69,12 +69,12 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
     private List<Query> queriesWish = new ArrayList<>();
 
     private Map<String, WishList> wishLists = new HashMap<>();
+    private Sections sections = new Sections();
     private Wish wishBackUp;
+
     private String friendId;
 
     private SwipeLayout swipedItem;
-
-    private Sections sections = new Sections();
 
     /**
      * @param context context that will be used in this adapter
@@ -542,9 +542,14 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
                     closeSwipeMenu();
                     String test = getAdapterPosition() + " -> " + sections.get(pos.first).get(pos.second).getTitle() + " @" + pos.first + ", " + pos.second;
                     Toast.makeText(context, test, Toast.LENGTH_SHORT).show();
+                    Wish wish = sections.get(pos.first).get(pos.second);
+                    WishList wishList = wishLists.get(wish.getWishListId());
                     Intent intent = new Intent(context, WishEditActivity.class)
-                            .setAction(WishEditActivity.ACTION_EDIT)
-                            .putExtra("Wish", sections.get(pos.first).get(pos.second));
+                            .putExtra(Wish.class.getSimpleName(), wish)
+                            .putExtra(WishList.class.getSimpleName(), wishList)
+                            .setAction(wishList.getOwner().equals(AuthUtils.getCurrentUser().getId())
+                                    ? WishEditActivity.ACTION_EDIT
+                                    : WishEditActivity.ACTION_READ);
                     context.startActivity(intent);
                     break;
                 case R.id.button_reserve:

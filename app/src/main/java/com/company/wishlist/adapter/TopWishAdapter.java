@@ -14,6 +14,7 @@ import com.company.wishlist.activity.TopWishActivity;
 import com.company.wishlist.activity.WishEditActivity;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.model.Wish;
+import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.CloudinaryUtil;
 import com.company.wishlist.component.IndexedHashSet;
 
@@ -27,12 +28,12 @@ public class TopWishAdapter extends RecyclerView.Adapter<TopWishAdapter.Holder> 
 
     private Context context;
     private IndexedHashSet<Wish> wishes;
-    private String wishListId;
+    private WishList wishList;
 
-    public TopWishAdapter(Context context, String wishListId) {
+    public TopWishAdapter(Context context, WishList wishList) {
         this.context = context;
         this.wishes = new IndexedHashSet<>();
-        this.wishListId = wishListId;
+        this.wishList = wishList;
     }
 
     private Wish getByIndex(int index) {
@@ -81,7 +82,7 @@ public class TopWishAdapter extends RecyclerView.Adapter<TopWishAdapter.Holder> 
         public void onClick() {
             Intent intent = new Intent(context, WishEditActivity.class)
                     .setAction(WishEditActivity.ACTION_TAKE_FROM_TOP)
-                    .putExtra(WishListFragment.WISH_LIST_ID, wishListId)
+                    .putExtra(WishList.class.getSimpleName(), wishList)
                     .putExtra(Wish.class.getSimpleName(), getByIndex(getAdapterPosition()))
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             context.startActivity(intent);

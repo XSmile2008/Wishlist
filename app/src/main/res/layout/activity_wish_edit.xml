@@ -37,8 +37,8 @@
             <com.company.wishlist.view.AspectRatioImageView
                 android:layout_width="match_parent"
                 android:layout_height="72dp"
-                android:background="@drawable/image_view_gradient"
-                android:fitsSystemWindows="true" />
+                android:fitsSystemWindows="true"
+                android:src="@drawable/image_view_gradient" />
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"

@@ -1,6 +1,7 @@
 package com.company.wishlist.activity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -201,6 +202,9 @@ public class MainActivity extends AuthActivity {
     private void showMyWishList() {
         this.selectedFriend = currentUser();
         getSupportActionBar().setTitle(getResources().getString(R.string.my_wish_list));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            findViewById(R.id.appBar).setElevation(getResources().getDimension(R.dimen.toolbar_elevation));
+        }
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_wish_list);
         if (fragment == null) {
             fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, currentUser());
@@ -220,6 +224,9 @@ public class MainActivity extends AuthActivity {
     private void showFriendWishList(User friend) {
         this.selectedFriend = friend;
         getSupportActionBar().setTitle(friend.getDisplayName());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            findViewById(R.id.appBar).setElevation(0);
+        }
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_wish_list);
         if (fragment == null) {
             fragment = TabbedWishListFragment.newInstance(friend);//TODO:

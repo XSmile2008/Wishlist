@@ -15,6 +15,7 @@ import com.company.wishlist.activity.abstracts.DebugActivity;
 import com.company.wishlist.adapter.TopWishAdapter;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.model.Wish;
+import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.ConnectionUtil;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
@@ -45,8 +46,8 @@ public class TopWishActivity extends DebugActivity {
         actionBar.setHomeButtonEnabled(true);
 
         //Init recycler view
-        String wishListId = getIntent().getExtras().getString(WishListFragment.WISH_LIST_ID);
-        adapter = new TopWishAdapter(this, wishListId);
+        WishList wishList = (WishList) getIntent().getExtras().getSerializable(WishList.class.getSimpleName());
+        adapter = new TopWishAdapter(this, wishList);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);

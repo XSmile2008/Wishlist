@@ -40,11 +40,10 @@ public class WishListFragment extends DebugFragment {
     public static final int MY_WISH_LIST_MODE = 0;
     public static final int WISH_LIST_MODE = 1;
     public static final int GIFT_LIST_MODE = 2;
-    public static final String WISH_LIST_ID = "WISH_LIST_ID";
     public static final String MODE = "mode";
 
     private WishListAdapter adapter;
-    private String wishListId;
+    private WishList wishList;
     private int mode;
 
     @Bind(R.id.fab) FloatingActionMenu mFab;
@@ -120,12 +119,11 @@ public class WishListFragment extends DebugFragment {
             case R.id.fab_add:
                 startActivity(new Intent(getContext(), WishEditActivity.class)
                         .setAction(WishEditActivity.ACTION_CREATE)
-                        .putExtra(WISH_LIST_ID, wishListId)
-                        .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
+                        .putExtra(WishList.class.getSimpleName(), wishList));
                 break;
             case R.id.fab_choose:
                 startActivity(new Intent(getContext(), TopWishActivity.class)
-                        .putExtra(WISH_LIST_ID, wishListId));
+                        .putExtra(WishList.class.getSimpleName(), wishList));
                 break;
         }
     }
@@ -148,13 +146,14 @@ public class WishListFragment extends DebugFragment {
                                 Log.d(LOG_TAG, getId()  + ".onDataChange(" + dataSnapshot + ")");
                                 for (DataSnapshot wishListDS : dataSnapshot.getChildren()) {
                                     if (wishListDS.getValue(WishList.class).getOwner().equals(AuthUtils.getCurrentUser().getId())) {
-                                        wishListId = wishListDS.getKey();
+                                        wishList = wishListDS.getValue(WishList.class);
+                                        wishList.setId(wishListDS.getKey());
                                         adapter.onFriendSelected(friendId);
                                         return;
                                     }
                                 }
-                                WishList wishList = new WishList(AuthUtils.getCurrentUser().getId(), friendId);
-                                wishListId = wishList.push();
+                                wishList = new WishList(AuthUtils.getCurrentUser().getId(), friendId);
+                                wishList.push();//TODO: check if new user
                                 adapter.onFriendSelected(friendId);
                             }
 

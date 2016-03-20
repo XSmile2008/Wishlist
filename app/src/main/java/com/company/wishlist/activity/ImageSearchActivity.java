@@ -30,20 +30,18 @@ public class ImageSearchActivity extends DebugActivity implements ImageSearchAda
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_image_grid);
         ButterKnife.bind(this);
+
+        String query = getIntent().getStringExtra(QUERY);
 
         //Setup ActionBar
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
-
-        String query = getIntent().getStringExtra(QUERY);
-
-        actionBar.setTitle(String.format("Results for query:%s", query));
+        actionBar.setTitle(query);
 
         RecyclerView.LayoutManager layoutManager = new GridAutofitLayoutManager(this, (int) getResources().getDimension(R.dimen.image_size_large_large));
         if (savedInstanceState != null && savedInstanceState.getStringArrayList(RESULT_ITEMS) != null) {

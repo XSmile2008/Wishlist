@@ -55,9 +55,15 @@ public class EditWishBean extends Wish {
         return wish;
     }
 
+    /**
+     * todo
+     * Check this condition, without condition null != wish,
+     * in edit wish activity after selecting picture from pinterest and pressing back
+     * throws null pointer exceptions on null references object - wish
+     */
     @JsonIgnore
     public boolean isPictureChanged() {
-        return this.getPicture() != null && (wish.getPicture() == null || !this.getPicture().equals(wish.getPicture()));
+        return this.getPicture() != null && ((null != wish && wish.getPicture() == null) || !this.getPicture().equals(wish.getPicture()));
     }
 
     /**

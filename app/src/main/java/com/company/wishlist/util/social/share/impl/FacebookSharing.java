@@ -1,6 +1,6 @@
 package com.company.wishlist.util.social.share.impl;
 
-import com.company.wishlist.util.social.FacebookUtils;
+import com.company.wishlist.util.social.facebook.FacebookUtils;
 import com.company.wishlist.util.social.share.ShareStrategy;
 import com.company.wishlist.util.social.share.SharingCallback;
 import com.facebook.GraphRequest;

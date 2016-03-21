@@ -1,4 +1,4 @@
-package com.company.wishlist.util.social;
+package com.company.wishlist.util.social.twitter;
 
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.Callback;

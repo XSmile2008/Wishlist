@@ -15,7 +15,7 @@ import com.company.wishlist.model.Wish;
 import com.company.wishlist.service.NotificationService;
 import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.DialogUtil;
-import com.company.wishlist.util.social.TwitterUtils;
+import com.company.wishlist.util.social.twitter.TwitterUtils;
 
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
@@ -83,11 +83,16 @@ public class SettingsActivity extends AuthActivity {
         }
 
         private void actionLogout() {
-            Intent intent = new Intent(getActivity().getApplicationContext(), LoginActivity.class)
-                    .setAction("LOGOUT")
-                    .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);//TODO: fix bug
-            startActivity(intent);
-            getActivity().finish();
+            DialogUtil.alertShow("Logout from account", "Are you sure?", getActivity(), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(getActivity().getApplicationContext(), LoginActivity.class)
+                            .setAction("LOGOUT")
+                            .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);//TODO: fix bug
+                    startActivity(intent);
+                    getActivity().finish();
+                }
+            });
         }
 
         private void actionTwitterAuth() {

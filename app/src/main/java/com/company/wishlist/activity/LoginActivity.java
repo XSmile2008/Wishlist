@@ -39,7 +39,8 @@ public class LoginActivity extends DebugActivity {
     private AccessTokenTracker mFacebookAccessTokenTracker;
     private android.app.AlertDialog progressDialog;
 
-    @Bind(R.id.custom_login_button) Button customLoginButton;
+    @Bind(R.id.custom_login_button)
+    Button customLoginButton;
     LoginButton loginButton;
 
     @Override
@@ -82,10 +83,23 @@ public class LoginActivity extends DebugActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        hideProgressDialog();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
+        hideProgressDialog();
         if (mFacebookAccessTokenTracker != null) {
             mFacebookAccessTokenTracker.stopTracking();
+        }
+    }
+
+    private void hideProgressDialog() {
+        if (null != progressDialog) {
+            progressDialog.dismiss();
         }
     }
 
@@ -113,11 +127,12 @@ public class LoginActivity extends DebugActivity {
     private void onFacebookAccessTokenChange(AccessToken token) {
         if (token != null) {
             loginButton.setVisibility(View.INVISIBLE);
+
             progressDialog = new ProgressDialog.Builder(this)
                     .setTitle(getString(R.string.app_name))
                     .setMessage("Signing in...")
-                    .setCancelable(false)
-                    .show();
+                    .setCancelable(false).show();
+
             AuthUtils.auth("facebook", token.getToken(), new AuthResultHandler());
         } else {
             if (this.mAuthData != null && this.mAuthData.getProvider().equals("facebook")) {

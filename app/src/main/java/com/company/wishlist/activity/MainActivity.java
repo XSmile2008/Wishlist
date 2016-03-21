@@ -29,7 +29,10 @@ import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.model.User;
 import com.company.wishlist.service.NotificationService;
 import com.company.wishlist.util.CropCircleTransformation;
+import com.company.wishlist.util.social.facebook.FacebookFriendCallback;
+import com.company.wishlist.util.social.facebook.FacebookUtils;
 import com.facebook.AccessToken;
+import com.facebook.FacebookRequestError;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.google.gson.Gson;
@@ -172,21 +175,18 @@ public class MainActivity extends AuthActivity {
                     .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
                     .into(userAvatarView);
 
-            GraphRequest.newMyFriendsRequest(AccessToken.getCurrentAccessToken(),
-                    new GraphRequest.GraphJSONArrayCallback() {
-                        @Override
-                        public void onCompleted(JSONArray objects, GraphResponse response) {
-                            if (response.getError() == null) {
-                                List<User> friends = new Gson().fromJson(objects.toString(), new TypeToken<List<User>>() {
-                                }.getType());
-                                friendListAdapter.setFriends(friends);
-                            } else {
-                                connectivityStatus.setVisibility(View.VISIBLE);//TODO: check connection when open drawer
-                                recyclerViewFriends.setVisibility(View.GONE);
-                                Log.e(LOG_TAG, "GraphRequestError: " + response.getError().getErrorMessage());
-                            }
-                        }
-                    }).executeAsync();
+            FacebookUtils.getAuthUserFriends(new FacebookFriendCallback() {
+                @Override
+                public void onSuccess(List<User> friends) {
+                    friendListAdapter.setFriends(friends);
+                }
+
+                @Override
+                public void onError(FacebookRequestError error) {
+                    connectivityStatus.setVisibility(View.VISIBLE);//TODO: check connection when open drawer
+                    recyclerViewFriends.setVisibility(View.GONE);
+                }
+            });
         }
     }
 

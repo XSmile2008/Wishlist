@@ -6,12 +6,13 @@ import android.preference.PreferenceManager;
 
 import com.company.wishlist.model.FirebaseRoot;
 import com.company.wishlist.model.User;
-import com.company.wishlist.util.social.FacebookUtils;
+import com.company.wishlist.util.social.facebook.FacebookUtils;
 import com.facebook.login.LoginManager;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.google.gson.Gson;
+import com.twitter.sdk.android.Twitter;
 
 /**
  * Created by root on 06.03.2016.
@@ -62,6 +63,7 @@ public class AuthUtils {
         data = firebase.getAuth();//TODO: check it
         LoginManager.getInstance().logOut();
         clearPreferences();
+        Twitter.logOut();
     }
 
     public static User getCurrentUser() {

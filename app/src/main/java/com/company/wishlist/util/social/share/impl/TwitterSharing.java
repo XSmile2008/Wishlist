@@ -1,6 +1,6 @@
 package com.company.wishlist.util.social.share.impl;
 
-import com.company.wishlist.util.social.TwitterUtils;
+import com.company.wishlist.util.social.twitter.TwitterUtils;
 import com.company.wishlist.util.social.share.ShareStrategy;
 import com.company.wishlist.util.social.share.SharingCallback;
 import com.twitter.sdk.android.core.Result;

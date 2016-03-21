@@ -30,8 +30,7 @@ import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.CloudinaryUtil;
 import com.company.wishlist.util.DateUtil;
-import com.company.wishlist.util.social.share.ShareStrategy;
-import com.company.wishlist.util.social.TwitterUtils;
+import com.company.wishlist.util.social.twitter.TwitterUtils;
 
 import com.company.wishlist.util.social.share.SocialSharing;
 import com.company.wishlist.util.social.share.impl.FacebookSharing;

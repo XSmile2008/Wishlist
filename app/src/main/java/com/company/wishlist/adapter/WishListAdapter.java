@@ -2,6 +2,7 @@ package com.company.wishlist.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -35,6 +36,7 @@ import com.company.wishlist.util.social.twitter.TwitterUtils;
 import com.company.wishlist.util.social.share.SocialSharing;
 import com.company.wishlist.util.social.share.impl.FacebookSharing;
 import com.company.wishlist.util.social.share.impl.TwitterSharing;
+import com.company.wishlist.view.BottomSheetShareDialog;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 
@@ -77,6 +79,8 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
 
     private SwipeLayout swipedItem;
 
+    private SocialSharing socialSharing;
+
     /**
      * @param context context that will be used in this adapter
      * @param mode    mode of this list. May be WISH_LIST_MODE or GIFT_LIST_MODE
@@ -85,6 +89,9 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
         this.context = context;
         this.rootView = rootView;
         this.mode = mode;
+
+        socialSharing = new SocialSharing(context);
+
         sections.add(new Section("Reserved by me"));
         sections.add(new Section("Not reserved"));
         sections.add(new Section("Reserved by another users"));
@@ -451,14 +458,11 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
         @Bind(R.id.button_share)
         Button buttonShare;
 
-        private SocialSharing socialSharing;
-
         public Holder(View itemView) {
             super(itemView);
             if (itemView.getId() != R.id.swipe_layout) return;
             ButterKnife.bind(this, itemView);
 
-            socialSharing = new SocialSharing(context);
             swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
             swipeLayout.addDrag(SwipeLayout.DragEdge.Right, bottomViewReserve);
             if (mode == WishListFragment.GIFT_LIST_MODE)
@@ -561,29 +565,10 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
                     reserveWish(pos.first, pos.second);
                     break;
                 case R.id.button_share:
+                    closeSwipeMenu();
                     final String message = context.getString(R.string.message_default_tweet_wish, sections.get(pos.first).get(pos.second).getTitle());
-                    socialSharing.setMessage(message);
-                    PopupMenu popup = new PopupMenu(context, v);
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-                            Toast.makeText(context, getAdapterPosition() + ": " + item, Toast.LENGTH_SHORT).show();
-                            switch (item.getItemId()) {
-                                case R.id.action_facebook:
-                                    socialSharing.setShareStrategy(new FacebookSharing());
-                                    break;
-                                case R.id.action_twitter:
-                                    socialSharing.setShareStrategy(new TwitterSharing());
-                                    break;
-                            }
-                            socialSharing.share();
-                            closeSwipeMenu();
-                            return false;
-                        }
-                    });
-                    popup.inflate(R.menu.menu_social_share);
-                    popup.getMenu().findItem(R.id.action_twitter).setEnabled(TwitterUtils.isConnected());
-                    popup.show();
+                    BottomSheetDialog bottomSheetDialog = new BottomSheetShareDialog(context, message);
+                    bottomSheetDialog.show();
                     break;
             }
         }

@@ -211,7 +211,7 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
                 return false;
             case R.id.action_share:
                 final String message = getString(R.string.message_default_tweet_wish, editWishBean.getTitle());
-                BottomSheetDialog bottomSheetDialog = new BottomSheetShareDialog(this);
+                BottomSheetDialog bottomSheetDialog = new BottomSheetShareDialog(this, message);
                 bottomSheetDialog.show();
         }
         return super.onOptionsItemSelected(item);

@@ -42,6 +42,7 @@ import com.company.wishlist.util.ConnectionUtil;
 import com.company.wishlist.util.DateUtil;
 import com.company.wishlist.util.DialogUtil;
 import com.company.wishlist.util.social.share.ShareStrategy;
+import com.company.wishlist.view.BottomSheetShareDialog;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Length;
@@ -210,8 +211,7 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
                 return false;
             case R.id.action_share:
                 final String message = getString(R.string.message_default_tweet_wish, editWishBean.getTitle());
-                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
-                bottomSheetDialog.setContentView(R.layout.bottom_sheet_share);
+                BottomSheetDialog bottomSheetDialog = new BottomSheetShareDialog(this);
                 bottomSheetDialog.show();
         }
         return super.onOptionsItemSelected(item);

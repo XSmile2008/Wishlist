@@ -51,7 +51,7 @@ public class SocialSharing {
         if (null == shareStrategy) {
             throw new IlleagalVariableException("Should be implemented ShareStrategy!");
         }
-        View promptsView = LayoutInflater.from(context).inflate(R.layout.share_tweet_dialog, null, false);
+        View promptsView = LayoutInflater.from(context).inflate(R.layout.dialog_tweet, null, false);
         final EditText userInput = (EditText) promptsView.findViewById(R.id.et_tweet_message);
         userInput.setText(message);
 

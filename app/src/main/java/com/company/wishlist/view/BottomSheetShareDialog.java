@@ -16,6 +16,7 @@ import com.company.wishlist.R;
 import com.company.wishlist.util.social.share.SocialSharing;
 import com.company.wishlist.util.social.share.impl.FacebookSharing;
 import com.company.wishlist.util.social.share.impl.TwitterSharing;
+import com.company.wishlist.util.social.twitter.TwitterUtils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -36,6 +37,9 @@ public class BottomSheetShareDialog extends BottomSheetDialog {
         this.socialSharing = new SocialSharing(context);
         this.menu = new MenuBuilder(context);
         ((AppCompatActivity) context).getMenuInflater().inflate(R.menu.menu_social_share, menu);
+        if (!TwitterUtils.isConnected()) {//TODO: enable/disable other share methods, make more elegant solution
+            menu.removeItem(R.id.action_twitter);
+        }
 
         ShareDialogAdapter adapter = new ShareDialogAdapter();
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);

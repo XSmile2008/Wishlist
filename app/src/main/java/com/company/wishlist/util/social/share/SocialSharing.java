@@ -57,10 +57,8 @@ public class SocialSharing {
 
         new AlertDialog.Builder(context)
                 .setView(promptsView)
-                .setCancelable(false)
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
                     }
                 })
                 .setPositiveButton("Share", new DialogInterface.OnClickListener() {

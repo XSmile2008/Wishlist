@@ -12,11 +12,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.text.InputFilter;
 import android.text.InputType;
-import android.text.Spanned;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,7 +29,6 @@ import com.codetroopers.betterpickers.calendardatepicker.CalendarDatePickerDialo
 import com.company.wishlist.R;
 import com.company.wishlist.activity.abstracts.DebugActivity;
 import com.company.wishlist.bean.EditWishBean;
-import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.model.Reservation;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
@@ -41,7 +37,6 @@ import com.company.wishlist.util.CloudinaryUtil;
 import com.company.wishlist.util.ConnectionUtil;
 import com.company.wishlist.util.DateUtil;
 import com.company.wishlist.util.DialogUtil;
-import com.company.wishlist.util.social.share.ShareStrategy;
 import com.company.wishlist.view.BottomSheetShareDialog;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
@@ -128,7 +123,7 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
         //Init fields and image
         editTextTitle.setText(editWishBean.getTitle());
         editTextComment.setText(editWishBean.getComment());
-        if (editWishBean.getPicture() != null) {//TODO: load optimized image
+        if (editWishBean.hasPicture()) {//TODO: load optimized image
             Glide.with(this)
                     .load(CloudinaryUtil.getInstance().url().generate(editWishBean.getPicture()))
                     .crossFade()
@@ -284,8 +279,8 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
 
     private void commitChanges() {
         if (!getIntent().getAction().equals(ACTION_READ)) {
-            if (editWishBean.isPictureChanged() && editWishBean.getOriginalWish().getPicture() != null) {
-                CloudinaryUtil.destroy(editWishBean.getOriginalWish().getPicture());//destroy old image on cloud
+            if (editWishBean.getOriginal() != null && editWishBean.getOriginal().hasPicture() && editWishBean.isPictureChanged()) {
+                CloudinaryUtil.destroy(editWishBean.getOriginal().getPicture());//destroy old image on cloud
             }
             editWishBean.setComment(editTextComment.getText().toString().trim());
             editWishBean.setTitle(editTextTitle.getText().toString().trim());
@@ -370,7 +365,7 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                if (editWishBean.isPictureChanged() && editWishBean.getPicture() != null) {
+                                if (editWishBean.isPictureChanged() && editWishBean.hasPicture()) {
                                     CloudinaryUtil.destroy(editWishBean.getPicture());//if user pick image second time destroy old
                                 }
                                 editWishBean.setPicture((String) imgInfo.get("public_id"));

@@ -43,7 +43,7 @@ public class EditWishBean extends Wish {
         if (isDifferent(getComment(), wish.getComment())) {
             map.put("comment", getComment());
         }
-        if (this.getReservation() != this.getOriginalWish().getReservation()) {
+        if (this.getReservation() != this.getOriginal().getReservation()) {
             if (getReservation() == null) map.put("reservation", null);
             else map.put("reservation", getReservation().toMap());
         }
@@ -51,7 +51,7 @@ public class EditWishBean extends Wish {
     }
 
     @JsonIgnore
-    public Wish getOriginalWish() {
+    public Wish getOriginal() {
         return wish;
     }
 
@@ -63,7 +63,7 @@ public class EditWishBean extends Wish {
      */
     @JsonIgnore
     public boolean isPictureChanged() {
-        return this.getPicture() != null && ((null != wish && wish.getPicture() == null) || !this.getPicture().equals(wish.getPicture()));
+        return this.hasPicture() && (wish == null || !this.getPicture().equals(wish.getPicture()));
     }
 
     /**

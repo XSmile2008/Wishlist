@@ -3,7 +3,6 @@ package com.company.wishlist.model;
 import android.util.Log;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -228,12 +227,17 @@ public class Wish implements Serializable {
 
     @JsonIgnore
     public boolean isReserved() {
-        return null != reservation;
+        return reservation != null;
     }
 
     @JsonIgnore
     public boolean isRemoved() {
-        return null != isRemoved;
+        return isRemoved != null;
+    }
+
+    @JsonIgnore
+    public boolean hasPicture() {
+        return picture != null;
     }
 
     @JsonIgnore
@@ -261,10 +265,11 @@ public class Wish implements Serializable {
                 });
     }
 
-    @JsonIgnore public static void clearAllSoftRemovedForUser(String userId){
+    @JsonIgnore
+    public static void clearAllSoftRemovedForUser(String userId) {
         Firebase ref = getFirebaseRef();
-        if (null == ref) { throw new NullPointerException("Firebase reference should be initialized"); }
-        if (null == userId){ throw new IllegalArgumentException("User id should be not null"); }
+        if (null == ref) throw new NullPointerException("Firebase reference should be initialized");
+        if (null == userId) throw new IllegalArgumentException("User id should be not null");
         WishList.getFirebaseRef()
                 .orderByChild("owner")
                 .equalTo(userId)
@@ -275,31 +280,21 @@ public class Wish implements Serializable {
                             Wish.getFirebaseRef()
                                     .orderByChild("wishListId")
                                     .equalTo(wishListDS.getKey())
-                                    .addChildEventListener(new ChildEventListener() {
-
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
-                                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                                            Wish wish = dataSnapshot.getValue(Wish.class);
-                                            wish.setId(dataSnapshot.getKey());
-                                            if (wish.isRemoved()) {
-                                                wish.remove(null);
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            for (DataSnapshot wishDS : dataSnapshot.getChildren()) {
+                                                Wish wish = wishDS.getValue(Wish.class);
+                                                wish.setId(wishDS.getKey());
+                                                if (wish.isRemoved()) {
+                                                    wish.remove(null);//TODO: remove picture from Cloudinary
+                                                }
                                             }
                                         }
 
                                         @Override
-                                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                                        }
-
-                                        @Override
-                                        public void onChildRemoved(DataSnapshot dataSnapshot) {
-                                        }
-
-                                        @Override
-                                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                                        }
-
-                                        @Override
                                         public void onCancelled(FirebaseError firebaseError) {
+                                            Log.d(Wish.class.getSimpleName(), firebaseError.toString());
                                         }
                                     });
                         }
@@ -307,7 +302,7 @@ public class Wish implements Serializable {
 
                     @Override
                     public void onCancelled(FirebaseError firebaseError) {
-                        Log.d("wish_list.onCanceled()", firebaseError.toString());
+                        Log.d(Wish.class.getSimpleName(), firebaseError.toString());
                     }
                 });
     }

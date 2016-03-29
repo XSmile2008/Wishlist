@@ -1,10 +1,12 @@
 package com.company.wishlist.activity;
 
-import android.app.ProgressDialog;
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,12 +18,15 @@ import com.company.wishlist.util.ConnectionUtil;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
+import com.facebook.login.LoginManager;
 import com.facebook.login.widget.LoginButton;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -32,24 +37,21 @@ import butterknife.ButterKnife;
 public class LoginActivity extends DebugActivity {
 
     private static String TAG = LoginActivity.class.getSimpleName();
-    public static final String ACTION_LOGOUT = "LOGOUT";
 
-    private AuthData mAuthData;
     private CallbackManager mFacebookCallbackManager;
     private AccessTokenTracker mFacebookAccessTokenTracker;
-    private android.app.AlertDialog progressDialog;
 
-    @Bind(R.id.custom_login_button)
-    Button customLoginButton;
-    LoginButton loginButton;
+    @Bind(R.id.coordinator_layout) CoordinatorLayout coordinatorLayout;
+    @Bind(R.id.custom_login_button) Button customLoginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (ACTION_LOGOUT.equals(getIntent().getAction())) {
+        if (getIntent().getAction().equals(getString(R.string.logout_key))) {
             AuthUtils.unauth();
         } else if (!AuthUtils.isDisconnected()) {//TODO: fix bug that isDisconnected return false
-            startMainActivity();
+            startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));
+            finish();
         } else if (AuthUtils.isFirstOpen()) {
             startActivity(new Intent(this, IntroActivity.class));
             finish();
@@ -58,16 +60,15 @@ public class LoginActivity extends DebugActivity {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
-        loginButton = new LoginButton(this);
-        loginButton.setReadPermissions(Collections.singletonList(getString(R.string.facebook_permissions)));
-
+        final Activity activity = this;//TODO: try remove this
         customLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (ConnectionUtil.isConnected()) {
-                    loginButton.callOnClick();
+                    List<String> permissions = Collections.singletonList(getString(R.string.facebook_permissions));
+                    LoginManager.getInstance().logInWithReadPermissions(activity, permissions);//TODO: may be use logInWithPublishPermissions
                 } else {
-                    Snackbar.make(findViewById(R.id.coordinator_layout), getString(R.string.no_internet_connection), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(coordinatorLayout, getString(R.string.no_internet_connection), Snackbar.LENGTH_LONG).show();
                 }
             }
         });
@@ -77,30 +78,17 @@ public class LoginActivity extends DebugActivity {
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
                 Log.i(TAG, "Facebook.AccessTokenTracker.OnCurrentAccessTokenChanged");
-                onFacebookAccessTokenChange(currentAccessToken);
+                AuthUtils.auth("facebook", currentAccessToken.getToken(), new AuthResultHandler());
             }
         };
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        hideProgressDialog();
-    }
-
-    @Override
     protected void onDestroy() {
-        super.onDestroy();
-        hideProgressDialog();
         if (mFacebookAccessTokenTracker != null) {
             mFacebookAccessTokenTracker.stopTracking();
         }
-    }
-
-    private void hideProgressDialog() {
-        if (null != progressDialog) {
-            progressDialog.dismiss();
-        }
+        super.onDestroy();
     }
 
     @Override
@@ -108,52 +96,22 @@ public class LoginActivity extends DebugActivity {
         mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void showErrorDialog(String message) {
-        new AlertDialog.Builder(this)
-                .setTitle("Error")
-                .setMessage(message)
-                .setPositiveButton(android.R.string.ok, null)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-    }
-
-    private void startMainActivity() {
-        startActivity(new Intent(getApplicationContext(), MainActivity.class)
-                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));//TODO: no animation if user already be authorized, and do animation when new user auth
-        finish();
-    }
-
-    private void onFacebookAccessTokenChange(AccessToken token) {
-        if (token != null) {
-            loginButton.setVisibility(View.INVISIBLE);
-
-            progressDialog = new ProgressDialog.Builder(this)
-                    .setTitle(getString(R.string.app_name))
-                    .setMessage("Signing in...")
-                    .setCancelable(false).show();
-
-            AuthUtils.auth("facebook", token.getToken(), new AuthResultHandler());
-        } else {
-            if (this.mAuthData != null && this.mAuthData.getProvider().equals("facebook")) {
-                AuthUtils.unauth();
-                loginButton.setVisibility(View.VISIBLE);
-            }
-        }
-    }
-
     private class AuthResultHandler implements Firebase.AuthResultHandler {
 
         @Override
         public void onAuthenticated(AuthData authData) {
-            progressDialog.hide();
-            mAuthData = authData;
-            startMainActivity();
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            finish();
         }
 
         @Override
         public void onAuthenticationError(FirebaseError firebaseError) {
-            showErrorDialog(firebaseError.toString());
+            new AlertDialog.Builder(getApplicationContext())
+                    .setTitle("Error")
+                    .setMessage(firebaseError.getMessage())
+                    .setPositiveButton(android.R.string.ok, null)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
         }
 
     }

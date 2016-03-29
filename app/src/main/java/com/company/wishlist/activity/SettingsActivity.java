@@ -87,7 +87,7 @@ public class SettingsActivity extends AuthActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     Intent intent = new Intent(getActivity().getApplicationContext(), LoginActivity.class)
-                            .setAction("LOGOUT")
+                            .setAction(getString(R.string.logout_key))
                             .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);//TODO: fix bug
                     startActivity(intent);
                     getActivity().finish();

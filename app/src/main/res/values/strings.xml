@@ -36,13 +36,16 @@
     <!-- Drawer end-->
 
     <!-- Messages-->
-    <string name="message_unreserve">Are you shure to unreserve wish?</string>
+    <string name="message_unreserve">Are you sure to unreserve wish?</string>
     <string name="message_wish_removed">Wish  %1$s deleted! </string>
     <string name="message_wish_restored">Wish  %1$s restored! </string>
     <string name="message_loading_pints_dialog">Loading pics…</string>
     <string name="message_load_wish_progress_dialog">Loading wishes..</string>
     <string name="message_remove_wish_dialog">Are you sure you want to remove this wish?</string>
     <string name="message_default_tweet_wish">My wish is %1$s!</string>
+    <string name="message_loading">Loading…</string>
+    <string name="message_searching_for_images">Searching for images…</string>
+    <string name="message_loading_top_wishes">Loading top wishes…</string>
     <!-- Messages end-->
 
     <!-- Connection-->
@@ -98,7 +101,6 @@
     <!-- intro -->
     <string name="first_intro_title">Welcome to wish list</string>
     <string name="first_intro_content">This steps will help to know how it is working!</string>
-
     <!-- intro end -->
 
 </resources>

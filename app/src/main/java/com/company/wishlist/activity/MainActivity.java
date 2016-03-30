@@ -31,17 +31,11 @@ import com.company.wishlist.service.NotificationService;
 import com.company.wishlist.util.CropCircleTransformation;
 import com.company.wishlist.util.social.facebook.FacebookFriendCallback;
 import com.company.wishlist.util.social.facebook.FacebookUtils;
-import com.facebook.AccessToken;
 import com.facebook.FacebookRequestError;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,16 +52,11 @@ public class MainActivity extends AuthActivity {
     private FriendListAdapter friendListAdapter;
 
     //NavigationDrawer
-    @Nullable
-    DrawerLayout drawer;
-    @Bind(R.id.image_view_avatar)
-    ImageView userAvatarView;
-    @Bind(R.id.text_view_user_name)
-    TextView profileUserName;
-    @Bind(R.id.connectivity_status)
-    View connectivityStatus;
-    @Bind(R.id.recycler_view_friends)
-    RecyclerView recyclerViewFriends;
+    @Nullable DrawerLayout drawer;
+    @Bind(R.id.image_view_avatar) ImageView userAvatarView;
+    @Bind(R.id.text_view_user_name) TextView profileUserName;
+    @Bind(R.id.connectivity_status) View connectivityStatus;
+    @Bind(R.id.recycler_view) RecyclerView recyclerViewFriends;
 
     private User selectedFriend;
 
@@ -111,8 +100,7 @@ public class MainActivity extends AuthActivity {
     }
 
     private void startNotificationService() {
-        boolean enabled = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.notification_enabled_key), false);
-        if (enabled) {
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.notification_enabled_key), false)) {
             startService(new Intent(this, NotificationService.class));
         }
     }
@@ -128,21 +116,6 @@ public class MainActivity extends AuthActivity {
     public void onPause() {
         EventBus.getDefault().unregister(this);
         super.onPause();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                return false;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override

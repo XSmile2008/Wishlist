@@ -12,7 +12,6 @@ import android.widget.TextView;
 import com.company.wishlist.R;
 import com.company.wishlist.activity.TopWishActivity;
 import com.company.wishlist.activity.WishEditActivity;
-import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.model.Wish;
 import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.CloudinaryUtil;
@@ -42,7 +41,7 @@ public class TopWishAdapter extends RecyclerView.Adapter<TopWishAdapter.Holder> 
 
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.top_wish_list_item, parent, false));
+        return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_top_wish_list, parent, false));
     }
 
     @Override

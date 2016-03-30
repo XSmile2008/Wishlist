@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -19,12 +18,10 @@ import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.login.LoginManager;
-import com.facebook.login.widget.LoginButton;
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,7 +44,7 @@ public class LoginActivity extends DebugActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getIntent().getAction().equals(getString(R.string.logout_key))) {
+        if (getString(R.string.logout_key).equals(getIntent().getAction())) {
             AuthUtils.unauth();
         } else if (!AuthUtils.isDisconnected()) {//TODO: fix bug that isDisconnected return false
             startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION));

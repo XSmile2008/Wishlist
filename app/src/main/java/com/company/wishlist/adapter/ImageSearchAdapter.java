@@ -1,6 +1,5 @@
 package com.company.wishlist.adapter;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
@@ -30,21 +29,14 @@ public class ImageSearchAdapter extends RecyclerView.Adapter<ImageSearchAdapter.
     private IOnPictureSelectedListener mListener;
     private List<String> mItems = new ArrayList<>();
 
-    public ImageSearchAdapter(Context context, IOnPictureSelectedListener listener, String query) {
+    public ImageSearchAdapter(Context context, IOnPictureSelectedListener listener) {
         this.mContext = context;
         this.mListener = listener;
-        loadPictures(query);
-    }
-
-    public ImageSearchAdapter(Context context, IOnPictureSelectedListener listener, List<String> urls) {
-        this.mContext = context;
-        this.mListener = listener;
-        this.mItems = urls;
     }
 
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.image_search_item, parent, false));
+        return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_image_search, parent, false));
     }
 
     @Override
@@ -64,29 +56,8 @@ public class ImageSearchAdapter extends RecyclerView.Adapter<ImageSearchAdapter.
         return mItems;
     }
 
-    public void loadPictures(String query) {
-        final ProgressDialog progressDialog = new ProgressDialog(mContext);
-        progressDialog.setTitle(R.string.app_name);
-        progressDialog.setMessage(mContext.getResources().getString(R.string.message_loading_pints_dialog));
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.setCancelable(false);
-        progressDialog.show();
-        PinterestUtil.getImagesAsLinks(new PinterestUtil.IOnDoneListener() {
-            @Override
-            public void onDone(final List<String> urls) {
-                if (null != urls && urls.size() > 0) {
-                    new Handler(mContext.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Collections.shuffle(urls);
-                            mItems = urls;
-                            notifyDataSetChanged();
-                            progressDialog.dismiss();
-                        }
-                    });
-                }
-            }
-        }, query);
+    public void setItems(List<String> items) {
+        this.mItems = items;
     }
 
     public class Holder extends RecyclerView.ViewHolder {

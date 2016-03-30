@@ -6,12 +6,10 @@ import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -31,11 +29,8 @@ import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.CloudinaryUtil;
 import com.company.wishlist.util.DateUtil;
-import com.company.wishlist.util.social.twitter.TwitterUtils;
 
 import com.company.wishlist.util.social.share.SocialSharing;
-import com.company.wishlist.util.social.share.impl.FacebookSharing;
-import com.company.wishlist.util.social.share.impl.TwitterSharing;
 import com.company.wishlist.view.BottomSheetShareDialog;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
@@ -99,7 +94,7 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
 
     @Override
     public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
-        int layout = viewType == VIEW_TYPE_HEADER ? R.layout.section : R.layout.wish_list_item;
+        int layout = viewType == VIEW_TYPE_HEADER ? R.layout.section : R.layout.item_wish_list;
         return new Holder(LayoutInflater.from(parent.getContext()).inflate(layout, parent, false));
     }
 

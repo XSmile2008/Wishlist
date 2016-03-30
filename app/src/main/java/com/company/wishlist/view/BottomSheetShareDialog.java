@@ -51,7 +51,7 @@ public class BottomSheetShareDialog extends BottomSheetDialog {
 
         @Override
         public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.dialog_share_item, parent, false));
+            return new Holder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_dialog_share, parent, false));
         }
 
         @Override

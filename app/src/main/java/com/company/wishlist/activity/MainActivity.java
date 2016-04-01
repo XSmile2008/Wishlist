@@ -1,6 +1,9 @@
 package com.company.wishlist.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -13,24 +16,25 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
-import com.company.wishlist.activity.abstracts.AuthActivity;
+import com.company.wishlist.activity.abstracts.DebugActivity;
 import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.events.FriendSelectedEvent;
 import com.company.wishlist.fragment.TabbedWishListFragment;
 import com.company.wishlist.fragment.WishListFragment;
 import com.company.wishlist.model.User;
 import com.company.wishlist.service.NotificationService;
-import com.company.wishlist.util.CropCircleTransformation;
+import com.company.wishlist.util.AuthUtils;
+import com.company.wishlist.util.ConnectionUtil;
 import com.company.wishlist.util.social.facebook.FacebookFriendCallback;
 import com.company.wishlist.util.social.facebook.FacebookUtils;
+import com.company.wishlist.view.CropCircleTransformation;
 import com.facebook.FacebookRequestError;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
@@ -45,11 +49,15 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AuthActivity {
+public class MainActivity extends DebugActivity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
+    private ConnectionStateReceiver receiver = new ConnectionStateReceiver();
+
     private FriendListAdapter friendListAdapter;
+
+    private User selectedFriend;
 
     //NavigationDrawer
     @Nullable DrawerLayout drawer;
@@ -57,8 +65,6 @@ public class MainActivity extends AuthActivity {
     @Bind(R.id.text_view_user_name) TextView profileUserName;
     @Bind(R.id.connectivity_status) View connectivityStatus;
     @Bind(R.id.recycler_view) RecyclerView recyclerViewFriends;
-
-    private User selectedFriend;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +95,7 @@ public class MainActivity extends AuthActivity {
 
         if (savedInstanceState != null) {
             User friend = (User) savedInstanceState.getSerializable(User.class.getSimpleName());
-            if (friend.getId().equals(currentUser().getId())) {
+            if (friend.getId().equals(AuthUtils.getCurrentUser().getId())) {
                 showMyWishList();
             } else {
                 showFriendWishList(friend);
@@ -109,12 +115,14 @@ public class MainActivity extends AuthActivity {
     public void onResume() {
         super.onResume();
         EventBus.getDefault().register(this);
-        refreshUserDataUi();//TODO:
+        registerReceiver(receiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+        refreshUserDataUi();//TODO: saveInstanceState
     }
 
     @Override
     public void onPause() {
         EventBus.getDefault().unregister(this);
+        unregisterReceiver(receiver);
         super.onPause();
     }
 
@@ -139,7 +147,7 @@ public class MainActivity extends AuthActivity {
     }
 
     private void refreshUserDataUi() {
-        User user = currentUser();
+        User user = AuthUtils.getCurrentUser();
         if (null != user) {
             profileUserName.setText(user.getDisplayName());
 
@@ -151,12 +159,14 @@ public class MainActivity extends AuthActivity {
             FacebookUtils.getAuthUserFriends(new FacebookFriendCallback() {
                 @Override
                 public void onSuccess(List<User> friends) {
+                    connectivityStatus.setVisibility(View.GONE);
+                    recyclerViewFriends.setVisibility(View.VISIBLE);
                     friendListAdapter.setFriends(friends);
                 }
 
                 @Override
                 public void onError(FacebookRequestError error) {
-                    connectivityStatus.setVisibility(View.VISIBLE);//TODO: check connection when open drawer
+                    connectivityStatus.setVisibility(View.VISIBLE);
                     recyclerViewFriends.setVisibility(View.GONE);
                 }
             });
@@ -173,20 +183,20 @@ public class MainActivity extends AuthActivity {
     }
 
     private void showMyWishList() {
-        this.selectedFriend = currentUser();
+        this.selectedFriend = AuthUtils.getCurrentUser();
         getSupportActionBar().setTitle(getResources().getString(R.string.my_wish_list));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             findViewById(R.id.appBar).setElevation(getResources().getDimension(R.dimen.toolbar_elevation));
         }
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_wish_list);
         if (fragment == null) {
-            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, currentUser());
+            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, selectedFriend);
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.container_wish_list, fragment)
                     .commit();
         } else if (!(fragment instanceof WishListFragment)) {
-            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, currentUser());
+            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, selectedFriend);
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.container_wish_list, fragment)
@@ -202,18 +212,34 @@ public class MainActivity extends AuthActivity {
         }
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_wish_list);
         if (fragment == null) {
-            fragment = TabbedWishListFragment.newInstance(friend);//TODO:
+            fragment = TabbedWishListFragment.newInstance(selectedFriend);
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.container_wish_list, fragment)
                     .commit();
         } else if (!(fragment instanceof TabbedWishListFragment)) {
-            fragment = TabbedWishListFragment.newInstance(friend);//TODO
+            fragment = TabbedWishListFragment.newInstance(selectedFriend);
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.container_wish_list, fragment)
                     .commit();
         }
+    }
+
+    public class ConnectionStateReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (ConnectionUtil.isConnected()) {
+                Toast.makeText(getApplicationContext(), "connected", Toast.LENGTH_SHORT).show();
+                refreshUserDataUi();
+            } else {
+                Toast.makeText(getApplicationContext(), "not connected", Toast.LENGTH_SHORT).show();
+                connectivityStatus.setVisibility(View.VISIBLE);
+                recyclerViewFriends.setVisibility(View.GONE);
+            }
+        }
+
     }
 
 }

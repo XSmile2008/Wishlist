@@ -12,7 +12,7 @@ import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
 import com.company.wishlist.events.FriendSelectedEvent;
 import com.company.wishlist.model.User;
-import com.company.wishlist.util.CropCircleTransformation;
+import com.company.wishlist.view.CropCircleTransformation;
 
 import org.greenrobot.eventbus.EventBus;
 

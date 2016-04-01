@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
+import com.company.wishlist.view.CropCircleTransformation;
 
 import java.io.IOException;
 import java.io.InputStream;

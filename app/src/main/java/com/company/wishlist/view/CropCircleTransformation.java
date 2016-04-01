@@ -1,4 +1,4 @@
-package com.company.wishlist.util;
+package com.company.wishlist.view;
 /*from w  ww.j  av  a2 s. co  m*/
 /**
  * Copyright (C) 2015 Wasabeef

@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/background_light"
-    android:orientation="vertical"
-    android:elevation="8dp">
+    android:elevation="8dp"
+    android:orientation="vertical">
 
     <!-- Drawer header-->
     <RelativeLayout
@@ -68,11 +68,22 @@
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:choiceMode="singleChoice"
         android:divider="@color/divider"
         android:dividerHeight="1dp"
         android:paddingTop="@dimen/default_padding_small" />
 
-    <include layout="@layout/connectivity_status" />
+    <FrameLayout
+        android:id="@+id/connectivity_status"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawableTop="@drawable/ic_perm_scan_wifi_grey_600_48dp"
+            android:text="@string/no_connection" />
+
+    </FrameLayout>
 
 </LinearLayout>

@@ -74,8 +74,6 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
 
     private SwipeLayout swipedItem;
 
-    private SocialSharing socialSharing;
-
     /**
      * @param context context that will be used in this adapter
      * @param mode    mode of this list. May be WISH_LIST_MODE or GIFT_LIST_MODE
@@ -84,8 +82,6 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
         this.context = context;
         this.rootView = rootView;
         this.mode = mode;
-
-        socialSharing = new SocialSharing(context);
 
         sections.add(new Section("Reserved by me"));
         sections.add(new Section("Not reserved"));
@@ -469,19 +465,6 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
                     if (layout.getDragEdge() == SwipeLayout.DragEdge.Left) {
                         Pair<Integer, Integer> pos = sections.getRelativePosition(getAdapterPosition());
                         removeWish(pos.first, pos.second);
-                    } else {
-//                        swipeLayout.setSwipeEnabled(false);//TODO
-//                        swipeLayout.setOnTouchListener(new View.OnTouchListener() {
-//                            @Override
-//                            public boolean onTouch(View v, MotionEvent event) {
-//                                if (event.getAction() == MotionEvent.ACTION_UP) {
-//                                    swipeLayout.setSwipeEnabled(true);
-//                                    swipeLayout.setOnTouchListener(null);
-//                                    Log.d("swipe", "unlocked");
-//                                }
-//                                return true;
-//                            }
-//                        });
                     }
                 }
 

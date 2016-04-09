@@ -10,7 +10,7 @@ import android.view.MotionEvent;
  */
 public class CustomViewPager extends ViewPager {
 
-    private boolean swiping = true;
+    private boolean mSwiping = true;
 
     public CustomViewPager(Context context) {
         super(context);
@@ -22,15 +22,15 @@ public class CustomViewPager extends ViewPager {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return this.swiping && super.onTouchEvent(event);
+        return this.mSwiping && super.onTouchEvent(event);
     }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        return this.swiping && super.onInterceptTouchEvent(event);
+        return this.mSwiping && super.onInterceptTouchEvent(event);
     }
 
     public void setSwiping(boolean enabled) {
-        this.swiping = enabled;
+        this.mSwiping = enabled;
     }
 }

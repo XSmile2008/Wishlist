@@ -28,11 +28,11 @@ import butterknife.ButterKnife;
  */
 public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Holder> {
 
-    private Context context;
-    private List<User> friends;
+    private Context mContext;
+    private List<User> mFriends;
 
     public FriendListAdapter(Context context, List<User> friends) {
-        this.context = context;
+        this.mContext = context;
         setFriends(friends);
     }
 
@@ -43,24 +43,24 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
 
     @Override
     public void onBindViewHolder(Holder holder, int position) {
-        Glide.with(context)
-                .load(friends.get(position).getAvatarURL())
+        Glide.with(mContext)
+                .load(mFriends.get(position).getAvatarURL())
                 .placeholder(R.drawable.ic_account_circle_80dp)
-                .bitmapTransform(new CropCircleTransformation(Glide.get(context).getBitmapPool()))
+                .bitmapTransform(new CropCircleTransformation(Glide.get(mContext).getBitmapPool()))
                 .into(holder.imageViewAvatar);
-        holder.textViewTitle.setText(friends.get(position).getDisplayName());
+        holder.textViewTitle.setText(mFriends.get(position).getDisplayName());
     }
 
     @Override
     public int getItemCount() {
-        return friends.size();
+        return mFriends.size();
     }
 
     public void setFriends(List<User> friends) {
         if (null == friends) {
             friends = new ArrayList<>();
         }
-        this.friends = friends;
+        this.mFriends = friends;
         Collections.sort(friends);
         notifyDataSetChanged();
     }
@@ -78,7 +78,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    User user = friends.get(getAdapterPosition());
+                    User user = mFriends.get(getAdapterPosition());
                     EventBus.getDefault().post(new FriendSelectedEvent(user));
                 }
             });

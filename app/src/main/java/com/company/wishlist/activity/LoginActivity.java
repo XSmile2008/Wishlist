@@ -1,7 +1,10 @@
 package com.company.wishlist.activity;
 
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.RotateDrawable;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -38,8 +41,8 @@ public class LoginActivity extends DebugActivity {
     private CallbackManager mFacebookCallbackManager;
     private AccessTokenTracker mFacebookAccessTokenTracker;
 
-    @Bind(R.id.coordinator_layout) CoordinatorLayout coordinatorLayout;
-    @Bind(R.id.custom_login_button) Button customLoginButton;
+    @Bind(R.id.coordinator_layout) CoordinatorLayout mCoordinatorLayout;
+    @Bind(R.id.custom_login_button) Button mCustomLoginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,14 +61,15 @@ public class LoginActivity extends DebugActivity {
         ButterKnife.bind(this);
 
         final Activity activity = this;//TODO: try remove this
-        customLoginButton.setOnClickListener(new View.OnClickListener() {
+        mCustomLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (ConnectionUtil.isConnected()) {
+                    setButtonProgressBarEnabled(true);
                     List<String> permissions = Collections.singletonList(getString(R.string.facebook_permissions));
                     LoginManager.getInstance().logInWithReadPermissions(activity, permissions);//TODO: may be use logInWithPublishPermissions
                 } else {
-                    Snackbar.make(coordinatorLayout, getString(R.string.no_internet_connection), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(mCoordinatorLayout, getString(R.string.no_internet_connection), Snackbar.LENGTH_LONG).show();
                 }
             }
         });
@@ -75,6 +79,7 @@ public class LoginActivity extends DebugActivity {
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
                 Log.i(TAG, "Facebook.AccessTokenTracker.OnCurrentAccessTokenChanged");
+                setButtonProgressBarEnabled(true);
                 AuthUtils.auth("facebook", currentAccessToken.getToken(), new AuthResultHandler());
             }
         };
@@ -90,7 +95,22 @@ public class LoginActivity extends DebugActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == 0) setButtonProgressBarEnabled(false);//TODO: check this result code
         mFacebookCallbackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void setButtonProgressBarEnabled(boolean enabled) {
+        if (enabled) {
+            RotateDrawable d = (RotateDrawable) getResources().getDrawable(R.drawable.spinner_24dp);
+            mCustomLoginButton.setCompoundDrawablesWithIntrinsicBounds(d, null, null, null);
+            ObjectAnimator animator = ObjectAnimator.ofInt(d, "level", 0, 100000);
+            animator.setRepeatCount(ObjectAnimator.INFINITE);
+            animator.setDuration(5000);
+            animator.start();
+        } else {
+            Drawable d = getResources().getDrawable(R.drawable.ic_facebook_icon);
+            mCustomLoginButton.setCompoundDrawablesWithIntrinsicBounds(d, null, null, null);
+        }
     }
 
     private class AuthResultHandler implements Firebase.AuthResultHandler {
@@ -103,6 +123,7 @@ public class LoginActivity extends DebugActivity {
 
         @Override
         public void onAuthenticationError(FirebaseError firebaseError) {
+            setButtonProgressBarEnabled(false);
             new AlertDialog.Builder(getApplicationContext())
                     .setTitle("Error")
                     .setMessage(firebaseError.getMessage())

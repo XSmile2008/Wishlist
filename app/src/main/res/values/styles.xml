@@ -29,7 +29,7 @@
     <!-- Base application theme end-->
 
     <!-- Login Page-->
-    <style name="AppTheme.LoginPage" parent="AppTheme">
+    <style name="AppTheme.LoginPage" parent="AppTheme.NoActionBar">
         <item name="colorButtonNormal">@color/com_facebook_button_background_color</item>
     </style>
 

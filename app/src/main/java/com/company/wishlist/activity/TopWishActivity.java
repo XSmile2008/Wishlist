@@ -29,10 +29,11 @@ import butterknife.OnClick;
 
 public class TopWishActivity extends DebugActivity {
 
+    private TopWishAdapter mAdapter;
+
     @Bind(R.id.text_view_loading) TextView mTextViewLoading;
     @Bind(R.id.recycler_view) RecyclerView mRecyclerView;
     @Bind(R.id.view_flipper) ViewFlipper mViewFlipper;
-    private TopWishAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -20,10 +20,8 @@ import butterknife.ButterKnife;
  */
 public class TabbedWishListFragment extends DebugFragment {
 
-    WishListPageViewAdapter wishListPageViewAdapter;
-
-    @Bind(R.id.tab_layout) TabLayout tabLayout;
-    @Bind(R.id.view_pager) CustomViewPager viewPager;
+    @Bind(R.id.tab_layout) TabLayout mTabLayout;
+    @Bind(R.id.view_pager) CustomViewPager mViewPager;
 
     public static TabbedWishListFragment newInstance(User friend) {
         Bundle args = new Bundle();
@@ -44,10 +42,9 @@ public class TabbedWishListFragment extends DebugFragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
         User user = (User) getArguments().getSerializable(User.class.getSimpleName());
-        wishListPageViewAdapter = new WishListPageViewAdapter(getChildFragmentManager(), user);
-        viewPager.setAdapter(wishListPageViewAdapter);
-        viewPager.setSwiping(false);
-        tabLayout.setupWithViewPager(viewPager);
+        mViewPager.setAdapter(new WishListPageViewAdapter(getChildFragmentManager(), user));
+        mViewPager.setSwiping(false);
+        mTabLayout.setupWithViewPager(mViewPager);
     }
 
 }

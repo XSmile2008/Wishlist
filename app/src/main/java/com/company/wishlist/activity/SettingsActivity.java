@@ -28,7 +28,7 @@ import com.twitter.sdk.android.core.identity.TwitterLoginButton;
  */
 public class SettingsActivity extends AuthActivity {
 
-    static TwitterLoginButton twitterLoginButton;
+    static TwitterLoginButton mTwitterLoginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,14 +47,14 @@ public class SettingsActivity extends AuthActivity {
         public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
-            twitterLoginButton = new TwitterLoginButton(getActivity());
+            mTwitterLoginButton = new TwitterLoginButton(getActivity());
 
             twitterPreference = getPreferenceManager()
                     .findPreference(getString(R.string.twitter_button_key));
 
             twitterPreference.setSummary(TwitterUtils.userName());
 
-            twitterLoginButton.setCallback(new Callback<TwitterSession>() {
+            mTwitterLoginButton.setCallback(new Callback<TwitterSession>() {
                 @Override
                 public void success(Result<TwitterSession> result) {
                     twitterPreference.setSummary(String.format("%s", result.data.getUserName()));
@@ -97,7 +97,7 @@ public class SettingsActivity extends AuthActivity {
 
         private void actionTwitterAuth() {
             if (!TwitterUtils.isConnected()) {
-                twitterLoginButton.performClick();
+                mTwitterLoginButton.performClick();
             } else {
                 DialogUtil.alertShow("Logout from Twitter", "Are you sure?", getActivity(), new DialogInterface.OnClickListener() {
                     @Override
@@ -140,7 +140,7 @@ public class SettingsActivity extends AuthActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        twitterLoginButton.onActivityResult(requestCode, resultCode, data);
+        mTwitterLoginButton.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

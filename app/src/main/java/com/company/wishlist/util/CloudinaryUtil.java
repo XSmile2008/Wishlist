@@ -98,10 +98,10 @@ public class CloudinaryUtil {
     //TODO: try use loaders
     private static class AsyncUploader extends AsyncTask<Object, Void, Void> {
 
-        IOnDoneListener listener;
+        private IOnDoneListener mListener;
 
         public AsyncUploader(@Nullable IOnDoneListener listener) {
-            this.listener = listener;
+            this.mListener = listener;
         }
 
         @Override
@@ -109,7 +109,7 @@ public class CloudinaryUtil {
             try {
                 Map options = ObjectUtils.emptyMap();
                 Map map = CloudinaryUtil.getInstance().uploader().upload(params[0], options);
-                if (listener != null) listener.onDone(map);
+                if (mListener != null) mListener.onDone(map);
             } catch (IOException e) {
                 e.printStackTrace();
             }

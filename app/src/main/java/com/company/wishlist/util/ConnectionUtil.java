@@ -10,14 +10,14 @@ import android.net.NetworkInfo;
  */
 public class ConnectionUtil {
 
-    private static Context context;
+    private static Context mContext;
 
     public ConnectionUtil(Context context) {
-        ConnectionUtil.context = context;
+        ConnectionUtil.mContext = context;
     }
 
     public static boolean isConnected() {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }

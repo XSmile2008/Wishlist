@@ -26,19 +26,19 @@ import butterknife.ButterKnife;
  */
 public class BottomSheetShareDialog extends BottomSheetDialog {
 
-    SocialSharing socialSharing;
-    Menu menu;
-    final String message;
+    private SocialSharing mSocialSharing;
+    private Menu mMenu;
+    private final String mMessage;
 
     public BottomSheetShareDialog(Context context, String message) {
         super(context);
         setContentView(R.layout.dialog_share);
-        this.message = message;
-        this.socialSharing = new SocialSharing(context);
-        this.menu = new MenuBuilder(context);
-        ((AppCompatActivity) context).getMenuInflater().inflate(R.menu.menu_social_share, menu);
+        this.mMessage = message;
+        this.mSocialSharing = new SocialSharing(context);
+        this.mMenu = new MenuBuilder(context);
+        ((AppCompatActivity) context).getMenuInflater().inflate(R.menu.menu_social_share, mMenu);
         if (!TwitterUtils.isConnected()) {//TODO: enable/disable other share methods, make more elegant solution
-            menu.removeItem(R.id.action_twitter);
+            mMenu.removeItem(R.id.action_twitter);
         }
 
         ShareDialogAdapter adapter = new ShareDialogAdapter();
@@ -56,13 +56,13 @@ public class BottomSheetShareDialog extends BottomSheetDialog {
 
         @Override
         public void onBindViewHolder(Holder holder, int position) {
-            holder.imageViewIcon.setImageDrawable(menu.getItem(position).getIcon());
-            holder.textViewTitle.setText(menu.getItem(position).getTitle());
+            holder.imageViewIcon.setImageDrawable(mMenu.getItem(position).getIcon());
+            holder.textViewTitle.setText(mMenu.getItem(position).getTitle());
         }
 
         @Override
         public int getItemCount() {
-            return menu.size();
+            return mMenu.size();
         }
 
         public class Holder extends RecyclerView.ViewHolder {
@@ -76,16 +76,16 @@ public class BottomSheetShareDialog extends BottomSheetDialog {
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        switch (menu.getItem(getAdapterPosition()).getItemId()) {
+                        switch (mMenu.getItem(getAdapterPosition()).getItemId()) {
                             case R.id.action_facebook:
-                                socialSharing.setShareStrategy(new FacebookSharing());
+                                mSocialSharing.setShareStrategy(new FacebookSharing());
                                 break;
                             case R.id.action_twitter:
-                                socialSharing.setShareStrategy(new TwitterSharing());
+                                mSocialSharing.setShareStrategy(new TwitterSharing());
                                 break;
                         }
-                        socialSharing.setMessage(new String(message));//TODO: fix this bug
-                        socialSharing.share();
+                        mSocialSharing.setMessage(new String(mMessage));//TODO: fix this bug
+                        mSocialSharing.share();
                         hide();
                     }
                 });

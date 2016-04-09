@@ -53,11 +53,11 @@ public class MainActivity extends DebugActivity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    private ConnectionStateReceiver receiver = new ConnectionStateReceiver();
+    private ConnectionStateReceiver mReceiver = new ConnectionStateReceiver();
 
-    private FriendListAdapter friendListAdapter;
+    private FriendListAdapter mFriendListAdapter;
 
-    private User selectedFriend;
+    private User mSelectedFriend;
 
     //NavigationDrawer
     @Nullable DrawerLayout drawer;
@@ -85,9 +85,9 @@ public class MainActivity extends DebugActivity {
         }
 
         //Setup friend list in drawer
-        friendListAdapter = new FriendListAdapter(this, new ArrayList<User>());
+        mFriendListAdapter = new FriendListAdapter(this, new ArrayList<User>());
         recyclerViewFriends.setLayoutManager(new LinearLayoutManager(this));
-        recyclerViewFriends.setAdapter(friendListAdapter);
+        recyclerViewFriends.setAdapter(mFriendListAdapter);
         recyclerViewFriends.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).build());
 
         //Start service
@@ -115,21 +115,21 @@ public class MainActivity extends DebugActivity {
     public void onResume() {
         super.onResume();
         EventBus.getDefault().register(this);
-        registerReceiver(receiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+        registerReceiver(mReceiver, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
         refreshUserDataUi();//TODO: saveInstanceState
     }
 
     @Override
     public void onPause() {
         EventBus.getDefault().unregister(this);
-        unregisterReceiver(receiver);
+        unregisterReceiver(mReceiver);
         super.onPause();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable(User.class.getSimpleName(), this.selectedFriend);
+        outState.putSerializable(User.class.getSimpleName(), this.mSelectedFriend);
     }
 
     @OnClick({R.id.header_layout, R.id.button_settings})
@@ -154,6 +154,7 @@ public class MainActivity extends DebugActivity {
             Glide.with(this)
                     .load(user.getAvatarURL())
                     .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
+                    .placeholder(R.drawable.ic_account_circle_80dp)
                     .into(userAvatarView);
 
             FacebookUtils.getAuthUserFriends(new FacebookFriendCallback() {
@@ -161,7 +162,7 @@ public class MainActivity extends DebugActivity {
                 public void onSuccess(List<User> friends) {
                     connectivityStatus.setVisibility(View.GONE);
                     recyclerViewFriends.setVisibility(View.VISIBLE);
-                    friendListAdapter.setFriends(friends);
+                    mFriendListAdapter.setFriends(friends);
                 }
 
                 @Override
@@ -183,20 +184,20 @@ public class MainActivity extends DebugActivity {
     }
 
     private void showMyWishList() {
-        this.selectedFriend = AuthUtils.getCurrentUser();
+        this.mSelectedFriend = AuthUtils.getCurrentUser();
         getSupportActionBar().setTitle(getResources().getString(R.string.my_wish_list));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             findViewById(R.id.appBar).setElevation(getResources().getDimension(R.dimen.toolbar_elevation));
         }
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_wish_list);
         if (fragment == null) {
-            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, selectedFriend);
+            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, mSelectedFriend);
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.container_wish_list, fragment)
                     .commit();
         } else if (!(fragment instanceof WishListFragment)) {
-            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, selectedFriend);
+            fragment = WishListFragment.newInstance(WishListFragment.MY_WISH_LIST_MODE, mSelectedFriend);
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.container_wish_list, fragment)
@@ -205,20 +206,20 @@ public class MainActivity extends DebugActivity {
     }
 
     private void showFriendWishList(User friend) {
-        this.selectedFriend = friend;
+        this.mSelectedFriend = friend;
         getSupportActionBar().setTitle(friend.getDisplayName());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             findViewById(R.id.appBar).setElevation(0);
         }
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container_wish_list);
         if (fragment == null) {
-            fragment = TabbedWishListFragment.newInstance(selectedFriend);
+            fragment = TabbedWishListFragment.newInstance(mSelectedFriend);
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.container_wish_list, fragment)
                     .commit();
         } else if (!(fragment instanceof TabbedWishListFragment)) {
-            fragment = TabbedWishListFragment.newInstance(selectedFriend);
+            fragment = TabbedWishListFragment.newInstance(mSelectedFriend);
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.container_wish_list, fragment)

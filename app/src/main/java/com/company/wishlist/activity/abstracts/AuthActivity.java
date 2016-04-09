@@ -13,8 +13,6 @@ public abstract class AuthActivity extends DebugActivity {
 
     public static final String RELOAD_DATA = "RELOAD_DATA";
 
-    private ConnectionUtil connection = new ConnectionUtil(this);
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,10 +47,6 @@ public abstract class AuthActivity extends DebugActivity {
             startActivity(intent);
             finish();
         }
-    }
-
-    public User currentUser() {
-        return AuthUtils.getCurrentUser();
     }
 
     public boolean isAuth() {

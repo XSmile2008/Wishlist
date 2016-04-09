@@ -21,21 +21,21 @@ public class AuthUtils {
 
     private final static String USER_PREFS = "USER_DATA";
     private final static String FIRST_OPEN = "FIRST_OPEN";
-    private static Firebase firebase = FirebaseRoot.get();
-    private static User currentUser;
-    private static AuthData data;
-    private static Context context;
+    private static Firebase sFirebase = FirebaseRoot.get();
+    private static User sCurrentUser;
+    private static AuthData sData;
+    private static Context sContext;
 
     public static void setAndroidContext(Context context) {
-        AuthUtils.context = context;
-        data = firebase.getAuth();
+        AuthUtils.sContext = context;
+        sData = sFirebase.getAuth();
     }
 
     public static void auth(String provider, String token, final Firebase.AuthResultHandler handler) {
-        firebase.authWithOAuthToken(provider, token, new Firebase.AuthResultHandler() {
+        sFirebase.authWithOAuthToken(provider, token, new Firebase.AuthResultHandler() {
             @Override
             public void onAuthenticated(AuthData authData) {
-                data = authData;
+                sData = authData;
                 saveUser(authData);
                 handler.onAuthenticated(authData);
             }
@@ -48,33 +48,33 @@ public class AuthUtils {
     }
 
     public static void refreshAuthData() {
-        data = firebase.getAuth();
-        saveUser(data);
+        sData = sFirebase.getAuth();
+        saveUser(sData);
     }
 
     private static void saveUser(AuthData authData) {
-        currentUser = FacebookUtils.build(authData);
-        User.getFirebaseRef().child(currentUser.getId()).setValue(currentUser);
-        saveUserToPreferences(currentUser);
+        sCurrentUser = FacebookUtils.build(authData);
+        User.getFirebaseRef().child(sCurrentUser.getId()).setValue(sCurrentUser);
+        saveUserToPreferences(sCurrentUser);
     }
 
     public static void unauth() {
-        firebase.unauth();
-        data = firebase.getAuth();//TODO: check it
+        sFirebase.unauth();
+        sData = sFirebase.getAuth();//TODO: check it
         LoginManager.getInstance().logOut();
         clearPreferences();
         Twitter.logOut();
     }
 
     public static User getCurrentUser() {
-        if (currentUser == null) {
+        if (sCurrentUser == null) {
             try {
                 return getUserFromPreferences();
             } catch (UserNotFoundException e) {
                 return FacebookUtils.getUserFromProfile();
             }
         } else {
-            return currentUser;
+            return sCurrentUser;
         }
     }
 
@@ -87,11 +87,11 @@ public class AuthUtils {
     }
 
     private static boolean isTokenExpired() {
-        return (data == null || isExpired(data.getExpires()));
+        return (sData == null || isExpired(sData.getExpires()));
     }
 
     private static SharedPreferences getSharedPreferences() {
-        return PreferenceManager.getDefaultSharedPreferences(context);
+        return PreferenceManager.getDefaultSharedPreferences(sContext);
     }
 
     private static void saveUserToPreferences(User user) {
@@ -110,17 +110,17 @@ public class AuthUtils {
     }
 
     private static void clearPreferences() {
-        PreferenceManager.getDefaultSharedPreferences(context)
+        PreferenceManager.getDefaultSharedPreferences(sContext)
                 .edit().clear();
     }
 
     public static void firstOpen() {
-        PreferenceManager.getDefaultSharedPreferences(context)
+        PreferenceManager.getDefaultSharedPreferences(sContext)
                 .edit().putBoolean(FIRST_OPEN, false).commit();
     }
 
     public static boolean isFirstOpen() {
-        return PreferenceManager.getDefaultSharedPreferences(context)
+        return PreferenceManager.getDefaultSharedPreferences(sContext)
                 .getBoolean(FIRST_OPEN, true);
     }
 }

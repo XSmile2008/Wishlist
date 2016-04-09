@@ -25,18 +25,18 @@ import butterknife.OnClick;
 
 public class TopWishAdapter extends RecyclerView.Adapter<TopWishAdapter.Holder> {
 
-    private Context context;
-    private IndexedHashSet<Wish> wishes;
-    private WishList wishList;
+    private Context mContext;
+    private IndexedHashSet<Wish> mWishes;
+    private WishList mWishList;
 
     public TopWishAdapter(Context context, WishList wishList) {
-        this.context = context;
-        this.wishes = new IndexedHashSet<>();
-        this.wishList = wishList;
+        this.mContext = context;
+        this.mWishes = new IndexedHashSet<>();
+        this.mWishList = wishList;
     }
 
     private Wish getByIndex(int index) {
-        return wishes.get(index);
+        return mWishes.get(index);
     }
 
     @Override
@@ -51,12 +51,12 @@ public class TopWishAdapter extends RecyclerView.Adapter<TopWishAdapter.Holder> 
 
     @Override
     public int getItemCount() {
-        return wishes.size();
+        return mWishes.size();
     }
 
     public void addAll(List<Wish> wishes) {
-        this.wishes.clear();
-        this.wishes.addAll(wishes);
+        this.mWishes.clear();
+        this.mWishes.addAll(wishes);
         notifyDataSetChanged();
     }
 
@@ -72,20 +72,20 @@ public class TopWishAdapter extends RecyclerView.Adapter<TopWishAdapter.Holder> 
         }
 
         public void onBind(Wish wish) {
-            CloudinaryUtil.loadThumb(context, imageView, wish.getPicture(), R.drawable.gift_icon, true);
+            CloudinaryUtil.loadThumb(mContext, imageView, wish.getPicture(), R.drawable.gift_icon, true);
             textViewTitle.setText(wish.getTitle());
             textViewComment.setText(wish.getComment());
         }
 
         @OnClick(R.id.layout_header)
         public void onClick() {
-            Intent intent = new Intent(context, WishEditActivity.class)
+            Intent intent = new Intent(mContext, WishEditActivity.class)
                     .setAction(WishEditActivity.ACTION_TAKE_FROM_TOP)
-                    .putExtra(WishList.class.getSimpleName(), wishList)
+                    .putExtra(WishList.class.getSimpleName(), mWishList)
                     .putExtra(Wish.class.getSimpleName(), getByIndex(getAdapterPosition()))
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            context.startActivity(intent);
-            ((TopWishActivity)context).finish();
+            mContext.startActivity(intent);
+            ((TopWishActivity) mContext).finish();
         }
 
     }

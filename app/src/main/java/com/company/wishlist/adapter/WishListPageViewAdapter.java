@@ -15,29 +15,29 @@ import java.util.List;
  */
 public class WishListPageViewAdapter extends FragmentStatePagerAdapter {
 
-    private static final String[] tabs = {"Wish list", "Gift list"};
+    private static final String[] TABS = {"Wish list", "Gift list"};
 
-    private List<Fragment> fragments = new ArrayList<>(tabs.length);
+    private List<Fragment> mFragments = new ArrayList<>(TABS.length);
 
     public WishListPageViewAdapter(FragmentManager fm, User friend) {
         super(fm);
-        fragments.add(WishListFragment.newInstance(WishListFragment.WISH_LIST_MODE, friend));
-        fragments.add(WishListFragment.newInstance(WishListFragment.GIFT_LIST_MODE, friend));
+        mFragments.add(WishListFragment.newInstance(WishListFragment.WISH_LIST_MODE, friend));
+        mFragments.add(WishListFragment.newInstance(WishListFragment.GIFT_LIST_MODE, friend));
     }
 
     @Override
     public Fragment getItem(int position) {
-        return fragments.get(position);
+        return mFragments.get(position);
     }
 
     @Override
     public int getCount() {
-        return tabs.length;
+        return TABS.length;
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return tabs[position];
+        return TABS[position];
     }
 
 }

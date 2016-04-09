@@ -31,10 +31,11 @@ public class ImageSearchActivity extends DebugActivity implements ImageSearchAda
     public static final String RESULT_DATA = "com.company.wishlist.activity.RESULT_DATA";
     private static final String RESULT_ITEMS = "RESULT_ITEMS";
 
+    private ImageSearchAdapter mImageSearchAdapter;
+
     @Bind(R.id.text_view_loading) TextView mTextViewLoading;
     @Bind(R.id.recycler_view) RecyclerView mRecyclerView;
     @Bind(R.id.view_flipper) ViewFlipper mViewFlipper;
-    ImageSearchAdapter mImageSearchAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

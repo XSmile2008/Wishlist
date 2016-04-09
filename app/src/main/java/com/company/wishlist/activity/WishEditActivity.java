@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialog;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -67,30 +66,27 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
     public static final String ACTION_TAKE_FROM_TOP = "com.company.wishlist.ACTION_TAKE_FROM_TOP";
 
     @Bind(R.id.image_view)
-    ImageView imageView;
+    ImageView mImageView;
 
     @Bind(R.id.edit_text_title)
     @NotEmpty
     @Length(min = 1)
-    EditText editTextTitle;
+    EditText mEditTextTitle;
 
     @Bind(R.id.edit_text_comment)
     @NotEmpty
     @Length(min = 2)
-    EditText editTextComment;
+    EditText mEditTextComment;
 
     @Bind(R.id.coordinator_layout)
-    CoordinatorLayout coordinatorLayout;
-
-    @Bind(R.id.collapsing_toolbar)
-    CollapsingToolbarLayout collapsingToolbarLayout;
+    CoordinatorLayout mCoordinatorLayout;
 
     @Bind(R.id.fab)
-    FloatingActionButton fab;
+    FloatingActionButton mFab;
 
-    private EditWishBean editWishBean;//TODO: test if edit wish bean contains correct data after screen rotate
-    private Validator validator;
-    private CalendarDatePickerDialogFragment reservedDateDialog;
+    private EditWishBean mEditWishBean;//TODO: test if edit wish bean contains correct data after screen rotate
+    private Validator mValidator;
+    private CalendarDatePickerDialogFragment mReservedDateDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,39 +102,39 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
         actionBar.setTitle(getIntent().getAction().equals(ACTION_CREATE) ? "New wish" : "Edit wish");
 
         //Setup validator
-        validator = new Validator(this);
-        validator.setValidationListener(this);
+        mValidator = new Validator(this);
+        mValidator.setValidationListener(this);
 
         //Init reserve date picker
-        reservedDateDialog = new CalendarDatePickerDialogFragment();
-        reservedDateDialog.setFirstDayOfWeek(Calendar.MONDAY);
-        reservedDateDialog.setRetainInstance(true);
-        reservedDateDialog.setDateRange(DateUtil.getToday(), null);
+        mReservedDateDialog = new CalendarDatePickerDialogFragment();
+        mReservedDateDialog.setFirstDayOfWeek(Calendar.MONDAY);
+        mReservedDateDialog.setRetainInstance(true);
+        mReservedDateDialog.setDateRange(DateUtil.getToday(), null);
 
         //Get wish and wishlist
         Wish wish = (Wish) getIntent().getSerializableExtra(Wish.class.getSimpleName());
         WishList wishList = (WishList) getIntent().getSerializableExtra(WishList.class.getSimpleName());
-        editWishBean = new EditWishBean(wish);
+        mEditWishBean = new EditWishBean(wish);
 
         //Init fields and image
-        editTextTitle.setText(editWishBean.getTitle());
-        editTextComment.setText(editWishBean.getComment());
-        if (editWishBean.hasPicture()) {//TODO: load optimized image
+        mEditTextTitle.setText(mEditWishBean.getTitle());
+        mEditTextComment.setText(mEditWishBean.getComment());
+        if (mEditWishBean.hasPicture()) {//TODO: load optimized image
             Glide.with(this)
-                    .load(CloudinaryUtil.getInstance().url().generate(editWishBean.getPicture()))
+                    .load(CloudinaryUtil.getInstance().url().generate(mEditWishBean.getPicture()))
                     .crossFade()
-                    .into(imageView);
+                    .into(mImageView);
         } else {
-            imageView.setImageResource(R.drawable.wish_header);
+            mImageView.setImageResource(R.drawable.wish_header);
         }
 
         //Init bean
         switch (getIntent().getAction()) {
             case ACTION_CREATE:
-                editWishBean.setWishListId(wishList.getId());
+                mEditWishBean.setWishListId(wishList.getId());
                 break;
             case ACTION_READ:
-                fab.setVisibility(View.GONE);
+                mFab.setVisibility(View.GONE);
                 ActionMode.Callback callback = new ActionMode.Callback() {//TODO: temporally will be like this, ask a question on next lesson
                     @Override
                     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -163,17 +159,17 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
                     }
 
                 };
-                editTextTitle.setInputType(InputType.TYPE_NULL);
-                editTextTitle.setTextIsSelectable(true);
-                editTextTitle.setCustomSelectionActionModeCallback(callback);
-                editTextComment.setInputType(InputType.TYPE_NULL);
-                editTextComment.setTextIsSelectable(true);
-                editTextComment.setMinLines(8);
-                editTextComment.setCustomSelectionActionModeCallback(callback);
+                mEditTextTitle.setInputType(InputType.TYPE_NULL);
+                mEditTextTitle.setTextIsSelectable(true);
+                mEditTextTitle.setCustomSelectionActionModeCallback(callback);
+                mEditTextComment.setInputType(InputType.TYPE_NULL);
+                mEditTextComment.setTextIsSelectable(true);
+                mEditTextComment.setMinLines(8);
+                mEditTextComment.setCustomSelectionActionModeCallback(callback);
                 break;
             case ACTION_TAKE_FROM_TOP:
-                editWishBean.setId(null);
-                editWishBean.setWishListId(wishList.getId());
+                mEditWishBean.setId(null);
+                mEditWishBean.setWishListId(wishList.getId());
                 break;
         }
     }
@@ -183,7 +179,7 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_wish_edit, menu);
         menu.findItem(R.id.action_delete).setVisible(getIntent().getAction().equals(ACTION_EDIT));
-        if (editWishBean.isReserved() && !editWishBean.getReservation().getByUser().equals(AuthUtils.getCurrentUser().getId())) {
+        if (mEditWishBean.isReserved() && !mEditWishBean.getReservation().getByUser().equals(AuthUtils.getCurrentUser().getId())) {
             menu.findItem(R.id.action_reserve).setVisible(false);
         }
         return true;
@@ -196,7 +192,7 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
                 onBackPressed();
                 return false;
             case R.id.action_done:
-                validator.validate();
+                mValidator.validate();
                 return false;
             case R.id.action_reserve:
                 reserveWish();
@@ -205,7 +201,7 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
                 deleteWish();
                 return false;
             case R.id.action_share:
-                final String message = getString(R.string.message_default_tweet_wish, editWishBean.getTitle());
+                final String message = getString(R.string.message_default_tweet_wish, mEditWishBean.getTitle());
                 BottomSheetDialog bottomSheetDialog = new BottomSheetShareDialog(this, message);
                 bottomSheetDialog.show();
         }
@@ -247,20 +243,20 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
      */
 
     private void reserveWish() {
-        if (!editWishBean.isReserved()) {
-            reservedDateDialog.setOnDateSetListener(new CalendarDatePickerDialogFragment.OnDateSetListener() {
+        if (!mEditWishBean.isReserved()) {
+            mReservedDateDialog.setOnDateSetListener(new CalendarDatePickerDialogFragment.OnDateSetListener() {
                 @Override
                 public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
-                    editWishBean.setReservation(new Reservation(AuthUtils.getCurrentUser().getId(), dialog.getSelectedDay().getDateInMillis()));
-                    Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " reserved", Toast.LENGTH_SHORT).show();
+                    mEditWishBean.setReservation(new Reservation(AuthUtils.getCurrentUser().getId(), dialog.getSelectedDay().getDateInMillis()));
+                    Toast.makeText(getApplicationContext(), "wish " + mEditWishBean.getTitle() + " reserved", Toast.LENGTH_SHORT).show();
                 }
             });
-            reservedDateDialog.show(getSupportFragmentManager(), DATE_DIALOG);
+            mReservedDateDialog.show(getSupportFragmentManager(), DATE_DIALOG);
         } else {
             DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.message_unreserve), this, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    editWishBean.setReservation(null);
-                    Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " unreserved", Toast.LENGTH_SHORT).show();
+                    mEditWishBean.setReservation(null);
+                    Toast.makeText(getApplicationContext(), "wish " + mEditWishBean.getTitle() + " unreserved", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -269,8 +265,8 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
     private void deleteWish() {
         DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.message_remove_wish_dialog), this, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                editWishBean.softRemove();
-                Toast.makeText(getApplicationContext(), "wish " + editWishBean.getTitle() + " deleted", Toast.LENGTH_SHORT).show();
+                mEditWishBean.softRemove();
+                Toast.makeText(getApplicationContext(), "wish " + mEditWishBean.getTitle() + " deleted", Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
@@ -279,25 +275,25 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
 
     private void commitChanges() {
         if (!getIntent().getAction().equals(ACTION_READ)) {
-            if (editWishBean.getOriginal() != null && editWishBean.getOriginal().hasPicture() && editWishBean.isPictureChanged()) {
-                CloudinaryUtil.destroy(editWishBean.getOriginal().getPicture());//destroy old image on cloud
+            if (mEditWishBean.getOriginal() != null && mEditWishBean.getOriginal().hasPicture() && mEditWishBean.isPictureChanged()) {
+                CloudinaryUtil.destroy(mEditWishBean.getOriginal().getPicture());//destroy old image on cloud
             }
-            editWishBean.setComment(editTextComment.getText().toString().trim());
-            editWishBean.setTitle(editTextTitle.getText().toString().trim());
+            mEditWishBean.setComment(mEditTextComment.getText().toString().trim());
+            mEditWishBean.setTitle(mEditTextTitle.getText().toString().trim());
         }
         if (getIntent().getAction().equals(ACTION_CREATE) || getIntent().getAction().equals(ACTION_TAKE_FROM_TOP)) {
-            editWishBean.push();
+            mEditWishBean.push();
         } else  {
-            Wish.getFirebaseRef().child(editWishBean.getId()).updateChildren(editWishBean.toMap());
+            Wish.getFirebaseRef().child(mEditWishBean.getId()).updateChildren(mEditWishBean.toMap());
         }
-        Toast.makeText(this, editWishBean.getTitle(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, mEditWishBean.getTitle(), Toast.LENGTH_SHORT).show();
         finish();
     }
 
     private void share() {
 //        if (TwitterUtils.isConnected() && twitterChekbox.isChecked()) {
 //            if (ConnectionUtil.isConnected()) {
-//                SocialShareUtils.ref().share(String.format("I have a new wish, it is %s!", editWishBean.getTitle()), social, new ShareStrategy.SharingCallback() {
+//                SocialShareUtils.ref().share(String.format("I have a new wish, it is %s!", mEditWishBean.getTitle()), social, new ShareStrategy.SharingCallback() {
 //                    @Override
 //                    public void success() {
 //                        Toast.makeText(getApplicationContext(), "Tweet successful published",
@@ -317,8 +313,8 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
     }
 
     private void discardChanges() {
-        if (editWishBean.isPictureChanged()) {
-            CloudinaryUtil.destroy(editWishBean.getPicture());//destroy new image on cloud
+        if (mEditWishBean.isPictureChanged()) {
+            CloudinaryUtil.destroy(mEditWishBean.getPicture());//destroy new image on cloud
         }
     }
 
@@ -331,12 +327,12 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
         if (ConnectionUtil.isConnected()) {
             switch (view.getId()) {
                 case R.id.fab:
-                    String query = editTextTitle.getText().toString().trim();
+                    String query = mEditTextTitle.getText().toString().trim();
                     if (query.isEmpty()) {
-                        Snackbar.make(coordinatorLayout, "Wish title should be not empty!", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(mCoordinatorLayout, "Wish title should be not empty!", Snackbar.LENGTH_SHORT).show();
                     } else {
                         Intent intent = new Intent(this, ImageSearchActivity.class);
-                        intent.putExtra(ImageSearchActivity.QUERY, editTextTitle.getText().toString());
+                        intent.putExtra(ImageSearchActivity.QUERY, mEditTextTitle.getText().toString());
                         startActivityForResult(intent, RESULT_IMAGE_SELECT);
                     }
                     break;
@@ -347,7 +343,7 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
 //                    break;
             }
         } else {
-            Snackbar.make(coordinatorLayout, getResources().getString(R.string.no_connection), Snackbar.LENGTH_LONG).show();
+            Snackbar.make(mCoordinatorLayout, getResources().getString(R.string.no_connection), Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -365,14 +361,14 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                if (editWishBean.isPictureChanged() && editWishBean.hasPicture()) {
-                                    CloudinaryUtil.destroy(editWishBean.getPicture());//if user pick image second time destroy old
+                                if (mEditWishBean.isPictureChanged() && mEditWishBean.hasPicture()) {
+                                    CloudinaryUtil.destroy(mEditWishBean.getPicture());//if user pick image second time destroy old
                                 }
-                                editWishBean.setPicture((String) imgInfo.get("public_id"));
+                                mEditWishBean.setPicture((String) imgInfo.get("public_id"));
                                 Glide.with(getApplicationContext()) //TODO: load optimized image
-                                        .load(CloudinaryUtil.getInstance().url().generate(editWishBean.getPicture()))
+                                        .load(CloudinaryUtil.getInstance().url().generate(mEditWishBean.getPicture()))
                                         .crossFade()
-                                        .into(imageView);
+                                        .into(mImageView);
                             }
                         });
                     }
@@ -391,7 +387,7 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
                     Snackbar.make(findViewById(R.id.coordinator_layout), e.getMessage(), Snackbar.LENGTH_SHORT);
                 }
             } else {
-                Snackbar.make(coordinatorLayout, getResources().getString(R.string.no_connection), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(mCoordinatorLayout, getResources().getString(R.string.no_connection), Snackbar.LENGTH_LONG).show();
             }
         }
     }

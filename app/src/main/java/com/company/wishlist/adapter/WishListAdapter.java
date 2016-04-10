@@ -29,12 +29,9 @@ import com.company.wishlist.model.WishList;
 import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.CloudinaryUtil;
 import com.company.wishlist.util.DateUtil;
-
-import com.company.wishlist.util.social.share.SocialSharing;
 import com.company.wishlist.view.BottomSheetShareDialog;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
-
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
@@ -422,32 +419,22 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
      * Holders start
      */
 
-    public class Holder extends RecyclerView.ViewHolder {
+    public class Holder extends RecyclerView.ViewHolder implements SwipeLayout.SwipeListener{
 
-        @Bind(R.id.swipe_layout)
-        SwipeLayout swipeLayout;
+        @Bind(R.id.swipe_layout) SwipeLayout swipeLayout;
 
         //CardView
-        @Bind(R.id.card_view)
-        CardView cardView;
-        @Bind(R.id.image_view)
-        ImageView imageView;
-        @Bind(R.id.text_view_title)
-        TextView textViewTitle;
-        @Bind(R.id.text_view_comment)
-        TextView textViewComment;
-        @Bind(R.id.text_view_status)
-        TextView textViewStatus;
+        @Bind(R.id.card_view) CardView cardView;
+        @Bind(R.id.image_view) ImageView imageView;
+        @Bind(R.id.text_view_title) TextView textViewTitle;
+        @Bind(R.id.text_view_comment) TextView textViewComment;
+        @Bind(R.id.text_view_status) TextView textViewStatus;
 
         //Background
-        @Bind(R.id.bottom_view_remove)
-        ViewGroup bottomViewRemove;
-        @Bind(R.id.bottom_view_reserve)
-        ViewGroup bottomViewReserve;
-        @Bind(R.id.button_reserve)
-        Button buttonReserve;
-        @Bind(R.id.button_share)
-        Button buttonShare;
+        @Bind(R.id.bottom_view_remove) ViewGroup bottomViewRemove;
+        @Bind(R.id.bottom_view_reserve) ViewGroup bottomViewReserve;
+        @Bind(R.id.button_reserve) Button buttonReserve;
+        @Bind(R.id.button_share) Button buttonShare;
 
         public Holder(View itemView) {
             super(itemView);
@@ -458,47 +445,10 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
             swipeLayout.addDrag(SwipeLayout.DragEdge.Right, bottomViewReserve);
             if (mode == WishListFragment.GIFT_LIST_MODE)
                 swipeLayout.addDrag(SwipeLayout.DragEdge.Left, bottomViewRemove);
-            swipeLayout.addSwipeListener(new SimpleSwipeListener() {
-                @Override
-                public void onOpen(SwipeLayout layout) {
-//                    Log.d("swipe", "onOpen");
-                    if (layout.getDragEdge() == SwipeLayout.DragEdge.Left) {
-                        Pair<Integer, Integer> pos = sections.getRelativePosition(getAdapterPosition());
-                        removeWish(pos.first, pos.second);
-                    }
-                }
-
-                @Override
-                public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
-//                    Log.d("swipe", "onUpdate");
-                    float alpha = Math.abs((float) leftOffset / (float) bottomViewReserve.getWidth());//TODO:
-                    layout.getCurrentBottomView().setAlpha(alpha);
-                }
-
-                @Override
-                public void onStartOpen(SwipeLayout layout) {
-//                    Log.e("swipe", "onStartOpen");
-                    if (swipedItem != null && !swipeLayout.equals(swipedItem)) {
-                        swipedItem.close();
-                    }
-                    swipedItem = swipeLayout;
-                    if (layout.getDragEdge() == SwipeLayout.DragEdge.Right) {
-                        Pair<Integer, Integer> pos = sections.getRelativePosition(getAdapterPosition());
-                        buttonReserve.setText(sections.get(pos.first).get(pos.second).isReserved() ? R.string.action_unreserve : R.string.action_reserve);
-                    }
-                }
-
-                @Override
-                public void onClose(SwipeLayout layout) {
-//                    Log.d("swipe", "onClose");
-                    if (swipeLayout.equals(swipedItem)) swipedItem = null;
-                }
-
-            });
+            swipeLayout.addSwipeListener(this);
         }
 
         public void onBind(int section, int relativePosition) {
-
             Wish wish = sections.get(section).get(relativePosition);
 
             CloudinaryUtil.loadThumb(context, imageView, wish.getPicture(), R.drawable.gift_icon, true);
@@ -507,27 +457,30 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
             textViewComment.setText(wish.getComment());
 
             if (wish.isReserved()) {
+                buttonReserve.setText(R.string.action_unreserve);
                 if (wish.getReservation().getByUser().equals(AuthUtils.getCurrentUser().getId())) {
-                    textViewStatus.setText(R.string.reserved_by_me);
-                    swipeLayout.setRightSwipeEnabled(true);
+                    String date = DateUtil.getFormattedDate(Long.valueOf(wish.getReservation().getForDate()));
+                    textViewStatus.setText(date);
+                    buttonReserve.setVisibility(View.VISIBLE);
                 } else {// by another user
                     textViewStatus.setText(R.string.reserved);//TODO: if wish list mode == MY_WISH_LIST enable swipe and enable swipe
-                    swipeLayout.setRightSwipeEnabled(false);
+                    buttonReserve.setVisibility(View.GONE);
                 }
             } else {
+                buttonReserve.setText(R.string.action_reserve);
                 textViewStatus.setText("");
-                swipeLayout.setRightSwipeEnabled(true);
             }
         }
 
         @OnClick({R.id.card_view, R.id.button_reserve, R.id.button_share})
         public void onClick(View v) {
             Pair<Integer, Integer> pos = sections.getRelativePosition(getAdapterPosition());
+            closeSwipedItem();
             switch (v.getId()) {
                 case R.id.card_view:
-                    closeSwipeMenu();
                     String test = getAdapterPosition() + " -> " + sections.get(pos.first).get(pos.second).getTitle() + " @" + pos.first + ", " + pos.second;
                     Toast.makeText(context, test, Toast.LENGTH_SHORT).show();
+
                     Wish wish = sections.get(pos.first).get(pos.second);
                     WishList wishList = wishLists.get(wish.getWishListId());
                     Intent intent = new Intent(context, WishEditActivity.class)
@@ -539,11 +492,9 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
                     context.startActivity(intent);
                     break;
                 case R.id.button_reserve:
-                    closeSwipeMenu();
                     reserveWish(pos.first, pos.second);
                     break;
                 case R.id.button_share:
-                    closeSwipeMenu();
                     final String message = context.getString(R.string.message_default_tweet_wish, sections.get(pos.first).get(pos.second).getTitle());
                     BottomSheetDialog bottomSheetDialog = new BottomSheetShareDialog(context, message);
                     bottomSheetDialog.show();
@@ -551,7 +502,47 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
             }
         }
 
-        private void closeSwipeMenu() {
+        @Override
+        public void onStartOpen(SwipeLayout layout) {//TODO: bug - not called
+            Log.e("swipe", "onStartOpen");
+            if (!swipeLayout.equals(swipedItem)) closeSwipedItem();
+            swipedItem = swipeLayout;
+        }
+
+        @Override
+        public void onOpen(SwipeLayout layout) {
+            Log.d("swipe", "onOpen");
+            onStartOpen(layout);//TODO: temporally solve this bug
+            if (layout.getDragEdge() == SwipeLayout.DragEdge.Left) {
+                Pair<Integer, Integer> pos = sections.getRelativePosition(getAdapterPosition());
+                removeWish(pos.first, pos.second);
+            }
+        }
+
+        @Override
+        public void onStartClose(SwipeLayout layout) {
+            Log.d("swipe", "onStartClose");
+            if (swipeLayout.equals(swipedItem)) swipedItem = null;
+        }
+
+        @Override
+        public void onClose(SwipeLayout layout) {
+
+        }
+
+        @Override
+        public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
+//            Log.d("swipe", "onUpdate");
+            float alpha = Math.abs((float) leftOffset / (float) bottomViewReserve.getWidth());
+            layout.getCurrentBottomView().setAlpha(alpha);
+        }
+
+        @Override
+        public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
+
+        }
+
+        private void closeSwipedItem() {
             if (swipedItem != null) swipedItem.close();
             swipedItem = null;//required
         }

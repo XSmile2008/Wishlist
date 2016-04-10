@@ -17,7 +17,7 @@
     <string name="login_with_facebook">Login with Facebook</string>
 
     <string name="reserved">Reserved</string>
-    <string name="reserved_by_me">Reserved by me</string>
+    <string name="reserved_by_me">Reserved by me on %s</string>
 
     <string name="Title">Title</string>
     <string name="Comment">Comment</string>

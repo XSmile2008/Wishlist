@@ -3,6 +3,7 @@ package com.company.wishlist.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -33,7 +34,7 @@ import butterknife.OnClick;
 /**
  * Created by vladstarikov on 07.01.16.
  */
-public class WishListFragment extends DebugFragment {
+public class WishListFragment extends Fragment {
 
     private static final String LOG_TAG = WishListFragment.class.getSimpleName();
 

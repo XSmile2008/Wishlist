@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -19,11 +20,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.company.wishlist.R;
-import com.company.wishlist.activity.abstracts.DebugActivity;
 import com.company.wishlist.adapter.FriendListAdapter;
 import com.company.wishlist.events.FriendSelectedEvent;
 import com.company.wishlist.fragment.TabbedWishListFragment;
@@ -49,7 +48,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends DebugActivity {
+public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -232,10 +231,10 @@ public class MainActivity extends DebugActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (ConnectionUtil.isConnected()) {
-                Toast.makeText(getApplicationContext(), "connected", Toast.LENGTH_SHORT).show();
+                Log.d(LOG_TAG, "connected");
                 refreshUserDataUi();
             } else {
-                Toast.makeText(getApplicationContext(), "not connected", Toast.LENGTH_SHORT).show();
+                Log.d(LOG_TAG, "not connected");
                 connectivityStatus.setVisibility(View.VISIBLE);
                 recyclerViewFriends.setVisibility(View.GONE);
             }

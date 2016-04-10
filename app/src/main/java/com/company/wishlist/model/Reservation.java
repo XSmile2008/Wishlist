@@ -12,7 +12,7 @@ import java.util.Map;
 public class Reservation implements Serializable{
 
     String byUser;
-    String forDate;
+    String forDate;//TODO: use long value?
 
     public Reservation(){}
 

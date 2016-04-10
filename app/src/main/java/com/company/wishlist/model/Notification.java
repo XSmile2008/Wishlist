@@ -79,7 +79,7 @@ public class Notification {
         this.owner = AuthUtils.getCurrentUser().getId();
 
         long reserve = Long.valueOf(wish.getReservation().getForDate());
-        long notify = DateUtil.isToday(reserve) ? reserve : DateUtil.substractDaysFromDate(reserve, NOTIFY_BEFORE_RESERVATION_DAYS);
+        long notify = DateUtil.isToday(reserve) ? reserve : DateUtil.subtractDaysFromDate(reserve, NOTIFY_BEFORE_RESERVATION_DAYS);
         this.notifyDate = String.valueOf(DateUtil.getDateWithoutTime(new Date(notify)));
 
         wishTable.child(this.id).setValue(this);

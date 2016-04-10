@@ -32,8 +32,8 @@
             android:entries="@array/notificationRepeatEntries"
             android:entryValues="@array/notificationRepeatValues"
             android:key="@string/settings_notification_reserve_repeat_key"
-            android:summary="@string/settings_notification_reserve_repeat"
-            android:title="@string/settings_notification_reserve" />
+            android:summary="@string/settings_notification_reserve"
+            android:title="@string/settings_notification_reserve_repeat" />
 
     </PreferenceCategory>
 

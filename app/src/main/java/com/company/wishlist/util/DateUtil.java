@@ -9,10 +9,14 @@ import java.util.Date;
 public class DateUtil {
 
     public static String getFormattedDate(long timeInMillis) {
-        return new SimpleDateFormat("yyyy-MM-dd").format(new Date(timeInMillis));
+        return SimpleDateFormat.getDateInstance().format(new Date(timeInMillis));
     }
 
-    public static long substractDaysFromDate(long date, int countSubtractedDays) {
+    public static long parse(String date) {
+        return 0;
+    }
+
+    public static long subtractDaysFromDate(long date, int countSubtractedDays) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date(date));
         cal.add(Calendar.DATE, -countSubtractedDays);

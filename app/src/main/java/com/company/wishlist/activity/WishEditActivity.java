@@ -1,6 +1,6 @@
 package com.company.wishlist.activity;
 
-import android.animation.Animator;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -12,13 +12,10 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
-import android.util.DisplayMetrics;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewAnimationUtils;
-import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -35,7 +32,6 @@ import com.company.wishlist.util.AuthUtils;
 import com.company.wishlist.util.CloudinaryUtil;
 import com.company.wishlist.util.ConnectionUtil;
 import com.company.wishlist.util.DateUtil;
-import com.company.wishlist.util.DialogUtil;
 import com.company.wishlist.view.BottomSheetShareDialog;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
@@ -83,6 +79,8 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
 
     @Bind(R.id.fab)
     FloatingActionButton mFab;
+
+    private Menu mMenu;
 
     private EditWishBean mEditWishBean;//TODO: test if edit wish bean contains correct data after screen rotate
     private Validator mValidator;
@@ -177,10 +175,15 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        this.mMenu = menu;
         getMenuInflater().inflate(R.menu.menu_wish_edit, menu);
         menu.findItem(R.id.action_delete).setVisible(getIntent().getAction().equals(ACTION_EDIT));
         if (mEditWishBean.isReserved() && !mEditWishBean.getReservation().getByUser().equals(AuthUtils.getCurrentUser().getId())) {
             menu.findItem(R.id.action_reserve).setVisible(false);
+        } else {
+            menu.findItem(R.id.action_reserve).setIcon(mEditWishBean.isReserved()
+                    ? R.drawable.ic_favorite_white_24dp
+                    : R.drawable.ic_favorite_border_white_24dp);
         }
         return true;
     }
@@ -214,30 +217,6 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
         discardChanges();
     }
 
-    @Deprecated
-    public void circleRevealAnimation() {
-        final View rootLayout = findViewById(R.id.coordinator_layout);
-        ViewTreeObserver viewTreeObserver = rootLayout.getViewTreeObserver();
-        if (viewTreeObserver.isAlive()) {
-            viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                        DisplayMetrics displayMetrics = new DisplayMetrics();
-                        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-                        float finalRadius = Math.max(displayMetrics.widthPixels, displayMetrics.heightPixels);
-
-                        Animator circularReveal = ViewAnimationUtils.createCircularReveal(rootLayout, 645, 870, 0, finalRadius);
-                        circularReveal.setDuration(1000);
-                        circularReveal.start();
-                    }
-                    rootLayout.setVisibility(View.VISIBLE);
-                    rootLayout.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                }
-            });
-        }
-    }
-
     /*vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
      * Database changes logic section
      */
@@ -248,29 +227,41 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
                 @Override
                 public void onDateSet(CalendarDatePickerDialogFragment dialog, int year, int monthOfYear, int dayOfMonth) {
                     mEditWishBean.setReservation(new Reservation(AuthUtils.getCurrentUser().getId(), dialog.getSelectedDay().getDateInMillis()));
+                    mMenu.findItem(R.id.action_reserve).setIcon(R.drawable.ic_favorite_white_24dp);
                     Toast.makeText(getApplicationContext(), "wish " + mEditWishBean.getTitle() + " reserved", Toast.LENGTH_SHORT).show();
                 }
             });
             mReservedDateDialog.show(getSupportFragmentManager(), DATE_DIALOG);
         } else {
-            DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.message_unreserve), this, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    mEditWishBean.setReservation(null);
-                    Toast.makeText(getApplicationContext(), "wish " + mEditWishBean.getTitle() + " unreserved", Toast.LENGTH_SHORT).show();
-                }
-            });
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.app_name)
+                    .setMessage(R.string.message_unreserve)
+                    .setNegativeButton(android.R.string.no, null)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            mEditWishBean.setReservation(null);
+                            mMenu.findItem(R.id.action_reserve).setIcon(R.drawable.ic_favorite_border_white_24dp);
+                            Toast.makeText(getApplicationContext(), "wish " + mEditWishBean.getTitle() + " unreserved", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .show();
         }
     }
 
     private void deleteWish() {
-        DialogUtil.alertShow(getString(R.string.app_name), getString(R.string.message_remove_wish_dialog), this, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                mEditWishBean.softRemove();
-                Toast.makeText(getApplicationContext(), "wish " + mEditWishBean.getTitle() + " deleted", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        });
-        //TODO: need to show SnackBar on main activity, like after swipe to remove, may be start this activity for result and return something like "removed" flag and than show SnackBar?
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.app_name)
+                .setMessage(R.string.message_remove_wish_dialog)
+                .setNegativeButton(android.R.string.no, null)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mEditWishBean.softRemove();
+                        Toast.makeText(getApplicationContext(), "wish " + mEditWishBean.getTitle() + " deleted", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                })
+                .show();
     }
 
     private void commitChanges() {
@@ -290,28 +281,6 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
         finish();
     }
 
-    private void share() {
-//        if (TwitterUtils.isConnected() && twitterChekbox.isChecked()) {
-//            if (ConnectionUtil.isConnected()) {
-//                SocialShareUtils.ref().share(String.format("I have a new wish, it is %s!", mEditWishBean.getTitle()), social, new ShareStrategy.SharingCallback() {
-//                    @Override
-//                    public void success() {
-//                        Toast.makeText(getApplicationContext(), "Tweet successful published",
-//                                Toast.LENGTH_SHORT).show();
-//                    }
-//
-//                    @Override
-//                    public void failure(Throwable e) {
-//                        Toast.makeText(getApplicationContext(), "Problem with share sending",
-//                                Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//            } else {
-//                Toast.makeText(this, "Check internet connection for sharing", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-    }
-
     private void discardChanges() {
         if (mEditWishBean.isPictureChanged()) {
             CloudinaryUtil.destroy(mEditWishBean.getPicture());//destroy new image on cloud
@@ -325,23 +294,17 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
     @OnClick({R.id.fab})
     public void showImagesDialog(View view) {
         if (ConnectionUtil.isConnected()) {
-            switch (view.getId()) {
-                case R.id.fab:
-                    String query = mEditTextTitle.getText().toString().trim();
-                    if (query.isEmpty()) {
-                        Snackbar.make(mCoordinatorLayout, "Wish title should be not empty!", Snackbar.LENGTH_SHORT).show();
-                    } else {
-                        Intent intent = new Intent(this, ImageSearchActivity.class);
-                        intent.putExtra(ImageSearchActivity.QUERY, mEditTextTitle.getText().toString());
-                        startActivityForResult(intent, RESULT_IMAGE_SELECT);
-                    }
-                    break;
-                //TODO: move loading image from storage to ImageSearchActivity
-//                case R.id.gallery_image_btn:
-//                    startActivityForResult(Intent.createChooser(new Intent(Intent.ACTION_GET_CONTENT)
-//                            .setType("image/*"), getString(R.string.choose_image)), RESULT_LOAD_IMAGE);
-//                    break;
+            String query = mEditTextTitle.getText().toString().trim();
+            if (query.isEmpty()) {
+                Snackbar.make(mCoordinatorLayout, "Wish title should be not empty!", Snackbar.LENGTH_SHORT).show();
+            } else {
+                Intent intent = new Intent(this, ImageSearchActivity.class);
+                intent.putExtra(ImageSearchActivity.QUERY, mEditTextTitle.getText().toString());
+                startActivityForResult(intent, RESULT_IMAGE_SELECT);
             }
+//            //TODO: move loading image from storage to ImageSearchActivity
+//            startActivityForResult(Intent.createChooser(new Intent(Intent.ACTION_GET_CONTENT)
+//                    .setType("image/*"), getString(R.string.choose_image)), RESULT_LOAD_IMAGE);
         } else {
             Snackbar.make(mCoordinatorLayout, getResources().getString(R.string.no_connection), Snackbar.LENGTH_LONG).show();
         }

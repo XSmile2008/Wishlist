@@ -504,14 +504,14 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
 
         @Override
         public void onStartOpen(SwipeLayout layout) {//TODO: bug - not called
-            Log.e("swipe", "onStartOpen");
+//            Log.e("swipe", "onStartOpen");
             if (!swipeLayout.equals(swipedItem)) closeSwipedItem();
             swipedItem = swipeLayout;
         }
 
         @Override
         public void onOpen(SwipeLayout layout) {
-            Log.d("swipe", "onOpen");
+//            Log.d("swipe", "onOpen");
             onStartOpen(layout);//TODO: temporally solve this bug
             if (layout.getDragEdge() == SwipeLayout.DragEdge.Left) {
                 Pair<Integer, Integer> pos = sections.getRelativePosition(getAdapterPosition());
@@ -521,7 +521,7 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
 
         @Override
         public void onStartClose(SwipeLayout layout) {
-            Log.d("swipe", "onStartClose");
+//            Log.d("swipe", "onStartClose");
             if (swipeLayout.equals(swipedItem)) swipedItem = null;
         }
 

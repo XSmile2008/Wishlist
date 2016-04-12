@@ -160,13 +160,7 @@ public class Wish implements Serializable {
     @JsonIgnore
     public void softRestore() {
         this.softRestore(null);
-        createNotification();
-    }
-
-    private void createNotification() {
-        if (isReserved()) {
-            new Notification().create(null, this);
-        }
+        new Notification().create(null, this);
     }
 
     /**
@@ -189,7 +183,7 @@ public class Wish implements Serializable {
     @JsonIgnore
     public void reserve(String userId, long date) {
         this.reserve(userId, date, null);
-        createNotification();
+        new Notification().create(null, this);
     }
 
     /**

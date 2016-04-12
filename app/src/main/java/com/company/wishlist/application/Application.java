@@ -20,12 +20,17 @@ public class Application extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         TwitterAuthConfig authConfig = new TwitterAuthConfig(getString(R.string.twitter_api_key), getString(R.string.twitter_secret));
+
         Fabric.with(this, new Twitter(authConfig), new Crashlytics());
-        Firebase.getDefaultConfig().setPersistenceEnabled(true);
+
         Firebase.setAndroidContext(this);
-        AuthUtils.setAndroidContext(this);
+        Firebase.getDefaultConfig().setPersistenceEnabled(true);
+
         FacebookSdk.sdkInitialize(getApplicationContext());
-        new ConnectionUtil(this);
+
+        AuthUtils.setAndroidContext(this);
+
+        ConnectionUtil.setAndroidContext(this);
     }
 
 }

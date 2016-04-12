@@ -37,7 +37,7 @@ public class NotificationService extends Service {
     private final static String LOG_TAG = NotificationService.class.getSimpleName();
 
     public final static int TASK_DELAY = 1000; //in milliseconds
-    public final static int TASK_REPEAT = 1000 * 60 * 60; // Repeat every hour
+    public final static int TASK_REPEAT = 1000 * 60 * 2; // Repeat every hour//TODO:
 
     private Timer timer;
     private Map<String, Integer> notifications = new HashMap<>();
@@ -122,15 +122,15 @@ public class NotificationService extends Service {
         Intent intentStartApp = new Intent(this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendIntentApp = PendingIntent.getActivity(this, 0, intentStartApp, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Builder ntfcBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.ic_stat_gift)
                 .setContentTitle(this.getString(R.string.notification_service_title))
                 .setContentIntent(pendIntentApp)
                 .setAutoCancel(true)
                 .setContentText(this.getString(R.string.notification_reserve_text, notification.getWishTitle()))
                 .addAction(android.R.drawable.ic_menu_close_clear_cancel, this.getString(R.string.notification_action_text), pendIntentDontRemind);
 
-        manager.notify(id, ntfcBuilder.build());
+        manager.notify(id, builder.build());
     }
 
 }

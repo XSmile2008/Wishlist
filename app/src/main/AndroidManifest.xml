@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.company.wishlist">
+    package="com.company.wishlist" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -16,7 +16,7 @@
         android:label="@string/app_name"
         android:largeHeap="true"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.NoActionBar">
+        android:theme="@style/AppTheme.NoActionBar" >
 
         <!-- Meta-data section -->
 
@@ -25,7 +25,7 @@
             android:value="f343a38b53417f7538bf503031d7d9fe7f9dd27c" />
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/app_id" />
+            android:value="@string/facebook_app_id" />
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="f343a38b53417f7538bf503031d7d9fe7f9dd27c" />
@@ -45,7 +45,7 @@
             android:label="@string/my_wish_list" />
         <activity
             android:name=".activity.LoginActivity"
-            android:theme="@style/AppTheme.LoginPage">
+            android:theme="@style/AppTheme.LoginPage" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

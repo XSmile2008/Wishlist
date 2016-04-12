@@ -79,7 +79,7 @@ public class WishListFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);//TODO: may be not bind if mFab is not visible?
+        ButterKnife.bind(this, view);
 
         this.mMode = getArguments().getInt(MODE);
 

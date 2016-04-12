@@ -3,7 +3,7 @@
     <string name="app_slogan">Your wishes comes true…</string>
     <string name="firebase_url">https://appwishlist.firebaseio.com</string>
     <string name="my_wish_list">My wish list</string>
-    <string name="app_id">1657942407822584</string>
+    <string name="facebook_app_id">1657942407822584</string>
     <string name="facebook_permissions">public_profile, email, user_birthday, user_friends, user_posts</string>
     <string name="twitter_api_key">qUi5Wrgriz3YsqLdzUk1rLLje</string>
     <string name="twitter_secret">DrwiaonU8TOECbpikF57XGtvzGt7PmC68hbaseumoybzozEOOh</string>

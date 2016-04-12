@@ -12,7 +12,6 @@ public class Notification {
     public static final int NOTIFY_BEFORE_RESERVATION_DAYS = 1;
 
     @JsonIgnore private String id;
-    private String wishId;
     private String wishTitle;
     private String reservationDate;
     private String notifyDate;
@@ -26,14 +25,6 @@ public class Notification {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getWishId() {
-        return wishId;
-    }
-
-    public void setWishId(String wishId) {
-        this.wishId = wishId;
     }
 
     public String getWishTitle() {
@@ -71,19 +62,20 @@ public class Notification {
     //TODO: refactoring
     @JsonIgnore
     public String create(Firebase.CompletionListener listener, Wish wish) {
-        Firebase wishTable = getFirebaseRef();
-        this.id = wishTable.push().getKey();
-        this.wishId = wish.getId();
+        Firebase ref = getFirebaseRef();
+        this.id = wish.getId();
         this.wishTitle = wish.getTitle();
         this.reservationDate = wish.getReservation().getForDate();
         this.owner = AuthUtils.getCurrentUser().getId();
 
-        long reserve = Long.valueOf(wish.getReservation().getForDate());
-        long notify = DateUtil.isToday(reserve) ? reserve : DateUtil.subtractDaysFromDate(reserve, NOTIFY_BEFORE_RESERVATION_DAYS);
+        long reservationDate = Long.valueOf(wish.getReservation().getForDate());
+        long notify = DateUtil.isToday(reservationDate)
+                ? reservationDate
+                : DateUtil.subtractDaysFromDate(reservationDate, NOTIFY_BEFORE_RESERVATION_DAYS);
         this.notifyDate = String.valueOf(DateUtil.getDateWithoutTime(new Date(notify)));
 
-        wishTable.child(this.id).setValue(this);
-        wishTable.child(this.id).keepSynced(true);
+        ref.child(this.id).setValue(this);
+        ref.child(this.id).keepSynced(true);
         return this.id;
     }
 

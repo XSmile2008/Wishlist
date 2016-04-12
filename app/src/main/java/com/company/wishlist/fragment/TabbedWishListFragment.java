@@ -3,6 +3,7 @@ package com.company.wishlist.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +19,7 @@ import butterknife.ButterKnife;
 /**
  * Created by vladstarikov on 23.01.16.
  */
-public class TabbedWishListFragment extends DebugFragment {
+public class TabbedWishListFragment extends Fragment {
 
     @Bind(R.id.tab_layout) TabLayout mTabLayout;
     @Bind(R.id.view_pager) CustomViewPager mViewPager;

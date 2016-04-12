@@ -12,8 +12,8 @@ public class ConnectionUtil {
 
     private static Context mContext;
 
-    public ConnectionUtil(Context context) {
-        ConnectionUtil.mContext = context;
+    public static void setAndroidContext(Context context) {
+        mContext = context;
     }
 
     public static boolean isConnected() {

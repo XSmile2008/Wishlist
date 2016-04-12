@@ -29,8 +29,8 @@
     <!-- Base application theme end-->
 
     <!-- Login Page-->
-    <style name="AppTheme.LoginPage" parent="AppTheme.ActionBar">
-        <item name="colorButtonNormal">@color/com_facebook_button_background_color</item>
+    <style name="AppTheme.LoginPage" parent="AppTheme.NoActionBar.TranslucentStatus">
+        <item name="colorButtonNormal">#3B5998</item>
     </style>
 
     <style name="AppTheme.LoginPage.EditText.Title" parent="LargeText">

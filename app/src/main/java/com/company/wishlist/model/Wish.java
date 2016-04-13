@@ -14,6 +14,9 @@ import java.util.Map;
 
 public class Wish implements Serializable {
 
+    //TODO: maybe divide Wish table for two tables? Reserved and Unreserved?
+    //TODO: or maybe be better if Reservation will be separated in it's own table?
+
     @JsonIgnore
     String id;
     String wishListId;
@@ -122,7 +125,7 @@ public class Wish implements Serializable {
             wishTable.child(id).child("reservation").setValue(reservation, listener);
         }
         return this.id;
-    }//TODO: test if this also pushed nested fields like Reservation
+    }
 
     /**
      * Hard remove this item form database
@@ -140,7 +143,6 @@ public class Wish implements Serializable {
     @JsonIgnore
     public void softRemove() {
         this.softRemove(null);
-        removeNotification();
     }
 
     /**
@@ -160,7 +162,6 @@ public class Wish implements Serializable {
     @JsonIgnore
     public void softRestore() {
         this.softRestore(null);
-        new Notification().create(null, this);
     }
 
     /**
@@ -183,7 +184,6 @@ public class Wish implements Serializable {
     @JsonIgnore
     public void reserve(String userId, long date) {
         this.reserve(userId, date, null);
-        new Notification().create(null, this);
     }
 
     /**
@@ -195,8 +195,9 @@ public class Wish implements Serializable {
      */
     @JsonIgnore
     public void reserve(String userId, long date, Firebase.CompletionListener listener) {
-        this.reservation = new Reservation(userId, date); //TODO: check it
+        this.reservation = new Reservation(userId, date);
         getFirebaseRef().child(this.id).child("reservation").setValue(this.reservation, listener);
+        new Notification().create(this, null);
     }
 
     /**
@@ -216,7 +217,7 @@ public class Wish implements Serializable {
     public void unreserve(Firebase.CompletionListener listener) {
         this.reservation = null; //TODO: check it
         getFirebaseRef().child(id).child("reservation").removeValue(listener);
-        removeNotification();//TODO: test it!
+        Notification.getFirebaseRef().child(this.id).removeValue();
     }
 
     @JsonIgnore
@@ -232,31 +233,6 @@ public class Wish implements Serializable {
     @JsonIgnore
     public boolean hasPicture() {
         return picture != null;
-    }
-
-    @JsonIgnore
-    private void removeNotification() {
-        Notification.getFirebaseRef().orderByChild("wishId").equalTo(this.getId())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                            Notification notification = ds.getValue(Notification.class);
-                            notification.setId(ds.getKey());
-                            notification.remove(new Firebase.CompletionListener() {
-                                @Override
-                                public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                                    Log.d(this.getClass().getSimpleName(), " Notification for this wish was removed");
-                                }
-                            });
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(FirebaseError firebaseError) {
-
-                    }
-                });
     }
 
     @JsonIgnore
@@ -281,6 +257,7 @@ public class Wish implements Serializable {
                                                 Wish wish = wishDS.getValue(Wish.class);
                                                 wish.setId(wishDS.getKey());
                                                 if (wish.isRemoved()) {
+                                                    Notification.getFirebaseRef().child(wish.getId()).removeValue();
                                                     wish.remove(null);//TODO: remove picture from Cloudinary
                                                 }
                                             }

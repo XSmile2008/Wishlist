@@ -45,14 +45,13 @@
             android:label="@string/my_wish_list" />
         <activity
             android:name=".activity.LoginActivity"
-            android:theme="@style/AppTheme.LoginPage" >
+            android:theme="@style/AppTheme.ActivityLogin" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.abstracts.InternetActivity" />
         <activity
             android:name=".activity.SettingsActivity"
             android:theme="@style/AppTheme" />

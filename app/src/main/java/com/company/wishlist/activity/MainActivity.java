@@ -60,10 +60,10 @@ public class MainActivity extends AppCompatActivity {
 
     //NavigationDrawer
     @Nullable DrawerLayout drawer;
-    @Bind(R.id.image_view_avatar) ImageView userAvatarView;
-    @Bind(R.id.text_view_user_name) TextView profileUserName;
-    @Bind(R.id.connectivity_status) View connectivityStatus;
-    @Bind(R.id.recycler_view) RecyclerView recyclerViewFriends;
+    @Bind(R.id.image_view_avatar) ImageView mImageViewAvatar;
+    @Bind(R.id.text_view_user_name) TextView mTextViewUserName;
+    @Bind(R.id.connectivity_status) View mConnectivityStatus;
+    @Bind(R.id.recycler_view) RecyclerView mRecyclerViewFriends;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,9 +85,9 @@ public class MainActivity extends AppCompatActivity {
 
         //Setup friend list in drawer
         mFriendListAdapter = new FriendListAdapter(this, new ArrayList<User>());
-        recyclerViewFriends.setLayoutManager(new LinearLayoutManager(this));
-        recyclerViewFriends.setAdapter(mFriendListAdapter);
-        recyclerViewFriends.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).build());
+        mRecyclerViewFriends.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerViewFriends.setAdapter(mFriendListAdapter);
+        mRecyclerViewFriends.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).build());
 
         //Start service
         startNotificationService();
@@ -148,26 +148,26 @@ public class MainActivity extends AppCompatActivity {
     private void refreshUserDataUi() {
         User user = AuthUtils.getCurrentUser();
         if (null != user) {
-            profileUserName.setText(user.getDisplayName());
+            mTextViewUserName.setText(user.getDisplayName());
 
             Glide.with(this)
                     .load(user.getAvatarURL())
                     .bitmapTransform(new CropCircleTransformation(Glide.get(this).getBitmapPool()))
                     .placeholder(R.drawable.ic_account_circle_80dp)
-                    .into(userAvatarView);
+                    .into(mImageViewAvatar);
 
             FacebookUtils.getAuthUserFriends(new FacebookFriendCallback() {
                 @Override
                 public void onSuccess(List<User> friends) {
-                    connectivityStatus.setVisibility(View.GONE);
-                    recyclerViewFriends.setVisibility(View.VISIBLE);
+                    mConnectivityStatus.setVisibility(View.GONE);
+                    mRecyclerViewFriends.setVisibility(View.VISIBLE);
                     mFriendListAdapter.setFriends(friends);
                 }
 
                 @Override
                 public void onError(FacebookRequestError error) {
-                    connectivityStatus.setVisibility(View.VISIBLE);
-                    recyclerViewFriends.setVisibility(View.GONE);
+                    mConnectivityStatus.setVisibility(View.VISIBLE);
+                    mRecyclerViewFriends.setVisibility(View.GONE);
                 }
             });
         }
@@ -235,8 +235,8 @@ public class MainActivity extends AppCompatActivity {
                 refreshUserDataUi();
             } else {
                 Log.d(LOG_TAG, "not connected");
-                connectivityStatus.setVisibility(View.VISIBLE);
-                recyclerViewFriends.setVisibility(View.GONE);
+                mConnectivityStatus.setVisibility(View.VISIBLE);
+                mRecyclerViewFriends.setVisibility(View.GONE);
             }
         }
 

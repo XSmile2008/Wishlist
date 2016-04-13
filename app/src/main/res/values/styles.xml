@@ -29,23 +29,26 @@
     <!-- Base application theme end-->
 
     <!-- Login Page-->
-    <style name="AppTheme.LoginPage" parent="AppTheme.NoActionBar.TranslucentStatus">
-        <item name="colorButtonNormal">#3B5998</item>
-    </style>
+    <style name="AppTheme.ActivityLogin" parent="AppTheme.NoActionBar.TranslucentStatus"/>
 
-    <style name="AppTheme.LoginPage.EditText.Title" parent="LargeText">
+    <style name="AppTheme.LoginScreen.EditText.Title" parent="LargeText">
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">30sp</item>
         <item name="android:textAllCaps">true</item>
     </style>
 
-    <style name="AppTheme.LoginPage.FacebookButton" parent="AppTheme.LoginPage">
-        <item name="android:drawableLeft">@drawable/ic_facebook_icon</item>
-        <item name="android:drawableStart">@drawable/ic_facebook_icon</item>
-        <item name="android:drawablePadding">@dimen/default_padding_medium</item>
+    <style name="AppTheme.ActivityLogin.SocialButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Medium</item>
         <item name="android:textColor">@color/com_facebook_share_button_text_color</item>
-        <item name="android:text">@string/login_with_facebook</item>
+        <item name="android:drawablePadding">8dp</item>
+    </style>
+
+    <style name="AppTheme.ActivityLogin.SocialButton.Facebook" parent="Widget.AppCompat.Button">
+        <item name="colorButtonNormal">@color/com_facebook_blue</item>
+        <item name="android:drawableLeft">@drawable/ic_facebook_icon</item>
+        <item name="android:drawableStart">@drawable/ic_facebook_icon</item>
     </style>
     <!-- Login Page end-->
 

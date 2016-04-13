@@ -29,7 +29,7 @@
 
         <TextView
             android:id="@+id/text_view_title"
-            style="@style/AppTheme.LoginPage.EditText.Title"
+            style="@style/AppTheme.LoginScreen.EditText.Title"
             android:layout_centerInParent="true"
             android:text="@string/app_name" />
 
@@ -49,11 +49,11 @@
 
             <Button
                 android:id="@+id/custom_login_button"
-                style="@style/AppTheme.LoginPage.FacebookButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/AppTheme.ActivityLogin.SocialButton"
                 android:layout_gravity="center"
-                android:padding="16dp" />
+                android:padding="16dp"
+                android:text="@string/login_with_facebook"
+                android:theme="@style/AppTheme.ActivityLogin.SocialButton.Facebook" />
 
         </FrameLayout>
 

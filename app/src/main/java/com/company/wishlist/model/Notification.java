@@ -9,13 +9,9 @@ import java.util.Date;
 
 public class Notification {
 
-    public static final int NOTIFY_BEFORE_RESERVATION_DAYS = 1;
-
     @JsonIgnore private String id;
-    private String wishTitle;
-    private String reservationDate;
-    private String notifyDate;
     private String owner;
+    private String reservationDate;
 
     public Notification() {}
 
@@ -27,12 +23,12 @@ public class Notification {
         this.id = id;
     }
 
-    public String getWishTitle() {
-        return wishTitle;
+    public String getOwner() {
+        return owner;
     }
 
-    public void setWishTitle(String wishTitle) {
-        this.wishTitle = wishTitle;
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
     public String getReservationDate() {
@@ -43,38 +39,14 @@ public class Notification {
         this.reservationDate = reservationDate;
     }
 
-    public String getNotifyDate() {
-        return notifyDate;
-    }
-
-    public void setNotifyDate(String notifyDate) {
-        this.notifyDate = notifyDate;
-    }
-
-    public String getOwner() {
-        return owner;
-    }
-
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
     //TODO: refactoring
     @JsonIgnore
-    public String create(Firebase.CompletionListener listener, Wish wish) {
+    public String create(Wish wish, Firebase.CompletionListener listener) {
         Firebase ref = getFirebaseRef();
         this.id = wish.getId();
-        this.wishTitle = wish.getTitle();
-        this.reservationDate = wish.getReservation().getForDate();
         this.owner = AuthUtils.getCurrentUser().getId();
-
-        long reservationDate = Long.valueOf(wish.getReservation().getForDate());
-        long notify = DateUtil.isToday(reservationDate)
-                ? reservationDate
-                : DateUtil.subtractDaysFromDate(reservationDate, NOTIFY_BEFORE_RESERVATION_DAYS);
-        this.notifyDate = String.valueOf(DateUtil.getDateWithoutTime(new Date(notify)));
-
-        ref.child(this.id).setValue(this);
+        this.reservationDate = wish.getReservation().getForDate();
+        ref.child(this.id).setValue(this, listener);
         ref.child(this.id).keepSynced(true);
         return this.id;
     }
@@ -90,8 +62,8 @@ public class Notification {
     }
 
     @JsonIgnore
-    public boolean isToday() {
-        return DateUtil.isToday(Long.valueOf(this.notifyDate));
+    public boolean isTimeToNotify() {
+        return DateUtil.isToday(Long.valueOf(this.reservationDate));
     }
 
 }

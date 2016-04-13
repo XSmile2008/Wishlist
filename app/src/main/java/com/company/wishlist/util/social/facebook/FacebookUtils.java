@@ -2,7 +2,6 @@ package com.company.wishlist.util.social.facebook;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 
 import com.company.wishlist.model.User;
 import com.facebook.AccessToken;

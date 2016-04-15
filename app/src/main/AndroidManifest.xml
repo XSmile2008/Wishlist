@@ -35,28 +35,34 @@
         <activity
             android:name=".activity.IntroActivity"
             android:theme="@style/AppTheme.NoActionBar.TranslucentStatus" />
+
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/my_wish_list" />
+
         <activity
             android:name=".activity.LoginActivity"
             android:theme="@style/AppTheme.ActivityLogin" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activity.SettingsActivity"
             android:theme="@style/AppTheme" />
+
         <activity android:name=".activity.WishEditActivity" />
+
         <activity android:name=".activity.TopWishActivity" />
+
         <activity android:name=".activity.ImageSearchActivity" />
 
         <!-- Service section -->

@@ -34,9 +34,7 @@ public class CropCircleTransformation implements Transformation<Bitmap> {
         this.mBitmapPool = pool;
     }
 
-    @Override
-    public Resource<Bitmap> transform(Resource<Bitmap> resource, int outWidth, int outHeight) {
-        Bitmap source = resource.get();
+    public static Bitmap transform(Bitmap source) {
         int size = Math.min(source.getWidth(), source.getHeight());
 
         int width = (source.getWidth() - size) / 2;
@@ -47,9 +45,9 @@ public class CropCircleTransformation implements Transformation<Bitmap> {
             source.recycle();
         }
 
-        Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        Bitmap result = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
 
-        Canvas canvas = new Canvas(bitmap);
+        Canvas canvas = new Canvas(result);
         Paint paint = new Paint();
         BitmapShader shader = new BitmapShader(squaredBitmap, BitmapShader.TileMode.CLAMP,
                 BitmapShader.TileMode.CLAMP);
@@ -61,7 +59,12 @@ public class CropCircleTransformation implements Transformation<Bitmap> {
 
         squaredBitmap.recycle();
 
-        return BitmapResource.obtain(bitmap, mBitmapPool);
+        return result;
+    }
+
+    @Override
+    public Resource<Bitmap> transform(Resource<Bitmap> resource, int outWidth, int outHeight) {
+        return BitmapResource.obtain(transform(resource.get()), mBitmapPool);
     }
 
     @Override

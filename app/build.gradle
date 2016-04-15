@@ -49,6 +49,10 @@ android {
         exclude 'META-INF/license.txt'
         exclude 'META-INF/LICENSE-FIREBASE.txt'
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
 }
 
 dependencies {
@@ -75,7 +79,7 @@ dependencies {
     compile 'com.mobsandgeeks:android-saripaar:2.0.3'
     compile 'com.code-troopers.betterpickers:library:2.5.2'
     compile 'com.orhanobut:dialogplus:1.10@aar'
-    compile 'com.github.clans:fab:1.6.2'
+    compile 'com.github.clans:fab:1.6.3'
     compile 'org.jsoup:jsoup:1.8.1'
     compile 'com.daimajia.swipelayout:library:1.2.0@aar'
     compile 'com.yqritc:recyclerview-flexibledivider:1.2.9'

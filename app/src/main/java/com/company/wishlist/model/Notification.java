@@ -61,9 +61,4 @@ public class Notification {
         return FirebaseRoot.get().child(Notification.class.getSimpleName());
     }
 
-    @JsonIgnore
-    public boolean isTimeToNotify() {
-        return DateUtil.isToday(Long.valueOf(this.reservationDate));
-    }
-
 }

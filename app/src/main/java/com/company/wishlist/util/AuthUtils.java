@@ -111,7 +111,7 @@ public class AuthUtils {
 
     private static void clearPreferences() {
         PreferenceManager.getDefaultSharedPreferences(sContext)
-                .edit().clear();
+                .edit().clear().commit();
     }
 
     public static void firstOpen() {

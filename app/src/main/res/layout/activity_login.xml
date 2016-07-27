@@ -52,11 +52,7 @@
                 style="@style/AppTheme.ActivityLogin.SocialButton"
                 android:layout_gravity="center"
                 android:padding="16dp"
-                android:text="@string/login_with_facebook"
-                android:theme="@style/AppTheme.ActivityLogin.SocialButton.Facebook" />
-
+                android:text="@string/login_with_facebook"/>
         </FrameLayout>
-
     </RelativeLayout>
-
 </android.support.design.widget.CoordinatorLayout>

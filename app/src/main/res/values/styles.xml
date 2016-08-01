@@ -8,12 +8,12 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="AppTheme.NoActionBar" parent="AppTheme">
+    <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.ActionBar" parent="AppTheme">
+    <style name="AppTheme.ActionBar">
         <item name="windowNoTitle">true</item>
     </style>
 
@@ -105,5 +105,4 @@
         <item name="android:layout_marginTop">@dimen/default_margin_medium</item>
         <item name="android:layout_marginBottom">@dimen/default_margin_medium</item>
     </style>
-
 </resources>

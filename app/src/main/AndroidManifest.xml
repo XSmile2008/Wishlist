@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.company.wishlist" >
+          package="com.company.wishlist">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
         android:name=".application.Application"
@@ -16,62 +16,61 @@
         android:label="@string/app_name"
         android:largeHeap="true"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.NoActionBar" >
+        android:theme="@style/AppTheme.NoActionBar">
 
         <!-- Meta-data section -->
 
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="f343a38b53417f7538bf503031d7d9fe7f9dd27c" />
+            android:value="f343a38b53417f7538bf503031d7d9fe7f9dd27c"/>
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id" />
+            android:value="@string/facebook_app_id"/>
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="f343a38b53417f7538bf503031d7d9fe7f9dd27c" />
+            android:value="f343a38b53417f7538bf503031d7d9fe7f9dd27c"/>
 
         <!-- Activity section -->
 
         <activity
             android:name=".activity.IntroActivity"
-            android:theme="@style/AppTheme.NoActionBar.TranslucentStatus" />
+            android:theme="@style/AppTheme.NoActionBar.TranslucentStatus"/>
 
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
 
         <activity
             android:name=".activity.MainActivity"
-            android:label="@string/my_wish_list" />
+            android:label="@string/my_wish_list"/>
 
         <activity
             android:name=".activity.LoginActivity"
-            android:theme="@style/AppTheme.ActivityLogin" >
+            android:theme="@style/AppTheme.ActivityLogin">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
         <activity
             android:name=".activity.SettingsActivity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"/>
 
-        <activity android:name=".activity.WishEditActivity" />
+        <activity android:name=".activity.WishEditActivity"/>
 
-        <activity android:name=".activity.TopWishActivity" />
+        <activity android:name=".activity.TopWishActivity"/>
 
-        <activity android:name=".activity.ImageSearchActivity" />
+        <activity android:name=".activity.ImageSearchActivity"/>
 
         <!-- Service section -->
         <service
             android:name=".service.NotRemindNotificationAction"
-            android:exported="false" />
+            android:exported="false"/>
         <service
             android:name=".service.NotificationService"
-            android:label="MyService" />
+            android:label="MyService"/>
     </application>
-
 </manifest>

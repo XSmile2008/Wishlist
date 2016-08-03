@@ -17,6 +17,8 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="AppTheme.NoActionBar.TranslucentStatus"/>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
@@ -24,8 +26,6 @@
     <style name="AppTheme.NoActionBar.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
     <style name="AppTheme.NoActionBar.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
-
-    <style name="AppTheme.NoActionBar.TranslucentStatus" parent="AppTheme.NoActionBar"/>
     <!-- Base application theme end-->
 
     <!-- Login Page-->

@@ -18,7 +18,7 @@ import com.company.wishlist.util.social.share.impl.FacebookSharing;
 import com.company.wishlist.util.social.share.impl.TwitterSharing;
 import com.company.wishlist.util.social.twitter.TwitterUtils;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -67,8 +67,8 @@ public class BottomSheetShareDialog extends BottomSheetDialog {
 
         public class Holder extends RecyclerView.ViewHolder {
 
-            @Bind(R.id.image_view_icon) ImageView imageViewIcon;
-            @Bind(R.id.text_view_title) TextView textViewTitle;
+            @BindView(R.id.image_view_icon) ImageView imageViewIcon;
+            @BindView(R.id.text_view_title) TextView textViewTitle;
 
             public Holder(View itemView) {
                 super(itemView);

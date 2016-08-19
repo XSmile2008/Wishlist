@@ -27,7 +27,7 @@ import com.github.clans.fab.FloatingActionMenu;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -47,7 +47,7 @@ public class WishListFragment extends Fragment {
     private WishList mWishList;
     private int mMode;
 
-    @Bind(R.id.fab) FloatingActionMenu mFab;
+    @BindView(R.id.fab) FloatingActionMenu mFab;
 
     public static WishListFragment newInstance(int mode, User user) {
         WishListFragment fragment = new WishListFragment();

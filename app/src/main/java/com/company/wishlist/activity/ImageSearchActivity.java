@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -33,9 +33,9 @@ public class ImageSearchActivity extends DebugActivity implements ImageSearchAda
 
     private ImageSearchAdapter mImageSearchAdapter;
 
-    @Bind(R.id.text_view_loading) TextView mTextViewLoading;
-    @Bind(R.id.recycler_view) RecyclerView mRecyclerView;
-    @Bind(R.id.view_flipper) ViewFlipper mViewFlipper;
+    @BindView(R.id.text_view_loading) TextView mTextViewLoading;
+    @BindView(R.id.recycler_view) RecyclerView mRecyclerView;
+    @BindView(R.id.view_flipper) ViewFlipper mViewFlipper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -59,11 +59,12 @@ public class MainActivity extends AppCompatActivity {
     private User mSelectedFriend;
 
     //NavigationDrawer
-    @Nullable DrawerLayout drawer;
-    @Bind(R.id.image_view_avatar) ImageView mImageViewAvatar;
-    @Bind(R.id.text_view_user_name) TextView mTextViewUserName;
-    @Bind(R.id.connectivity_status) View mConnectivityStatus;
-    @Bind(R.id.recycler_view) RecyclerView mRecyclerViewFriends;
+    @Nullable
+    @BindView(R.id.drawer_layout) DrawerLayout drawer;
+    @BindView(R.id.image_view_avatar) ImageView mImageViewAvatar;
+    @BindView(R.id.text_view_user_name) TextView mTextViewUserName;
+    @BindView(R.id.connectivity_status) View mConnectivityStatus;
+    @BindView(R.id.recycler_view) RecyclerView mRecyclerViewFriends;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         //Init navigation drawer
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer != null) {
             ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.toggle_open_drawer, R.string.toggle_close_drawer);
             drawer.addDrawerListener(toggle);
@@ -239,7 +239,5 @@ public class MainActivity extends AppCompatActivity {
                 mRecyclerViewFriends.setVisibility(View.GONE);
             }
         }
-
     }
-
 }

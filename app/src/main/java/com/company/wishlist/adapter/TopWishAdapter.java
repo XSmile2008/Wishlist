@@ -19,7 +19,7 @@ import com.company.wishlist.component.IndexedHashSet;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -62,9 +62,9 @@ public class TopWishAdapter extends RecyclerView.Adapter<TopWishAdapter.Holder> 
 
     public class Holder extends RecyclerView.ViewHolder {
 
-        @Bind(R.id.image_view) ImageView imageView;
-        @Bind(R.id.text_view_title) TextView textViewTitle;
-        @Bind(R.id.text_view_comment) TextView textViewComment;
+        @BindView(R.id.image_view) ImageView imageView;
+        @BindView(R.id.text_view_title) TextView textViewTitle;
+        @BindView(R.id.text_view_comment) TextView textViewComment;
 
         public Holder(View itemView) {
             super(itemView);

@@ -28,7 +28,7 @@ import com.firebase.client.FirebaseError;
 import java.util.Collections;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -41,8 +41,8 @@ public class LoginActivity extends DebugActivity {
     private CallbackManager mFacebookCallbackManager;
     private AccessTokenTracker mFacebookAccessTokenTracker;
 
-    @Bind(R.id.coordinator_layout) CoordinatorLayout mCoordinatorLayout;
-    @Bind(R.id.custom_login_button) Button mCustomLoginButton;
+    @BindView(R.id.coordinator_layout) CoordinatorLayout mCoordinatorLayout;
+    @BindView(R.id.custom_login_button) Button mCustomLoginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

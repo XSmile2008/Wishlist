@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -31,9 +31,9 @@ public class TopWishActivity extends DebugActivity {
 
     private TopWishAdapter mAdapter;
 
-    @Bind(R.id.text_view_loading) TextView mTextViewLoading;
-    @Bind(R.id.recycler_view) RecyclerView mRecyclerView;
-    @Bind(R.id.view_flipper) ViewFlipper mViewFlipper;
+    @BindView(R.id.text_view_loading) TextView mTextViewLoading;
+    @BindView(R.id.recycler_view) RecyclerView mRecyclerView;
+    @BindView(R.id.view_flipper) ViewFlipper mViewFlipper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

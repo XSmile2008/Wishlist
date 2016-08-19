@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -62,7 +62,7 @@ public class ImageSearchAdapter extends RecyclerView.Adapter<ImageSearchAdapter.
 
     public class Holder extends RecyclerView.ViewHolder {
 
-        @Bind(R.id.ivIcon) ImageView ivIcon;
+        @BindView(R.id.ivIcon) ImageView ivIcon;
 
         public Holder(View itemView) {
             super(itemView);

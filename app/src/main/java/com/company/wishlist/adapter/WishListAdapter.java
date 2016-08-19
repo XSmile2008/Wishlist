@@ -44,7 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -421,20 +421,20 @@ public class WishListAdapter extends SectionedRecyclerViewAdapter<WishListAdapte
 
     public class Holder extends RecyclerView.ViewHolder implements SwipeLayout.SwipeListener{
 
-        @Bind(R.id.swipe_layout) SwipeLayout swipeLayout;
+        @BindView(R.id.swipe_layout) SwipeLayout swipeLayout;
 
         //CardView
-        @Bind(R.id.card_view) CardView cardView;
-        @Bind(R.id.image_view) ImageView imageView;
-        @Bind(R.id.text_view_title) TextView textViewTitle;
-        @Bind(R.id.text_view_comment) TextView textViewComment;
-        @Bind(R.id.text_view_status) TextView textViewStatus;
+        @BindView(R.id.card_view) CardView cardView;
+        @BindView(R.id.image_view) ImageView imageView;
+        @BindView(R.id.text_view_title) TextView textViewTitle;
+        @BindView(R.id.text_view_comment) TextView textViewComment;
+        @BindView(R.id.text_view_status) TextView textViewStatus;
 
         //Background
-        @Bind(R.id.bottom_view_remove) ViewGroup bottomViewRemove;
-        @Bind(R.id.bottom_view_reserve) ViewGroup bottomViewReserve;
-        @Bind(R.id.button_reserve) Button buttonReserve;
-        @Bind(R.id.button_share) Button buttonShare;
+        @BindView(R.id.bottom_view_remove) ViewGroup bottomViewRemove;
+        @BindView(R.id.bottom_view_reserve) ViewGroup bottomViewReserve;
+        @BindView(R.id.button_reserve) Button buttonReserve;
+        @BindView(R.id.button_share) Button buttonShare;
 
         public Holder(View itemView) {
             super(itemView);

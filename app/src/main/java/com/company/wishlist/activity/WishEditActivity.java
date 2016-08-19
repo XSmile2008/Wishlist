@@ -44,7 +44,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -61,23 +61,23 @@ public class WishEditActivity extends DebugActivity implements Validator.Validat
     public static final String ACTION_CREATE = "com.company.wishlist.ACTION_CREATE";
     public static final String ACTION_TAKE_FROM_TOP = "com.company.wishlist.ACTION_TAKE_FROM_TOP";
 
-    @Bind(R.id.image_view)
+    @BindView(R.id.image_view)
     ImageView mImageView;
 
-    @Bind(R.id.edit_text_title)
+    @BindView(R.id.edit_text_title)
     @NotEmpty
     @Length(min = 1)
     EditText mEditTextTitle;
 
-    @Bind(R.id.edit_text_comment)
+    @BindView(R.id.edit_text_comment)
     @NotEmpty
     @Length(min = 2)
     EditText mEditTextComment;
 
-    @Bind(R.id.coordinator_layout)
+    @BindView(R.id.coordinator_layout)
     CoordinatorLayout mCoordinatorLayout;
 
-    @Bind(R.id.fab)
+    @BindView(R.id.fab)
     FloatingActionButton mFab;
 
     private Menu mMenu;

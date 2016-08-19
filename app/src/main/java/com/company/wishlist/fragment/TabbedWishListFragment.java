@@ -13,7 +13,7 @@ import com.company.wishlist.adapter.WishListPageViewAdapter;
 import com.company.wishlist.model.User;
 import com.company.wishlist.view.CustomViewPager;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -21,8 +21,8 @@ import butterknife.ButterKnife;
  */
 public class TabbedWishListFragment extends Fragment {
 
-    @Bind(R.id.tab_layout) TabLayout mTabLayout;
-    @Bind(R.id.view_pager) CustomViewPager mViewPager;
+    @BindView(R.id.tab_layout) TabLayout mTabLayout;
+    @BindView(R.id.view_pager) CustomViewPager mViewPager;
 
     public static TabbedWishListFragment newInstance(User friend) {
         Bundle args = new Bundle();

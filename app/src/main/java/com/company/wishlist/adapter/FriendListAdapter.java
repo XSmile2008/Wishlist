@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -67,9 +67,9 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Ho
 
     public class Holder extends RecyclerView.ViewHolder {
 
-        @Bind(R.id.friend_avatar_iv)
+        @BindView(R.id.friend_avatar_iv)
         ImageView imageViewAvatar;
-        @Bind(R.id.friend_name_tv)
+        @BindView(R.id.friend_name_tv)
         TextView textViewTitle;
 
         public Holder(View itemView) {
